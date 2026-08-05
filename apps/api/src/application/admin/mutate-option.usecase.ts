@@ -1,5 +1,5 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common'
-import { OptionRepo, type OptionRow } from '../../infra/prisma/admin/option.repo'
+import { OptionRepo, DOC_TYPE_KIND, type OptionRow } from '../../infra/prisma/admin/option.repo'
 
 const empty = () => new BadRequestException({ code: 'InvalidOption', message: 'Giá trị không được rỗng' })
 const dup = () => new ConflictException({ code: 'DuplicateOption', message: 'Giá trị đã tồn tại' })
@@ -27,6 +27,11 @@ export class UpdateOptionUseCase {
   async execute(id: string, patch: { value?: string; active?: boolean }): Promise<OptionRow> {
     const existing = await this.options.findById(id)
     if (!existing) throw new NotFoundException({ code: 'OptionNotFound', message: 'Không tìm thấy giá trị' })
+    // Document Type là ADD-ONLY (hồ sơ cũ lưu text theo loại) — chặn đổi tên/tắt
+    // ở đây, không chỉ ẩn trên UI. Trạm thêm mới đi qua AddDocumentTypeUseCase.
+    if (existing.kind === DOC_TYPE_KIND) {
+      throw new BadRequestException({ code: 'DocTypeImmutable', message: 'Document Type chỉ được thêm mới, không sửa/tắt' })
+    }
 
     const data: { value?: string; active?: boolean } = {}
     if (patch.active !== undefined) data.active = patch.active

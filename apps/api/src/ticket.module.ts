@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { AuthModule } from './http/auth/auth.module'
 import { TransitionTicketUseCase } from './application/core/transition-ticket.usecase'
 import { CreateTicketUseCase } from './application/lifecycle/create-ticket.usecase'
+import { FlowResolver } from './application/lifecycle/flow-resolver'
 import { OptionRepo } from './infra/prisma/admin/option.repo'
 import { CreateFromExistingUseCase } from './application/lifecycle/create-from-existing.usecase'
 import { CancelTicketUseCase } from './application/lifecycle/cancel-ticket.usecase'
@@ -93,6 +94,7 @@ import { DispatchController } from './http/dispatch/dispatch.controller'
   providers: [
     TransitionTicketUseCase,
     CreateTicketUseCase,
+    FlowResolver,
     OptionRepo,
     CreateFromExistingUseCase,
     CancelTicketUseCase,

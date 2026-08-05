@@ -42,6 +42,9 @@ export function BoardCardView({
   // behind the modal/confirm the action pops.
   const detailsRef = useRef<HTMLDetailsElement>(null)
   const closeMenu = () => detailsRef.current?.removeAttribute('open')
+  // Ga ⋯ chỉ render khi có menu/khoá; keyed vào effect bên dưới để listener gắn
+  // lại đúng lúc <details> xuất hiện (thẻ được refetch tại chỗ, không remount).
+  const hasMenu = menu.length > 0 || !!c.lockedBy
 
   // Native <details> chỉ đóng khi bấm lại ⋯ — thêm: mở ra thì click ngoài (hoặc
   // qua thẻ/cột khác) tự đóng. Chỉ gắn listener khi đang mở, tháo khi đóng.
@@ -60,7 +63,7 @@ export function BoardCardView({
       el.removeEventListener('toggle', onToggle)
       document.removeEventListener('pointerdown', onOutside, true)
     }
-  }, [])
+  }, [hasMenu])
   return (
     <article className={`${cls}${selected ? ' picked' : ''}`}>
       <div className="r1">
@@ -106,7 +109,7 @@ export function BoardCardView({
           <span className={PRIO_CLASS[c.priority]}>{prioLabel(c.priority)}</span>
         )}
         <DupBadge hints={c.dupOf ?? []} />
-        {(menu.length > 0 || c.lockedBy) && (
+        {hasMenu && (
         <details ref={detailsRef}>
           <summary className="dots" aria-label={t('board.menu.aria')} aria-busy={busy}>
             <MoreVertical size={16} aria-hidden />

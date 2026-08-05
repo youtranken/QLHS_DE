@@ -20,7 +20,16 @@ export class AddDocumentTypeUseCase {
     if (await this.options.findByValue(DOC_TYPE_KIND, value)) {
       throw new ConflictException({ code: 'DuplicateValue', message: 'Loại hồ sơ này đã tồn tại' })
     }
-    const row = await this.options.createDocType(value, flow)
-    return { value: row.value, flow: row.flow as Flow }
+    try {
+      const row = await this.options.createDocType(value, flow)
+      return { value: row.value, flow: row.flow as Flow }
+    } catch (e) {
+      // Two concurrent adds pass the check-then-act above; the loser hits the
+      // @@unique([kind,value]) constraint (P2002) — surface it as 409, not 500.
+      if ((e as { code?: string })?.code === 'P2002') {
+        throw new ConflictException({ code: 'DuplicateValue', message: 'Loại hồ sơ này đã tồn tại' })
+      }
+      throw e
+    }
   }
 }

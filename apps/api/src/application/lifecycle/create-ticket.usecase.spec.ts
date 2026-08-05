@@ -1,10 +1,12 @@
 import { describe, it, expect, vi } from 'vitest'
 import { CreateTicketUseCase } from './create-ticket.usecase'
+import { FlowResolver } from './flow-resolver'
 
 function make(catalogFlow: string | null) {
   const repo = { create: vi.fn().mockResolvedValue({ id: 't1' }) }
   const options = { flowForDocType: vi.fn().mockResolvedValue(catalogFlow) }
-  return { uc: new CreateTicketUseCase(repo as never, options as never), repo }
+  const flow = new FlowResolver(options as never)
+  return { uc: new CreateTicketUseCase(repo as never, flow), repo }
 }
 
 const fields = (documentType: string) =>

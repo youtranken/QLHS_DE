@@ -15,7 +15,6 @@ import {
 } from '../../../application/core/ticket-errors'
 import { TicketNotFoundError } from '../../../domain/errors'
 import { diffFields, type ApplicantFields } from '../../../domain/ticket/applicant-fields'
-import { mapFlow } from '../../../domain/ticket/document-flow'
 
 export interface CreateTicketInput {
   applicantSub: string
@@ -113,7 +112,7 @@ export class TicketWriteRepo {
    * (`Return-fixing`). Each changed field appends one `field_changed` TicketEvent
    * (B6); status/code are never touched here.
    */
-  async updateFields(id: string, actorSub: string, next: ApplicantFields): Promise<void> {
+  async updateFields(id: string, actorSub: string, next: ApplicantFields, resolvedFlow: Flow): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       const t = await tx.ticket.findFirst({ where: { id, applicantSub: actorSub } })
       if (!t) throw new TicketNotFoundError(id)
@@ -148,7 +147,10 @@ export class TicketWriteRepo {
           // derived `flow` in sync, BUT only while still in Pool (code not minted).
           // Once `code` is minted (G-/CT-…) it's immutable and encodes the flow, so
           // recomputing flow at Return-fixing would desync code↔flow forever.
-          flow: t.code === null ? mapFlow(next.documentType) : t.flow,
+          // `resolvedFlow` comes from the catalog-backed FlowResolver (handles
+          // admin-added types); a bare mapFlow here returned undefined for them,
+          // which Prisma skips → documentType changed but flow stayed stale.
+          flow: t.code === null ? resolvedFlow : t.flow,
           description: next.description,
           paymentTerm: next.paymentTerm,
           contractNo: next.contractNo,

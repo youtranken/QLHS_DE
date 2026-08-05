@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { type DocumentType, type Priority, PRIORITY } from '@qlhs/contracts'
-import { mapFlow } from '../../domain/ticket/document-flow'
 import { cloneFields, type ApplicantFields } from '../../domain/ticket/applicant-fields'
 import { TicketQueryRepo } from '../../infra/prisma/ticket/ticket-query.repo'
 import { TicketWriteRepo } from '../../infra/prisma/ticket/ticket-write.repo'
+import { FlowResolver } from './flow-resolver'
 import { TicketNotFoundError } from '../../domain/errors'
 
 export interface CreateFromExistingRequest {
@@ -21,6 +21,7 @@ export class CreateFromExistingUseCase {
   constructor(
     private readonly repo: TicketQueryRepo,
     private readonly writes: TicketWriteRepo,
+    private readonly flow: FlowResolver,
   ) {}
 
   async execute(req: CreateFromExistingRequest): Promise<{ id: string }> {
@@ -41,7 +42,7 @@ export class CreateFromExistingUseCase {
     })
     return this.writes.create({
       applicantSub: req.applicantSub,
-      flow: mapFlow(fields.documentType),
+      flow: await this.flow.resolve(fields.documentType),
       priority: req.priority ?? PRIORITY.Normal,
       fields,
     })
