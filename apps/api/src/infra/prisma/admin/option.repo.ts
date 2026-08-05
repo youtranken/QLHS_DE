@@ -1,0 +1,68 @@
+import { Injectable } from '@nestjs/common'
+import { PrismaService } from '../prisma.service'
+
+export const OPTION_KINDS = ['paymentTerm', 'projectTeam', 'currency'] as const
+export type OptionKind = (typeof OPTION_KINDS)[number]
+
+export function isOptionKind(k: string): k is OptionKind {
+  return (OPTION_KINDS as readonly string[]).includes(k)
+}
+
+export interface OptionRow {
+  id: string
+  kind: string
+  value: string
+  sortOrder: number
+  active: boolean
+}
+
+/** Admin-managed create-form dropdowns (N3). Values are deactivated, never
+ *  deleted — old tickets keep their string. Sorted by (sortOrder, value). */
+@Injectable()
+export class OptionRepo {
+  constructor(private readonly prisma: PrismaService) {}
+
+  list(kind: string): Promise<OptionRow[]> {
+    return this.prisma.optionItem.findMany({
+      where: { kind },
+      orderBy: [{ sortOrder: 'asc' }, { value: 'asc' }],
+    })
+  }
+
+  listActive(kind: string): Promise<OptionRow[]> {
+    return this.prisma.optionItem.findMany({
+      where: { kind, active: true },
+      orderBy: [{ sortOrder: 'asc' }, { value: 'asc' }],
+    })
+  }
+
+  findByValue(kind: string, value: string): Promise<OptionRow | null> {
+    return this.prisma.optionItem.findUnique({ where: { kind_value: { kind, value } } })
+  }
+
+  findById(id: string): Promise<OptionRow | null> {
+    return this.prisma.optionItem.findUnique({ where: { id } })
+  }
+
+  async create(kind: string, value: string): Promise<OptionRow> {
+    const max = await this.prisma.optionItem.aggregate({ where: { kind }, _max: { sortOrder: true } })
+    return this.prisma.optionItem.create({
+      data: { kind, value, sortOrder: (max._max.sortOrder ?? 0) + 1, active: true },
+    })
+  }
+
+  update(id: string, patch: { value?: string; active?: boolean }): Promise<OptionRow> {
+    return this.prisma.optionItem.update({ where: { id }, data: patch })
+  }
+
+  /** "Đang dùng bởi": tickets whose field equals this value (by kind). */
+  usageCount(kind: string, value: string): Promise<number> {
+    if (kind === 'projectTeam') return this.prisma.ticket.count({ where: { projectTeam: value } })
+    if (kind === 'currency') return this.prisma.ticket.count({ where: { currency: value } })
+    return this.prisma.ticket.count({ where: { paymentTerm: value } })
+  }
+
+  count(kind: string): Promise<number> {
+    return this.prisma.optionItem.count({ where: { kind } })
+  }
+}

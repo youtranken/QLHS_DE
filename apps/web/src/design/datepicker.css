@@ -1,0 +1,212 @@
+/* DatePicker (.dp) — ported from QLTS, mapped to QLHS tokens. */
+/* ---- DatePicker (thay input type=date) ----------------------------------- */
+.dp {
+  position: relative;
+  width: 100%;
+}
+.dp-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  text-align: left;
+}
+.dp-trigger:hover:not(:disabled) {
+  border-color: var(--ink-3);
+}
+.dp.open .dp-trigger {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.dp-trigger:disabled {
+  background: var(--panel-3);
+  color: var(--ink-3);
+  cursor: default;
+}
+.dp-trigger > svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--ink-3);
+}
+.dp-trigger .dp-val {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.dp-trigger .dp-val.ph {
+  color: var(--ink-3);
+}
+.dp-trigger .chev {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  color: var(--ink-3);
+  transition: transform 0.18s;
+}
+.dp.open .dp-trigger .chev {
+  transform: rotate(180deg);
+}
+.dp-clear {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--ink-3);
+  font-size: 11px;
+  cursor: pointer;
+}
+.dp-clear:hover {
+  background: var(--panel-3);
+  color: var(--ink);
+}
+.dp-pop {
+  min-width: 260px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: auto;
+  box-shadow: var(--shadow);
+  z-index: 4000;
+  pointer-events: auto;
+  animation: pickpop 0.13s ease both;
+}
+.dp-head {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #fff;
+}
+.dp-nav {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.24);
+  display: grid;
+  place-items: center;
+  transition: background 0.14s, transform 0.14s;
+}
+.dp-nav:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.4);
+  transform: scale(1.08);
+}
+.dp-nav:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.dp-nav svg {
+  width: 15px;
+  height: 15px;
+}
+.dp-title {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 6px;
+}
+.dp-title:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.dp-body {
+  padding: 10px;
+}
+.dp-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 3px;
+}
+.dp-week span {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--ink-3);
+  padding: 3px 0;
+  text-transform: uppercase;
+}
+.dp-grid {
+  display: grid;
+  gap: 2px;
+}
+.dp-grid.days {
+  grid-template-columns: repeat(7, 1fr);
+}
+.dp-grid.months,
+.dp-grid.years {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+.dp-cell {
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+}
+.dp-grid.days .dp-cell {
+  aspect-ratio: 1;
+  font-size: 11px;
+  font-weight: 600;
+}
+.dp-grid.months .dp-cell,
+.dp-grid.years .dp-cell {
+  padding: 11px 0;
+  font-weight: 700;
+}
+.dp-cell:hover:not(:disabled) {
+  background: var(--panel-3);
+}
+.dp-cell.dim {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.dp-cell.today {
+  background: var(--accent-soft);
+  color: var(--accent-2);
+}
+.dp-cell.sel {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-weight: 800;
+}
+.dp-cell:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+@keyframes pickpop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

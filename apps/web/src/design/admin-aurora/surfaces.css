@@ -1,0 +1,87 @@
+/* Admin · Aurora (Vân Đài) — surfaces (scoped .adminshell) + portalled modal (.aa-*). */
+
+/* ---- content wrapper + section heads ---- */
+.adminshell .aa-content { padding: var(--sp-6) clamp(20px, 2.6vw, 44px) var(--sp-9); max-width: none; width: 100%; }
+.adminshell .sec { margin-bottom: var(--sp-7); }
+.adminshell .sec-head { display: flex; align-items: baseline; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+.adminshell .eyebrow { font-family: var(--sans); font-size: var(--fs-eyebrow); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); font-weight: var(--fw-semibold); }
+.adminshell .sec-title { font-family: var(--display); font-weight: var(--fw-semibold); font-size: var(--fs-lg); letter-spacing: .3px; }
+.adminshell .sec-note { font-size: var(--fs-cap); color: var(--ink-3); margin-left: auto; }
+.adminshell .pagehead h1 { font-family: var(--display); font-weight: var(--fw-semibold); font-size: var(--fs-title); letter-spacing: .3px; margin: 2px 0 0; }
+
+/* ---- card ---- */
+.adminshell .card { position: relative; background: var(--panel); border: 1px solid var(--stroke); border-radius: var(--r-l); box-shadow: inset 0 1px 0 var(--top-hi), var(--shadow); }
+
+/* ---- KPI top accent bar (applies to the live Overview `.kpis .kpi` cards) ---- */
+/* Vietnamese labels read badly in monospace uppercase — use Inter, sentence-case. */
+.adminshell .kpi .lbl { font-family: var(--sans); font-size: var(--fs-cap); font-weight: 500; letter-spacing: normal; text-transform: none; color: var(--ink-3); }
+.adminshell .kpis .kpi { position: relative; overflow: hidden; }
+.adminshell .kpis .kpi::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--aurora); opacity: .9; }
+.adminshell .kpis .kpi.hot::before { background: linear-gradient(90deg, var(--sla), #f43f5e); }
+
+/* ---- KPI (preview markup `.kpi-*`) ---- */
+.adminshell .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-4); }
+.adminshell .kpi { padding: var(--sp-5) var(--sp-5) var(--sp-4); display: flex; flex-direction: column; min-height: 138px; overflow: hidden; }
+.adminshell .kpi-top { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); }
+.adminshell .kpi-label { font-size: var(--fs-cap); color: var(--ink-3); font-weight: var(--fw-medium); }
+.adminshell .kpi-ic { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; border: 1px solid var(--stroke); background: var(--panel-2); color: var(--ink-2); }
+.adminshell .kpi-ic svg { width: 16px; height: 16px; }
+.adminshell .kpi-num { font-family: var(--mono); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums; font-size: var(--fs-num-lg); line-height: 1; letter-spacing: -1px; margin-top: auto; }
+.adminshell .kpi-sub { font-size: var(--fs-mini); color: var(--ink-3); margin-top: var(--sp-2); }
+.adminshell .kpi-accent { position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--aurora); opacity: .9; }
+.adminshell .kpi.danger .kpi-num { color: var(--sla); }
+.adminshell .kpi.danger .kpi-ic { color: var(--sla); border-color: rgba(251,113,133,.3); background: var(--sla-bg); }
+.adminshell .kpi.danger .kpi-accent { background: linear-gradient(90deg, var(--sla), #f43f5e); }
+.adminshell .delta { display: inline-flex; align-items: center; gap: 3px; font-family: var(--mono); font-size: var(--fs-mini); font-weight: var(--fw-semibold); padding: 2px 7px; border-radius: var(--r-pill); }
+.adminshell .delta.up { color: var(--done); background: var(--done-soft); }
+.adminshell .delta.down { color: var(--sla); background: var(--sla-bg); }
+.adminshell .delta svg { width: 12px; height: 12px; }
+
+/* ---- meters + flow badges ---- */
+.adminshell .meter { height: 8px; border-radius: var(--r-pill); background: var(--track); overflow: hidden; }
+.adminshell .meter > span { display: block; height: 100%; border-radius: inherit; }
+.adminshell .meter.a > span { background: var(--grad-general); }
+.adminshell .meter.b > span { background: var(--grad-contract); }
+.adminshell .meter.c > span { background: var(--grad-payment); }
+.adminshell .flow-badge { width: 36px; height: 36px; border-radius: var(--r-sm); flex: none; display: grid; place-items: center; font-family: var(--display); font-weight: var(--fw-bold); font-size: var(--fs-sm); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.3); }
+.adminshell .flow-badge.a { background: linear-gradient(135deg, #2dd4bf, #14b8a6); }
+.adminshell .flow-badge.b { background: linear-gradient(135deg, #60a5fa, #38bdf8); }
+.adminshell .flow-badge.c { background: linear-gradient(135deg, #a78bfa, #8b5cf6); }
+
+/* ---- table (collapses to cards ≤680px) ---- */
+.adminshell .tbl-toolbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.adminshell .table-card { padding: 6px; overflow: hidden; }
+.adminshell table.tbl { width: 100%; border-collapse: collapse; }
+.adminshell .tbl thead th { text-align: left; font-family: var(--sans); font-size: var(--fs-eyebrow); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); font-weight: var(--fw-semibold); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--stroke); }
+.adminshell .tbl tbody td { padding: 14px var(--sp-4); font-size: var(--fs-body); border-bottom: 1px solid var(--hairline); vertical-align: middle; }
+.adminshell .tbl tbody tr:last-child td { border-bottom: 0; }
+.adminshell .tbl tbody tr { transition: background var(--dur-fast); }
+.adminshell .tbl tbody tr:hover { background: var(--panel-2); }
+.adminshell .ord { font-family: var(--mono); font-weight: var(--fw-semibold); color: var(--ink-3); }
+.adminshell .row-menu { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; border: 1px solid transparent; background: transparent; color: var(--ink-3); cursor: pointer; transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast); }
+.adminshell .row-menu:hover { background: var(--panel-2); color: var(--ink); border-color: var(--stroke); }
+.adminshell .row-menu svg { width: 18px; height: 18px; }
+
+/* ---- segmented tabs (Radix Tabs list styled here) ---- */
+.adminshell .segmented { display: inline-flex; padding: var(--sp-1); gap: var(--sp-1); background: var(--panel-2); border: 1px solid var(--stroke); border-radius: var(--r-md); }
+.adminshell .seg { border: 0; background: transparent; cursor: pointer; font: inherit; font-size: var(--fs-sm); font-weight: var(--fw-medium); color: var(--ink-3); padding: 6px 14px; border-radius: var(--r-xs); transition: color var(--dur-fast), background var(--dur-fast); }
+.adminshell .seg:hover { color: var(--ink); }
+.adminshell .seg[data-state='active'], .adminshell .seg.active { color: var(--ink); background: var(--panel); box-shadow: inset 0 0 0 1px var(--stroke-strong), 0 4px 12px -8px rgba(0,0,0,.6); }
+
+/* ---- empty state ---- */
+.adminshell .empty { padding: var(--sp-8) var(--sp-6); display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; }
+.adminshell .empty-ic { width: 56px; height: 56px; border-radius: 50%; margin-bottom: var(--sp-2); display: grid; place-items: center; background: var(--aurora-soft); color: var(--accent); }
+.adminshell .empty-ic svg { width: 26px; height: 26px; }
+.adminshell .empty-title { font-family: var(--display); font-weight: var(--fw-semibold); font-size: var(--fs-num-sm); }
+.adminshell .empty-help { font-size: var(--fs-sm); color: var(--ink-3); max-width: 300px; }
+.adminshell .empty .btn { margin-top: var(--sp-3); }
+
+/* ---- portalled MODAL (Radix Dialog; content carries .aa-scope for tokens) ---- */
+.aa-overlay { position: fixed; inset: 0; z-index: var(--z-overlay); background: rgba(2,10,6,.62); backdrop-filter: blur(4px); display: grid; place-items: center; padding: var(--sp-5); }
+.aa-modal { width: 100%; max-width: 440px; background: var(--panel); border: 1px solid var(--stroke-strong); border-radius: var(--r-xl); box-shadow: inset 0 1px 0 var(--top-hi), 0 40px 80px -30px rgba(0,0,0,.8); overflow: hidden; }
+.aa-modal-accent { height: 3px; background: var(--aurora); }
+.aa-modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-5) 22px 6px; }
+.aa-modal-title { font-family: var(--display); font-weight: var(--fw-semibold); font-size: var(--fs-lg); color: var(--ink); }
+.aa-modal-sub { font-size: var(--fs-cap); color: var(--ink-3); margin-top: 2px; }
+.aa-modal-body { padding: var(--sp-3) 22px var(--sp-1); display: flex; flex-direction: column; gap: var(--sp-4); }
+.aa-modal-foot { display: flex; justify-content: flex-end; gap: var(--sp-3); padding: var(--sp-4) 22px 22px; }

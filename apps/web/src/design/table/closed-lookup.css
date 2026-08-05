@@ -1,0 +1,353 @@
+/* ===== Tra cứu hồ sơ đóng (FR-17) — header nén (nút back + tiêu đề), form LỌC 1
+   HÀNG (3 ô + khoảng ngày + Tìm kiếm), date picker tự vẽ, bảng kết quả. ===== */
+
+/* header: nút back dạng icon + tiêu đề trên một hàng gọn (nhường chỗ cho bảng) */
+.closedhead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 2px 14px;
+}
+.closedhead h1 {
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+.backchip {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s, transform 0.06s;
+}
+.backchip svg {
+  width: 18px;
+  height: 18px;
+}
+.backchip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.backchip:active {
+  transform: translateY(1px);
+}
+
+/* form lọc: một hàng — 3 ô text + khoảng ngày + Xóa lọc + Tìm kiếm (wrap khi hẹp) */
+.searchpanel .filterrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+}
+.filterrow > input {
+  flex: 1 1 150px;
+  min-width: 130px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.filterrow > input.mono {
+  font-family: var(--mono);
+}
+.filterrow > input::placeholder {
+  color: var(--ink-3);
+}
+.filterrow > input:hover {
+  border-color: var(--ink-3);
+}
+.filterrow > input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent);
+}
+.filterrow .btn {
+  flex: none;
+}
+
+/* khoảng ngày: hàng ngang chứa 2 ô DateField tự vẽ + mũi tên */
+.dr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 230px;
+  min-width: 210px;
+}
+.dr .arr {
+  font-family: var(--mono);
+  color: var(--ink-3);
+  flex: none;
+  font-size: 12px;
+}
+/* Màn rất hẹp (≤400px): 2 ô ngày xếp dọc thay vì chen ngang, mũi tên quay xuống. */
+@media (max-width: 400px) {
+  .dr {
+    flex-direction: column;
+    align-items: stretch;
+    flex-basis: 100%;
+  }
+  .dr .arr {
+    align-self: center;
+    transform: rotate(90deg);
+  }
+}
+
+/* ===== DateField tự vẽ (dd/mm/yyyy + lịch popup theo theme) ===== */
+.datefield {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.datetrig {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.datetrig svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  color: var(--ink-3);
+}
+.datetrig.has {
+  color: var(--ink);
+}
+.datetrig.has svg {
+  color: var(--accent);
+}
+.datetrig:hover {
+  border-color: var(--ink-3);
+}
+.datetrig:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent);
+}
+.dateclr {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--panel-3);
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+.dateclr:hover {
+  background: var(--sla-bg);
+  color: var(--sla);
+}
+.datepop {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 244px;
+  padding: 10px;
+  border-radius: var(--r-m);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.dp-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.dp-hd button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink-2);
+  line-height: 1;
+  cursor: pointer;
+}
+.dp-hd button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.dp-wd,
+.dp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.dp-wd {
+  margin-bottom: 4px;
+}
+.dp-wd span {
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--ink-3);
+  padding: 2px 0;
+}
+.dp-day {
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--ink-2);
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.dp-day:hover {
+  background: var(--panel-2);
+  color: var(--ink);
+}
+.dp-day.on {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+/* thanh kết quả: đếm bên trái · chip luồng bên phải */
+.resultbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 16px 2px 12px;
+}
+.resultbar .count {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.resultbar .chips {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+/* Xuất CSV: đẩy về mép phải (auto nuốt khoảng trống khi không có chips lọc). */
+.resultbar .exportcsv {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.resultbar .exportcsv svg {
+  width: 15px;
+  height: 15px;
+}
+.resultbar .chips ~ .exportcsv {
+  margin-left: 0;
+}
+
+/* ===== bảng kết quả ===== */
+.tbl .who2 {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.tbl .who2 .sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+}
+.tbl .vi {
+  display: block;
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+.tbl .nul {
+  color: var(--ink-3);
+}
+.tbl .mono {
+  font-family: var(--mono);
+}
+.closedtbl tbody tr {
+  transition: background 0.12s;
+}
+.closedtbl tbody tr:hover td {
+  background: var(--panel-2);
+}
+.closedtbl tbody tr:last-child td {
+  border-bottom: 0;
+}
+.closedtbl th.num,
+.closedtbl td.num {
+  text-align: right;
+}
+.closedtbl td.num {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.closedtbl td.num .u {
+  color: var(--ink-3);
+  font-size: 9.5px;
+  margin-left: 2px;
+}
+.closedtbl .code {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--accent);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.closedtbl .code:hover {
+  text-decoration: underline;
+}
+.closedtbl td.act .btn {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Load-more row for the paginated closed archive */
+.loadmore {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0 8px;
+}

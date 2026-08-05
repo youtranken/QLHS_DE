@@ -1,0 +1,226 @@
+/* FR-8 bulk-select + FR-1 priority picker on the DCC1 board. Kept out of
+   board.css (already at the 300-line ceiling) — one responsibility per file. */
+
+/* Thanh hành-động-hàng-loạt: hiện khi chọn ≥1 hồ sơ ở ga "Submitted to VP Andy" */
+.bulkbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+  padding: 9px 14px;
+  background: color-mix(in srgb, var(--accent) 14%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 10px;
+  box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.5);
+}
+.bulkbar .bulkcount {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+}
+.bulkbar .bulkacts {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.bulkbar .btn {
+  padding: 7px 12px;
+  font-size: 12.5px;
+  border-radius: 8px;
+}
+
+/* Nút thu gọn bản đồ tuyến (đưa bảng trạm lên trên khi cần). Chip nhất quán với
+   .chiptoggle: có icon + chevron xoay theo trạng thái, target đủ lớn cho cảm ứng. */
+.dcc-home .maptoggle {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+.dcc-home .maptoggle .maptoggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 6px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-s);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.dcc-home .maptoggle .maptoggle-btn:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+.dcc-home .maptoggle .maptoggle-btn .mapicn {
+  flex: none;
+  color: var(--accent);
+}
+.dcc-home .maptoggle .maptoggle-btn .chev {
+  flex: none;
+  color: var(--ink-3);
+  transition: transform 0.18s ease;
+}
+/* Bản đồ đang hiện → chevron chỉ lên (bấm nữa là thu gọn); ẩn → chỉ xuống. */
+.dcc-home .maptoggle .maptoggle-btn[aria-expanded='true'] .chev {
+  transform: rotate(180deg);
+}
+
+/* Màn hẹp: kéo dài full-width để target cảm ứng lớn hơn (WCAG 2.5.5). */
+@media (max-width: 560px) {
+  .dcc-home .maptoggle {
+    justify-content: stretch;
+  }
+  .dcc-home .maptoggle .maptoggle-btn {
+    flex: 1;
+    justify-content: center;
+    min-height: 40px;
+  }
+}
+
+/* Hàng lọc board: nhóm chip tuyến (DCC1) + nhóm chip ưu tiên (mọi DCC) */
+.boardfilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  margin: 0 2px 12px;
+}
+.boardfilters .fgrp {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+/* Nhóm "bộ lọc đã lưu" (FR #9) tách sang phải bằng một vạch mảnh */
+.boardfilters .fgrp.views {
+  margin-left: auto;
+  padding-left: 16px;
+  border-left: 1px solid var(--line);
+}
+.boardfilters .addview {
+  border-style: dashed;
+}
+/* chip bộ lọc đã lưu = [áp dụng | ✕] gộp trong một viên bo tròn */
+.boardfilters .viewchip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.boardfilters .viewchip.on {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.boardfilters .viewchip .apply {
+  padding: 5px 4px 5px 11px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.boardfilters .viewchip.on .apply {
+  color: var(--accent);
+}
+.boardfilters .viewchip .del {
+  display: grid;
+  place-items: center;
+  padding: 0 8px 0 4px;
+  color: var(--ink-3);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.boardfilters .viewchip .del:hover {
+  color: var(--sla);
+}
+.boardfilters .viewsave {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.boardfilters .viewsave input {
+  width: 130px;
+  padding: 5px 9px;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink);
+}
+.boardfilters .viewsave input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Nút lọc nhanh "Chỉ quá hạn" ở đầu bảng (power-user) */
+.boardhead .chiptoggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.boardhead .chiptoggle:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+.boardhead .chiptoggle.on {
+  color: var(--sla);
+  background: color-mix(in srgb, var(--sla) 14%, transparent);
+  border-color: color-mix(in srgb, var(--sla) 45%, transparent);
+}
+
+/* Ô chọn trên thẻ + trạng thái đã-chọn */
+.tcard .bulksel {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.tcard.picked {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Picker ưu tiên trong menu ⋯ (FR-1) */
+.cardmenu .priopick {
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+  padding-top: 4px;
+  display: flex;
+  flex-direction: column;
+}
+.cardmenu .priopick .phead {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  padding: 4px 10px 2px;
+}
+.cardmenu .priopick button[aria-current='true'] {
+  color: var(--accent);
+  font-weight: 700;
+}
+.cardmenu .priopick button[aria-current='true']::after {
+  content: ' ✓';
+}

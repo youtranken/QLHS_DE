@@ -1,0 +1,5 @@
+/* Admin redesign · Vân Đài / Aurora (Vân Đài) — component kit barrel.
+   All rules scoped under `.adminshell` (see the individual files). Ported from
+   design-previews/admin-aurora/_SPEC-aurora.md §2. */
+@import './controls.css';
+@import './surfaces.css';

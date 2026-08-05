@@ -1,0 +1,301 @@
+/* Line-map (SIGNATURE), filter bar, station popover. (MASTER-prototype) */
+
+/* DCC home stacks the line-map + workbox, both intentionally wider than the screen
+   and scrolling internally (overflow-x:auto). As grid children they default to
+   min-width:auto and would stretch the page instead — pin min-width:0 so their own
+   horizontal scroll engages (fixes body h-scroll on phones and sub-1590px laptops). */
+.dcc-home {
+  display: grid;
+  gap: 8px;
+}
+.dcc-home > * {
+  min-width: 0;
+}
+
+.board {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 4px 8px 12px;
+  overflow-x: auto;
+  margin-bottom: 14px;
+}
+.line {
+  display: flex;
+  align-items: center;
+  padding: 18px 10px;
+  border-bottom: 1px dashed var(--line-soft);
+  min-width: 900px;
+}
+.line:last-child {
+  border-bottom: none;
+}
+.lbl {
+  width: 130px;
+  flex: 0 0 130px;
+}
+.lbl .nm {
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.lbl .nm i {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+}
+.lbl .ct {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin-top: 3px;
+}
+.contract .lbl .nm i {
+  background: var(--contract);
+}
+.payment .lbl .nm i {
+  background: var(--payment);
+}
+.general .lbl .nm i {
+  background: var(--general);
+}
+.rail {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.contract .rail {
+  --rc: var(--rail-contract);
+}
+.payment .rail {
+  --rc: var(--rail-payment);
+}
+.general .rail {
+  --rc: var(--rail-general);
+}
+.stn {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 74px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.stn::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  left: -50%;
+  width: 100%;
+  height: 3px;
+  background: var(--rc, var(--line));
+}
+.stn:first-child::before {
+  display: none;
+}
+.node {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  border: 2px solid var(--line);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.stn:hover .node {
+  filter: brightness(1.18);
+}
+.contract .node.load {
+  background: var(--contract);
+  border-color: var(--contract);
+  color: #fff;
+}
+.payment .node.load {
+  background: var(--payment);
+  border-color: var(--payment);
+  color: #fff;
+}
+.general .node.load {
+  background: var(--general);
+  border-color: var(--general);
+  color: #06201d;
+}
+.node.owned {
+  box-shadow: 0 0 0 3px var(--accent);
+}
+.node.hot {
+  border-color: var(--sla);
+}
+.stn .flag {
+  position: absolute;
+  top: -13px;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  background: var(--sla-bg);
+  color: var(--sla);
+  border: 1px solid var(--sla);
+  border-radius: 5px;
+  padding: 1px 4px;
+  z-index: 3;
+}
+.snm {
+  /* Vietnamese station names — sans + 10px (was mono 9px, hard to read). */
+  font-family: var(--sans);
+  font-size: 10px;
+  color: var(--ink-3);
+  margin-top: 9px;
+  text-align: center;
+  line-height: 1.3;
+  max-width: 80px;
+}
+.snm.own {
+  color: var(--accent);
+}
+.legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 10px 12px 2px;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+.legend .ring {
+  box-shadow: 0 0 0 2px var(--accent);
+  border: 1px solid var(--line);
+}
+
+/* filter bar */
+.fbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 2px 12px;
+  flex-wrap: wrap;
+}
+.fsearch {
+  font-family: var(--sans);
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  min-width: 230px;
+}
+.fchip {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.fchip.on {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+.fchip.hot {
+  color: var(--sla);
+}
+.donetoggle {
+  margin-left: auto;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-2);
+}
+
+/* station popover */
+.stnpop {
+  width: 252px;
+  background: var(--panel);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin: 6px 2px 14px;
+}
+.stnpop .ph {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.stnpop .ph .n {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+}
+.stnpop .pl {
+  max-height: 230px;
+  overflow: auto;
+  padding: 6px;
+}
+.stnpop .pi {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+}
+.stnpop .pi:hover {
+  background: var(--panel-2);
+}
+.stnpop .pi .c {
+  font-family: var(--mono);
+  color: var(--accent);
+  font-weight: 600;
+}
+.stnpop .pi .p2 {
+  flex: 1;
+  color: var(--ink-2);
+  margin-left: 8px;
+}
+.stnpop .pi .s {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--sla);
+  font-weight: 700;
+}
+.stnpop .pf {
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}

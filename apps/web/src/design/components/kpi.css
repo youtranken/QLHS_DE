@@ -1,0 +1,75 @@
+/* ===== KPI stat tiles ===== (spacing + cỡ chữ dùng token sp/fs) */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+.kpi {
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-m);
+  padding: var(--sp-3) var(--sp-4);
+  box-shadow: var(--elev-1);
+  position: relative;
+  overflow: hidden;
+}
+.kpi .lbl {
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.kpi .val {
+  font-family: var(--display);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 2px;
+  line-height: 1.15;
+}
+.kpi .val small {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink-3);
+  margin-left: var(--sp-1);
+  font-family: var(--sans);
+}
+.kpi .sub2 {
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+}
+.kpi .sub2 .warn {
+  color: var(--sla);
+  font-weight: 700;
+}
+.kpi.hot {
+  border-color: color-mix(in srgb, var(--sla) 55%, var(--line-soft));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--sla-bg) 60%, var(--panel)), var(--panel));
+}
+.kpi.hot .val {
+  color: var(--sla);
+}
+/* KPI dạng link/nút: pop nhẹ khi hover */
+a.kpi,
+button.kpi {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  text-decoration: none;
+  color: var(--ink);
+  transition:
+    transform 0.12s ease-out,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+a.kpi:hover,
+button.kpi:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: var(--elev-1), var(--glow-accent);
+}

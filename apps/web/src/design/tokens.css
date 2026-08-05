@@ -1,0 +1,181 @@
+/* Design tokens v2 — "Phòng điều độ ban đêm" (SPEC design-previews/_SPEC.md §3).
+   DARK mặc định, LIGHT ngang hàng qua [data-theme="light"]. Semantic
+   (SLA/ưu tiên/completed) cố định cả 2 theme. Giữ TÊN token cũ để trang chưa
+   port không vỡ; token mới (--display, --hairline, --grad-*, --glow-*, --elev-*…)
+   là phần bổ sung. */
+:root {
+  --sans: 'Inter', system-ui, 'Segoe UI', sans-serif;
+  /* Headings in Inter (same as admin) — Chakra Petch read as harsh/ugly. */
+  --display: 'Inter', system-ui, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', 'Cascadia Code', ui-monospace, Consolas, monospace;
+
+  /* DARK (default) */
+  --bg: #0a111c;
+  --bg-2: #0e1622;
+  --panel: #121c2b;
+  --panel-2: #162233;
+  --panel-3: #1b2a3f;
+  --line: #243550;
+  --line-soft: #1c2a3e;
+  --hairline: rgba(140, 180, 235, 0.09);
+  --ink: #e9f1fc;
+  --ink-2: #9fb3c9;
+  /* Lifted from #67809c (~4.1:1 on --panel — failed AA for 10-11px captions).
+     #8 da bit lighter → ≈6:1 on the dark panels where it's used most. */
+  --ink-3: #8ea3bd;
+  --accent: #4aa3ff;
+  --accent-2: #7cc0ff;
+  --accent-soft: #14304f;
+  --on-accent: #071322;
+  --contract: #3b8ef0;
+  --payment: #a78bfa;
+  --general: #2dd4bf;
+  --rail-contract: #16385f;
+  --rail-payment: #31285e;
+  --rail-general: #0f3d3b;
+  --by-d2-bg: #31285e;
+  /* semantic — fixed across themes */
+  --sla: #f4776b;
+  --sla-bg: #3a1b18;
+  --urgent: #f16a5e;
+  --urgent-soft: #3a1b18;
+  --rush: #e9a24e;
+  --rush-soft: #33280f;
+  --done: #5fc98c;
+  --done-soft: #123726;
+  --grad-contract: linear-gradient(90deg, #2f7ad6, #5da8ff);
+  --grad-payment: linear-gradient(90deg, #8a63f0, #b899ff);
+  --grad-general: linear-gradient(90deg, #17b3a0, #4fe0cc);
+  --glow-accent: 0 0 0 1px rgba(74, 163, 255, 0.35), 0 0 18px rgba(74, 163, 255, 0.22);
+  --glow-sla: 0 0 0 1px rgba(244, 119, 107, 0.4), 0 0 16px rgba(244, 119, 107, 0.25);
+  --elev-1: 0 1px 0 var(--hairline) inset, 0 8px 24px rgba(2, 8, 18, 0.35);
+  --elev-2: 0 1px 0 var(--hairline) inset, 0 16px 44px rgba(2, 8, 18, 0.5);
+  --grid-dot: rgba(120, 160, 215, 0.055);
+  --shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  --r-s: 8px;
+  --r-m: 12px;
+  --r-l: 16px;
+  --topbar-h: 52px;
+  /* THANG spacing + cỡ chữ — NGUỒN DUY NHẤT ở đây. (Trước bị định nghĩa LẶP ở
+     admin-aurora/tokens.css với giá trị khác → xung đột global; đã gộp về đây,
+     giá trị = bản aurora đang hiệu lực để không đổi giao diện.) --fs-xs là cỡ
+     NHỎ NHẤT cho nhãn (11px — bỏ 9.5/10.5px khó đọc). */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 30px;
+  --sp-8: 40px;
+  --sp-9: 56px;
+  --fs-xs: 11px;
+  --fs-eyebrow: 10.5px;
+  --fs-mini: 11.5px;
+  --fs-cap: 12px;
+  --fs-sm: 13px;
+  --fs-base: 13.5px;
+  --fs-body: 13.5px;
+  --fs-md: 14px;
+  --fs-lg: 16px;
+  --fs-title: 20px;
+  --fs-num-sm: 15px;
+  --fs-xl: 22px;
+  --fs-2xl: 28px;
+  --fs-3xl: 32px;
+  --fs-num-lg: 42px;
+}
+
+/* LIGHT · warm paper (giống admin — bớt chói/lạnh so với trắng xanh cũ). */
+:root[data-theme='light'] {
+  --bg: #f1efe9;
+  --bg-2: #f7f5f0;
+  --panel: #fcfbf8;
+  --panel-2: #f2efe8;
+  --panel-3: #eae5db;
+  --line: #e2dbcc;
+  --line-soft: #ece7dc;
+  --hairline: rgba(60, 50, 35, 0.07);
+  --ink: #262219;
+  --ink-2: #514c40;
+  /* Darkened from #7c7666 → ≥4.5:1 on the light paper for small captions. */
+  --ink-3: #6a6455;
+  --accent: #2f6bff;
+  --accent-2: #5a86ff;
+  --accent-soft: #e7ecfb;
+  --on-accent: #ffffff;
+  --contract: #2f6bff;
+  --payment: #7c3aed;
+  --general: #0d9488;
+  --rail-contract: #dfe7fb;
+  --rail-payment: #ece2fb;
+  --rail-general: #d6ede9;
+  --by-d2-bg: #ece2fb;
+  --sla: #c02718;
+  --sla-bg: #f8e3dc;
+  --urgent: #9c1a14;
+  --urgent-soft: #f8e3dc;
+  --rush: #b25a0b;
+  --rush-soft: #f7ecd6;
+  --done: #17663f;
+  --done-soft: #dcefe0;
+  --grad-contract: linear-gradient(90deg, #2f6bff, #5a95f5);
+  --grad-payment: linear-gradient(90deg, #6d32d9, #9a6ef2);
+  --grad-general: linear-gradient(90deg, #0b8a7e, #2fbfae);
+  --glow-accent: 0 0 0 1px rgba(47, 107, 255, 0.26), 0 0 14px rgba(47, 107, 255, 0.14);
+  --glow-sla: 0 0 0 1px rgba(192, 39, 24, 0.3), 0 0 12px rgba(192, 39, 24, 0.16);
+  --elev-1: 0 1px 0 #fff inset, 0 6px 18px rgba(82, 66, 42, 0.1);
+  --elev-2: 0 1px 0 #fff inset, 0 14px 36px rgba(82, 66, 42, 0.16);
+  --grid-dot: rgba(120, 95, 45, 0.05);
+  --shadow: 0 24px 60px rgba(82, 66, 42, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+}
+body {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--bg);
+  overflow-x: hidden;
+  background-image: radial-gradient(var(--grid-dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+  -webkit-font-smoothing: antialiased;
+}
+.mono {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.accent {
+  color: var(--accent);
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+input,
+select,
+textarea {
+  font-family: inherit;
+  color: inherit;
+}
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

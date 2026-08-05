@@ -1,0 +1,65 @@
+# Third-party skills installed via `npx skills` — không commit vào repo chung
+.claude/skills/find-skills/
+.claude/skills/ui-ux-pro-max/
+
+# Dependencies & build output
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Env & secrets (NFR — không commit giá trị thật)
+.env
+.env.*
+!.env.example
+
+# TLS certs / private keys — NEVER commit
+pmh.com.vn/
+*.pem
+*.pfx
+*.key
+
+# Prisma
+apps/api/prisma/*.db
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vite/
+
+# Playwright MCP session artifacts (screenshots, console logs)
+.playwright-mcp/
+
+# Generated knowledge graph (graphify skill) + design scratch images
+graphify-out/
+/Img/
+*.jfif
+
+# Postgres backups (1.5) — dated dumps live here, never committed (contain all
+# data + the immutable audit). Scripts live in ops/backup and ARE committed.
+/data-backups/
+/backups/
+
+# Local test-account cheat-sheet (contains passwords)
+TEST-ACCOUNTS.md
+
+# Ad-hoc screenshots dropped at repo root during UI review sessions
+/*.png
+
+# Playwright e2e (3.1) artefacts
+apps/web/test-results/
+apps/web/playwright-report/
+apps/web/blob-report/
+apps/web/.playwright/
+
+# vbsec security scan reports (may contain finding excerpts)
+vbsec-reports/
+
+# Artifact/tooling — không thuộc source code (giữ local, không đẩy GitHub)
+.claude/
+_bmad/
+_bmad-output/
+design-previews/
+skills-lock.json
+apps/web/public/mockup/

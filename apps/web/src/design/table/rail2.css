@@ -1,0 +1,103 @@
+/* horizontal mini metro inside an expanded applicant row */
+.rail2 {
+  display: flex;
+  align-items: flex-start;
+  padding: 0 8px;
+  overflow-x: auto;
+}
+.st2 {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 64px;
+  text-align: center;
+}
+.st2::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: -50%;
+  width: 100%;
+  height: 2px;
+  background: var(--line);
+}
+.st2:first-child::before {
+  display: none;
+}
+/* Light the segment leading INTO the current node too — the ticket has arrived
+   there ("Đang ở đây"), so the lit rail must reach it, not stop one node short
+   (else e.g. a Payment ticket shows the badge on Completed but the line parked on
+   Received by DCC3). Mirrors the vertical detail timeline, which lights the
+   connector out of each past node. */
+.st2.past::before,
+.st2.now::before {
+  background: var(--accent);
+}
+.st2 .nd {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 2.5px solid var(--line);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  font-size: 8px;
+  color: #fff;
+}
+.st2.past .nd {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.st2.past .nd::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><path d='M20 6 9 17l-5-5'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><path d='M20 6 9 17l-5-5'/></svg>") center / contain no-repeat;
+}
+.st2.now .nd {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.st2.now .nd::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.st2.next .nd {
+  opacity: 0.5;
+}
+.st2 .lb {
+  font-size: 10px;
+  font-weight: 600;
+  margin-top: 5px;
+}
+.st2.next .lb {
+  color: var(--ink-3);
+  font-weight: 400;
+}
+.st2 .here {
+  margin-top: 4px;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--on-accent);
+  background: var(--accent);
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+.st2 .hold {
+  font-size: 9px;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+.empty-note {
+  font-size: 13px;
+  color: var(--ink-2);
+}

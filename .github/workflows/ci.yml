@@ -1,0 +1,128 @@
+name: CI
+
+# Every push and every PR. The three checks run in parallel so a failure points
+# straight at the dimension that broke — lint, types, or a failing test — instead
+# of one long log you have to read to the end.
+on:
+  push:
+  pull_request:
+
+# A new push to the same branch cancels the in-flight run — no point finishing a
+# check on code that has already been replaced.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      # contracts resolves to its built dist for anything outside the test alias.
+      - run: pnpm --filter @qlhs/contracts build
+      - run: pnpm lint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm --filter @qlhs/contracts build
+      # tsc on the API needs the generated Prisma client types.
+      - run: pnpm --filter @qlhs/api exec prisma generate
+      - run: pnpm typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    # Same Postgres major as prod/dev (docker-compose), on the port the test
+    # suite hard-codes (:5432). The app connects as the restricted qlhs_app role;
+    # migrations below run as the owner, exactly like local dev.
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: qlhs
+          POSTGRES_PASSWORD: qlhs
+          POSTGRES_DB: qlhs
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U qlhs -d qlhs"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm --filter @qlhs/contracts build
+      - run: pnpm --filter @qlhs/api exec prisma generate
+
+      # As the OWNER: this creates the qlhs_app role + grants, the append-only
+      # triggers, and the seeded SLA baseline the integration tests read. The
+      # tests themselves connect as qlhs_app (vitest config), so append-only is
+      # genuinely enforced during the run — not bypassed by a superuser.
+      - name: Apply migrations (as DB owner)
+        run: pnpm --filter @qlhs/api exec prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://qlhs:qlhs@localhost:5432/qlhs?schema=public
+
+      # Root `test` = API/domain (Postgres) then web (jsdom). All other env —
+      # the qlhs_app URL, DEV_AUTH, TZ=UTC, disabled crons — is pinned in
+      # vitest.config.ts, so CI and a laptop run the identical suite.
+      - run: pnpm test
+
+  # 3.1 — browser e2e for the 3 golden journeys (General full loop · Contract every
+  # station · Payment hitting a Return). Playwright starts the API (built) + web
+  # (vite dev, forced HTTP on :5273) itself and drives real clicks; the throwaway
+  # data lives in the fresh CI `qlhs` DB, reset between tests as the owner.
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: qlhs
+          POSTGRES_PASSWORD: qlhs
+          POSTGRES_DB: qlhs
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U qlhs -d qlhs"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm --filter @qlhs/contracts build
+      - run: pnpm --filter @qlhs/api exec prisma generate
+
+      - name: Apply migrations (as DB owner)
+        run: pnpm --filter @qlhs/api exec prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://qlhs:qlhs@localhost:5432/qlhs?schema=public
+
+      - run: pnpm --filter @qlhs/api build
+      - name: Install Playwright browser
+        run: pnpm --filter @qlhs/web exec playwright install --with-deps chromium
+
+      - name: Golden-journey e2e
+        run: pnpm --filter @qlhs/web e2e
+        env:
+          # Fresh CI DB — no dev data to protect, so the journeys run against qlhs
+          # directly (app as qlhs_app, reset as owner qlhs).
+          E2E_APP_DB_URL: postgresql://qlhs_app:qlhs_app@localhost:5432/qlhs?schema=public
+          E2E_OWNER_DB_URL: postgresql://qlhs:qlhs@localhost:5432/qlhs
+
+      - name: Upload Playwright trace on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          # traces + screenshots (the reporter is github/list, no HTML report is built)
+          name: e2e-failure-traces
+          path: apps/web/test-results
+          retention-days: 7

@@ -1,0 +1,50 @@
+/** Ops analytics: throughput chart, return rates, dwell heatmap, top overdue. */
+export const adminAnalytics = {
+  ariaLabel: 'Analytics quản lý',
+  title: 'Phân tích vận hành',
+  exportAria: 'Xuất toàn bộ nhật ký ra CSV',
+  exportCsv: 'Xuất CSV',
+  loadError: 'Không tải được số liệu — thử lại sau.',
+  loading: 'Đang tính số liệu…',
+  /** VI display name per canonical flow (fallback: raw flow). */
+  flows: {
+    General: 'Tổng hợp',
+    Contract: 'Hợp đồng',
+    Payment: 'Thanh toán',
+  } as Record<string, string>,
+  throughput: {
+    aria: 'Throughput theo kỳ',
+    title: 'Tạo mới ↔ hoàn tất theo kỳ',
+    granularityAria: 'Đơn vị kỳ',
+    week: 'Tuần',
+    month: 'Tháng',
+    legendIn: 'Tạo mới',
+    legendOut: 'Hoàn tất',
+    chartAria: 'Hồ sơ tạo mới và hoàn tất theo kỳ',
+    empty: 'Chưa có dữ liệu trong kỳ.',
+    createdTitle: '{n} tạo mới',
+    completedTitle: '{n} hoàn tất',
+  },
+  returns: {
+    title: 'Tỷ lệ trả lại theo luồng',
+    note: 'thấp hơn = tốt hơn',
+  },
+  dwell: {
+    aria: 'Nơi hồ sơ đọng lâu nhất',
+    title: 'Nơi hồ sơ đọng (ngày TB / ga)',
+    note: 'càng đậm = càng đọng lâu',
+    empty: 'Chưa có lượt di chuyển nào để đo.',
+    station: 'Ga',
+    cellTitle: '{status} · {flow}: {days} ngày TB · {count} lượt',
+    legendLow: 'Ít',
+    legendHigh: 'Nhiều · lâu nhất {n} ngày',
+  },
+  topOverdue: {
+    aria: 'Hồ sơ trễ nhất đang chạy',
+    title: 'Trễ nhất đang chạy',
+    count: '{n} hồ sơ đang quá SLA',
+    emptyTitle: 'Tất cả đúng hạn',
+    emptyHelp: 'Không có hồ sơ nào đang quá SLA.',
+    overdueDays: '▲ {n} ngày',
+  },
+} as const

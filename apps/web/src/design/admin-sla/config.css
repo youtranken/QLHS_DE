@@ -1,0 +1,290 @@
+/* Admin › Ngưỡng SLA (SlaConfigAdmin.tsx) · Aurora (Vân Đài).
+   Tab từng luồng → panel là metro CÓ THỨ TỰ (node đánh số + đường nối màu luồng)
+   → mỗi ga một stepper [− N +]. Thanh lưu sticky nằm ở pauses.css (dùng chung). */
+
+/* info line */
+.adminshell .sla-info {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--aurora-soft);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r-l);
+  padding: 10px 15px;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+  line-height: 1.55;
+  margin: 0 0 var(--sp-6);
+}
+.adminshell .sla-info svg {
+  flex: none;
+  color: var(--accent);
+  margin-top: 2px;
+}
+.adminshell .sla-info b {
+  color: var(--ink);
+  font-weight: var(--fw-semibold);
+}
+
+.adminshell .slatabs {
+  margin-bottom: var(--sp-8);
+}
+
+/* ---- flow tab bar: pill bo tròn, tách rời (KHÔNG phải hộp segmented liền) ---- */
+.adminshell .flowtabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  width: max-content;
+  max-width: 100%;
+  margin: 0 0 var(--sp-5);
+}
+.adminshell .flowtab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 9px 15px;
+  border-radius: var(--r-md-2);
+  border: 1px solid var(--stroke);
+  background: var(--panel-2);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 var(--top-hi);
+  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast),
+    box-shadow var(--dur), transform 0.12s var(--ease);
+}
+.adminshell .flowtab:hover {
+  color: var(--ink);
+  border-color: var(--stroke-strong);
+  background: var(--panel);
+  transform: translateY(-1px);
+}
+.adminshell .flowtab:active {
+  transform: translateY(0);
+}
+.adminshell .flowtab[data-flow='shared'] { --seg-c: var(--accent); }
+.adminshell .flowtab[data-flow='a'] { --seg-c: var(--general); }
+.adminshell .flowtab[data-flow='b'] { --seg-c: var(--contract); }
+.adminshell .flowtab[data-flow='c'] { --seg-c: var(--payment); }
+.adminshell .flowtab[data-state='active'] {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--seg-c) 60%, transparent);
+  background: color-mix(in srgb, var(--seg-c) 13%, var(--panel-2));
+  box-shadow: 0 0 0 1px var(--seg-c), 0 10px 24px -12px var(--seg-c), inset 0 1px 0 var(--top-hi);
+}
+.adminshell .flowtab:focus-visible {
+  outline: 2px solid var(--seg-c);
+  outline-offset: 2px;
+}
+.adminshell .flowtab .tab-n {
+  font-family: var(--mono);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-eyebrow);
+  line-height: 1;
+  padding: 2px 6px;
+  min-width: 20px;
+  text-align: center;
+  border-radius: var(--r-pill);
+  background: var(--panel);
+  border: 1px solid var(--stroke);
+  color: var(--ink-3);
+}
+.adminshell .flowtab[data-state='active'] .tab-n {
+  color: var(--seg-c);
+  border-color: var(--seg-c);
+  background: transparent;
+}
+
+/* ---- flow panel + header ---- */
+/* forceMount keeps every panel in the DOM (spec finds inactive inputs); show only
+   the active flow. Radix reliably sets data-state, not always [hidden]. */
+.adminshell .flow-panel[hidden],
+.adminshell .flow-panel[data-state='inactive'] { display: none; }
+.adminshell .flow-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin: 0 var(--sp-1) var(--sp-4);
+}
+.adminshell .flow-header .flow-badge.shared {
+  background: var(--aurora);
+  color: var(--on-accent);
+}
+.adminshell .fh-text { min-width: 0; }
+.adminshell .fh-name {
+  font-family: var(--display);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-lg);
+  letter-spacing: 0.3px;
+}
+.adminshell .fh-desc {
+  font-size: var(--fs-cap);
+  color: var(--ink-3);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+.adminshell .flow-header .cnt2 {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: var(--fs-cap);
+  color: var(--ink-3);
+}
+
+/* ---- station rows (inside .card.stations.metro) ---- */
+.adminshell .stations { padding: var(--sp-1); }
+.adminshell .station {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: 13px var(--sp-4);
+  border-radius: var(--r-md-2);
+  border-bottom: 1px solid var(--hairline);
+  transition: background var(--dur-fast);
+}
+.adminshell .stations .station:last-child { border-bottom: 0; }
+.adminshell .station:hover { background: var(--panel-2); }
+.adminshell .station.is-dirty {
+  background: linear-gradient(90deg, var(--rush-soft), transparent 60%);
+}
+
+/* metro: node đánh số + đường nối dọc màu luồng (chỉ luồng có thứ tự) */
+.adminshell .metro[data-flow='shared'] { --flow: var(--accent); }
+.adminshell .metro[data-flow='a'] { --flow: var(--general); }
+.adminshell .metro[data-flow='b'] { --flow: var(--contract); }
+.adminshell .metro[data-flow='c'] { --flow: var(--payment); }
+.adminshell .metro .st-node {
+  position: relative;
+  flex: none;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+}
+.adminshell .metro[data-flow='shared'] .st-node { width: auto; padding: 0 var(--sp-1); }
+.adminshell .node-dot {
+  position: relative;
+  z-index: 1;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-sm);
+  color: var(--flow);
+  background: var(--panel);
+  border: 1.5px solid var(--flow);
+  box-shadow: 0 0 10px -3px var(--flow);
+}
+.adminshell .node-pill {
+  position: relative;
+  z-index: 1;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--aurora-soft);
+  border: 1px solid var(--stroke);
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+.adminshell .metro:not([data-flow='shared']) .st-node::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--flow);
+  opacity: 0.3;
+  z-index: 0;
+}
+.adminshell .metro:not([data-flow='shared']) .station:first-of-type .st-node::before { top: 50%; }
+.adminshell .metro:not([data-flow='shared']) .station:last-of-type .st-node::before { bottom: 50%; }
+
+/* trạng thái = tên EN + phụ đề tiếng Việt (biết bước nào) */
+.adminshell .st-meta { min-width: 0; flex: 1; }
+.adminshell .st-name {
+  font-family: var(--sans);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  color: var(--ink);
+  letter-spacing: 0.2px;
+}
+.adminshell .st-note { font-size: var(--fs-cap); color: var(--ink-3); margin-top: 2px; }
+.adminshell .st-right { display: flex; align-items: center; gap: var(--sp-4); flex: none; }
+.adminshell .st-ctrl { display: flex; align-items: center; gap: var(--sp-2); }
+.adminshell .st-unit { font-size: var(--fs-cap); color: var(--ink-3); }
+
+/* input số trong stepper (kit .stepper lo viền/nền; đây lo ô số) */
+.adminshell .stepper .stin {
+  width: 44px;
+  min-width: 44px;
+  text-align: center;
+  font-family: var(--mono);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-num-sm);
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  padding: 0;
+  line-height: 1;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.adminshell .stepper .stin::-webkit-outer-spin-button,
+.adminshell .stepper .stin::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.adminshell .stepper .stin:focus { outline: none; }
+
+/* thẻ "Chưa lưu" từng ga */
+.adminshell .dirty-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-mini);
+  font-weight: var(--fw-semibold);
+  color: var(--rush);
+  background: var(--rush-soft);
+  border: 1px solid color-mix(in srgb, var(--rush) 26%, transparent);
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+.adminshell .dirty-tag::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ghi chú "còn tính ngưỡng ở nhóm Chung" dưới mỗi luồng */
+.adminshell .metro-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  margin: var(--sp-3) var(--sp-1) 0;
+  font-size: var(--fs-cap);
+  color: var(--ink-faint);
+  line-height: 1.5;
+}
+.adminshell .metro-note svg { flex: none; margin-top: 1px; opacity: 0.8; }
+.adminshell .metro-note b { color: var(--ink-3); font-weight: var(--fw-semibold); }
+
+@media (max-width: 560px) {
+  .adminshell .station { flex-wrap: wrap; gap: var(--sp-2) var(--sp-4); }
+  .adminshell .st-meta { flex: 1 1 auto; min-width: 0; }
+  .adminshell .st-right { flex: 1 1 100%; justify-content: flex-end; padding-left: 58px; }
+}

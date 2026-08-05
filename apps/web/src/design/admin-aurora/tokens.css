@@ -1,0 +1,146 @@
+/* ============================================================================
+   Admin redesign · Vân Đài (AURORA) — SCOPED token layer.
+   Deep slate canvas + aurora teal→blue→violet accent; glow reserved for signals.
+   Tokens apply to `.adminshell` AND `.aa-scope` (the latter is put on Radix
+   portalled content — Select/Dialog menus render at <body>, outside .adminshell,
+   so they need the palette too). Only `.adminshell` PAINTS the page canvas.
+   Dark is default; light via :root[data-theme='light'].
+   Ported from design-previews/admin-concepts/concept-b-aurora.html.
+   ============================================================================ */
+
+/* --- Non-scale tokens. The spacing + type scale moved to design/tokens.css
+   (single source of truth); it used to be duplicated here and collided once the
+   base tokens file defined the same names. Font-weight, radius, z-index and
+   motion tokens stay here. --- */
+:root {
+  --fw-normal: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700;
+
+  /* radius scale — the ported kit uses --r-sm/--r-md/--r-lg (preview names);
+     this app's base tokens only define --r-s/--r-m/--r-l, so alias them here
+     (missing --r-md/--r-sm was making .segmented / .flow-badge square). */
+  --r-xs: 8px; --r-sm: 10px; --r-md: 12px; --r-md-2: 11px; --r-lg: 16px; --r-xl: 18px; --r-pill: 999px;
+
+  --z-nav: 20; --z-topbar: 30; --z-popover: 40; --z-overlay: 80; --z-toast: 90;
+
+  --ease: cubic-bezier(.22, .61, .36, 1);
+  --dur-fast: .14s; --dur: .18s; --dur-slow: .24s;
+}
+
+/* --- Aurora palette (DARK default), mapped onto the EXISTING token names
+   so the whole admin subtree recolours with no markup change. --- */
+.adminshell,
+.aa-scope {
+  /* Headings in Inter (like QLTS) — Chakra Petch read as harsh/ugly. */
+  --display: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --bg: #070912;
+  --bg-2: #0b0e1a;
+  --panel: #121627;
+  --panel-2: #191f36;
+  --panel-3: #232a45;
+  --line: rgba(148, 163, 204, 0.16);
+  --line-soft: rgba(148, 163, 204, 0.10);
+  --hairline: rgba(148, 163, 204, 0.10);
+  --stroke: rgba(148, 163, 204, 0.14);
+  --stroke-strong: rgba(148, 163, 204, 0.26);
+  --top-hi: rgba(255, 255, 255, 0.06);
+
+  --ink: #eef1fb;
+  --ink-2: #b7bfd6;
+  --ink-3: #7f88a6;
+  --ink-faint: #59627e;
+
+  /* Aurora accent = light blue; primary surfaces use the --aurora gradient. */
+  --accent: #6ea8fe;
+  --accent-2: #93c0ff;
+  --accent-soft: rgba(110, 168, 254, 0.14);
+  --on-accent: #0a0e1a;
+
+  /* Per-flow identity (General teal · Contract blue · Payment violet) */
+  --general: #2dd4bf;
+  --contract: #3b82f6;
+  --payment: #8b5cf6;
+  --rail-general: rgba(45, 212, 191, 0.14);
+  --rail-contract: rgba(59, 130, 246, 0.14);
+  --rail-payment: rgba(139, 92, 246, 0.16);
+
+  /* Semantic */
+  --sla: #fb7185;      --sla-bg: rgba(251, 113, 133, 0.13);
+  --urgent: #fb7185;   --urgent-soft: rgba(251, 113, 133, 0.13);
+  --rush: #fbbf24;     --rush-soft: rgba(251, 191, 36, 0.12);
+  --done: #34d399;     --done-soft: rgba(52, 211, 153, 0.12);
+
+  --grad-general: linear-gradient(90deg, #2dd4bf, #22d3ee);
+  --grad-contract: linear-gradient(90deg, #3b82f6, #60a5fa);
+  --grad-payment: linear-gradient(90deg, #8b5cf6, #a78bfa);
+  --aurora: linear-gradient(90deg, #2dd4bf 0%, #3b82f6 52%, #8b5cf6 100%);
+  --aurora-soft: linear-gradient(120deg, rgba(45,212,191,.16), rgba(59,130,246,.16) 55%, rgba(139,92,246,.16));
+
+  --glow-accent: 0 0 0 1px rgba(59, 130, 246, 0.30), 0 0 16px rgba(59, 130, 246, 0.18);
+  --glow-sla: 0 0 0 1px rgba(251, 113, 133, 0.4), 0 0 16px rgba(251, 113, 133, 0.25);
+  --elev-1: 0 1px 0 var(--top-hi) inset, 0 8px 24px rgba(0, 0, 0, 0.5);
+  --elev-2: 0 1px 0 var(--top-hi) inset, 0 18px 44px rgba(0, 0, 0, 0.62);
+  --shadow: 0 18px 44px -20px rgba(0, 0, 0, 0.72), 0 2px 8px -4px rgba(0, 0, 0, 0.6);
+  --input-bg: rgba(11, 14, 26, 0.7);
+  --track: rgba(148, 163, 204, 0.14);
+}
+
+/* Only the admin shell paints the Aurora canvas (portals just borrow tokens). */
+.adminshell {
+  color: var(--ink);
+  background: var(--bg);
+  background-image:
+    radial-gradient(1200px 700px at 78% -8%, rgba(59, 130, 246, 0.14), transparent 60%),
+    radial-gradient(1000px 620px at 6% 4%, rgba(45, 212, 191, 0.10), transparent 58%),
+    radial-gradient(900px 800px at 96% 100%, rgba(139, 92, 246, 0.12), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* --- LIGHT · warm paper (softer than pure white — QLTS-like, less glare) --- */
+:root[data-theme='light'] .adminshell,
+:root[data-theme='light'] .aa-scope {
+  --bg: #f1efe9;
+  --bg-2: #f7f5f0;
+  --panel: #fcfbf8;
+  --panel-2: #f2efe8;
+  --panel-3: #eae5db;
+  --line: rgba(60, 50, 35, 0.12);
+  --line-soft: rgba(60, 50, 35, 0.08);
+  --hairline: rgba(60, 50, 35, 0.07);
+  --stroke: rgba(60, 50, 35, 0.11);
+  --stroke-strong: rgba(60, 50, 35, 0.18);
+  --top-hi: rgba(255, 255, 255, 0.85);
+
+  --ink: #262219;
+  --ink-2: #514c40;
+  --ink-3: #7c7666;
+  --ink-faint: #a49d8c;
+
+  --accent: #2f6bff;
+  --accent-2: #5a86ff;
+  --accent-soft: rgba(47, 107, 255, 0.12);
+  --on-accent: #ffffff;
+
+  --rail-general: rgba(45, 212, 191, 0.18);
+  --rail-contract: rgba(59, 130, 246, 0.18);
+  --rail-payment: rgba(139, 92, 246, 0.20);
+
+  --sla: #e11d48;      --sla-bg: rgba(225, 29, 72, 0.10);
+  --urgent: #e11d48;   --urgent-soft: rgba(225, 29, 72, 0.10);
+  --rush: #b7791f;     --rush-soft: rgba(183, 121, 31, 0.14);
+  --done: #0f9d6b;     --done-soft: rgba(15, 157, 107, 0.12);
+
+  --glow-accent: 0 0 0 1px rgba(47, 107, 255, 0.28), 0 0 14px rgba(47, 107, 255, 0.16);
+  --glow-sla: 0 0 0 1px rgba(225, 29, 72, 0.3), 0 0 12px rgba(225, 29, 72, 0.16);
+  --elev-1: 0 1px 0 #fff inset, 0 6px 18px rgba(82, 66, 42, 0.10);
+  --elev-2: 0 1px 0 #fff inset, 0 14px 36px rgba(82, 66, 42, 0.16);
+  --shadow: 0 20px 46px -26px rgba(82, 66, 42, 0.26), 0 2px 8px -5px rgba(82, 66, 42, 0.16);
+  --input-bg: #fbfaf6;
+  --track: rgba(60, 50, 35, 0.10);
+}
+:root[data-theme='light'] .adminshell {
+  background-image:
+    radial-gradient(1100px 640px at 80% -6%, rgba(59, 130, 246, 0.07), transparent 60%),
+    radial-gradient(900px 560px at 4% 2%, rgba(45, 212, 191, 0.07), transparent 58%),
+    radial-gradient(900px 760px at 98% 100%, rgba(217, 160, 90, 0.08), transparent 60%);
+}

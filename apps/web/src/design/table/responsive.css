@@ -1,0 +1,55 @@
+/* ===== table → card at mobile/tablet (cells carry data-label) =====
+   Ngưỡng 860 (không phải 680): ở 681–860 bảng 11 cột rộng hơn màn → trước đây
+   phải cuộn ngang mới thấy cột Status/Hành động. Dạng thẻ hiện đủ mọi trường,
+   không cần cuộn — hợp tablet dọc hơn. */
+@media (max-width: 860px) {
+  .tbl thead {
+    display: none;
+  }
+  .tbl,
+  .tbl tbody,
+  .tbl tr,
+  .tbl td {
+    display: block;
+    width: 100%;
+  }
+  .tbl tbody tr.trow,
+  .tbl tbody tr:not(.grouphd):not(.exprow) {
+    border-bottom: 1px solid var(--line-soft);
+    padding: 10px 14px;
+  }
+  .tbl td {
+    border: 0;
+    padding: 3px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .tbl td[data-label]::before {
+    content: attr(data-label);
+    /* Vietnamese column labels on mobile — sans reads far better than mono here. */
+    font-family: var(--sans);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    flex: none;
+  }
+  .tbl .num {
+    text-align: left;
+  }
+  .tbl .grouphd td,
+  .tbl .exprow td {
+    display: block;
+    padding: 7px 14px;
+  }
+  .tbl .exprow td {
+    padding: 0 8px 12px;
+  }
+  .tbl .grouphd td::before,
+  .tbl .exprow td::before {
+    content: none;
+  }
+}

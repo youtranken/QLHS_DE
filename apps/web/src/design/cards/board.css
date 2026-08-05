@@ -1,0 +1,205 @@
+/* Kanban "Trạm của tôi": header 1 hàng (tiêu đề · ô tìm · nút Tra cứu), columns,
+   tilt cards, ⋯ menu. (mock 04/05/06). Spacing + cỡ chữ dùng token sp/fs. */
+.boardhead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin: 2px 2px var(--sp-4);
+}
+.boardhead h2 {
+  flex: none;
+  font-family: var(--display);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+/* ô tìm trong-bảng: nằm kế tiêu đề, co giãn lấp khoảng giữa (scope trong .boardhead
+   để không đụng phần tử .srch khác trong tương lai) */
+.boardhead .srch {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: var(--sp-2) var(--sp-3);
+  flex: 1 1 240px;
+  min-width: 200px;
+  max-width: 440px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.boardhead .srch:focus-within {
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent);
+}
+.boardhead .srch input {
+  border: 0;
+  background: none;
+  outline: none;
+  font-family: var(--sans);
+  font-size: var(--fs-sm);
+  color: var(--ink);
+  width: 100%;
+}
+.boardhead .srch input::placeholder {
+  color: var(--ink-3);
+}
+.boardhead .srch svg {
+  width: 15px;
+  height: 15px;
+  color: var(--ink-3);
+  flex: none;
+}
+/* nút mở màn Tra cứu hồ sơ đóng — đẩy về phải, style riêng (không dùng nút mặc
+   định của trình duyệt), icon hộp lưu trữ để phân biệt với ô tìm. */
+.newbtn {
+  flex: none;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  padding: var(--sp-2) var(--sp-4);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.06s;
+}
+.newbtn svg {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+  flex: none;
+}
+.newbtn:hover {
+  border-color: var(--accent);
+  background: var(--panel-3);
+}
+.newbtn:active {
+  transform: translateY(1px);
+}
+.newbtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.cols {
+  display: flex;
+  gap: var(--sp-3);
+  overflow-x: auto;
+  padding: 2px 2px var(--sp-4);
+  align-items: flex-start;
+}
+/* Cột co giãn đều lấp hết chiều ngang browser (mỗi vai DCC có số cột khác nhau).
+   min-width giữ cột không quá hẹp; khi tổng vượt màn thì .cols cuộn ngang. */
+.col {
+  flex: 1 1 0;
+  min-width: 244px;
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-l);
+  box-shadow: var(--elev-1);
+  max-height: calc(100vh - 210px);
+  display: flex;
+  flex-direction: column;
+}
+/* Mobile/tablet-portrait: stack columns vertically instead of horizontal-scroll
+   (nested scrollers under the metro map read as broken). Each column full-width,
+   its own scroll dropped so the page scrolls as one. */
+@media (max-width: 760px) {
+  .cols {
+    flex-direction: column;
+    overflow-x: visible;
+  }
+  .col {
+    min-width: 0;
+    max-height: none;
+  }
+}
+.col .ch {
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--line-soft);
+  border-radius: var(--r-l) var(--r-l) 0 0;
+}
+.col .ch .r1 {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.col .ch .r1 .colwarn {
+  display: inline-flex;
+  align-items: center;
+  color: var(--sla);
+}
+.col .ch .st {
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.col .ch .n {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--panel-3);
+  border-radius: 99px;
+  padding: 0 var(--sp-2);
+  line-height: 18px;
+}
+.col .ch .vi {
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+.col.hotcol .ch {
+  background: color-mix(in srgb, var(--sla-bg) 55%, var(--panel));
+  border-bottom-color: color-mix(in srgb, var(--sla) 40%, var(--line-soft));
+}
+.col.hotcol .ch .n {
+  color: var(--sla);
+  background: var(--sla-bg);
+}
+.col.reccol {
+  border-color: color-mix(in srgb, var(--sla) 45%, var(--line-soft));
+}
+.col.dragover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.col .cb {
+  padding: var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  overflow-y: auto;
+}
+
+.tcard {
+  position: relative;
+  background: var(--panel-2);
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--line);
+  border-radius: var(--r-m);
+  padding: var(--sp-3);
+  box-shadow: 0 1px 0 var(--hairline) inset;
+  transition:
+    transform 0.1s ease-out,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+.tcard:hover,
+.tcard:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 16px 32px rgba(2, 8, 18, 0.5), var(--glow-accent);
+  z-index: 6;
+  transform: translateY(-4px) scale(1.03);
+}

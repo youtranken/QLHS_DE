@@ -1,0 +1,109 @@
+/* App shell: topbar command-bar + khung main + section heads. Login ở login.css,
+   sidebar admin ở admin*.css. (SPEC _SPEC.md §4) */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 20px;
+  background: color-mix(in srgb, var(--bg-2) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line-soft);
+}
+.topbar .brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14.5px;
+  letter-spacing: -0.01em;
+  padding: 4px 6px;
+}
+.topbar .brand .q {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: var(--glow-accent);
+}
+.topbar .brand small {
+  font-weight: 500;
+  color: var(--ink-3);
+  font-size: 11px;
+  font-family: var(--sans);
+}
+.topbar .clock {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.topbar .themebtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink-2);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.topbar .themebtn:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+.topbar .me {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.topbar .av {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--panel-3);
+  border: 1px solid var(--line);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+.topbar .logout {
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--ink-3);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.topbar .logout:hover {
+  color: var(--sla);
+  border-color: color-mix(in srgb, var(--sla) 50%, transparent);
+}
+
+main {
+  max-width: 2040px;
+  margin: 0 auto;
+  padding: 22px 40px 70px;
+}

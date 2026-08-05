@@ -1,0 +1,119 @@
+/* Themed Select (.fsel) + DatePicker (.dp) — ported from QLTS, mapped to QLHS
+   tokens. Menus portal to <body>; high z-index so they clear modals. */
+
+/* ---- Select (thay <select> native) --------------------------------------- */
+.fsel {
+  position: relative;
+  display: inline-flex;
+}
+.field .fsel,
+.field-event .fsel {
+  width: 100%;
+}
+.fsel-trigger {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  padding: 9px 32px 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.fsel-trigger:hover:not(:disabled) {
+  border-color: var(--ink-3);
+}
+.fsel-trigger[aria-expanded='true'] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.fsel-trigger:disabled {
+  background: var(--panel-3);
+  color: var(--ink-2);
+  cursor: default;
+}
+.fsel-val {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fsel-val.ph {
+  color: var(--ink-3);
+}
+.fsel-caret {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  color: var(--ink-3);
+  pointer-events: none;
+  transition: transform 0.18s, color 0.18s;
+}
+.fsel-trigger[aria-expanded='true'] .fsel-caret {
+  transform: translateY(-50%) rotate(180deg);
+  color: var(--accent);
+}
+.fsel-menu {
+  z-index: 4000;
+  pointer-events: auto;
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  animation: pickpop 0.13s ease both;
+}
+.fsel-group {
+  padding: 6px 10px 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.fsel-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: none;
+  background: none;
+  border-radius: 7px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+.fsel-none {
+  padding: 8px 10px;
+  color: var(--ink-3);
+  font-size: 12px;
+  cursor: default;
+}
+.fsel-option:hover,
+.fsel-option.active {
+  background: var(--accent-soft);
+  color: var(--accent-2);
+}
+.fsel-option.sel {
+  font-weight: 600;
+}
+/* Grouped options (e.g. Document Type under a flow header) sit indented so the
+   flow → type nesting is visible instead of one flat column. */
+.fsel-option.indent {
+  padding-left: 24px;
+}
+

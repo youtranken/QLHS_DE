@@ -1,0 +1,138 @@
+/* Admin console (audit §K): left nav rail + framed content pane. Depth comes
+   from tonal layering + borders (DESIGN.md), not heavy shadow. */
+/* Admin = app-shell: sidebar full-height sát mép trái (nền riêng + kẻ dọc) +
+   vùng nội dung cuộn riêng bên phải. Yêu cầu <main class="flush"> (bỏ căn giữa). */
+.adminshell {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+}
+.adminside {
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  flex: 0 0 252px;
+  width: 252px;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 12px;
+  background: var(--bg-2);
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+}
+.adminmain {
+  flex: 1;
+  min-width: 0;
+  /* Nội dung giãn hết bề rộng còn lại (bám sidebar) — không chừa khoảng trống phải. */
+  padding: 20px 28px 64px;
+}
+@media (max-width: 900px) {
+  /* Block (không flex) để sidebar ngang cuộn trong bề rộng viewport, không phình
+     theo min-content của hàng pill (tránh tràn ngang ở mobile). */
+  .adminshell {
+    display: block;
+    min-height: 0;
+  }
+  .adminside {
+    position: static;
+    top: auto;
+    height: auto;
+    width: auto;
+    padding: 8px 12px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+  }
+  .adminmain {
+    padding: 16px 14px 48px;
+  }
+}
+
+/* ---------- framed content pane ---------- */
+.panelcard {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.panelcard.slacard {
+  max-width: 580px;
+}
+.panelcard .pchd {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel-2);
+}
+.panelcard .pchd-t h2 {
+  font-size: var(--fs-num-sm);
+  margin: 0;
+}
+.panelcard .pchd-t .d {
+  font-size: var(--fs-mini);
+  color: var(--ink-3);
+}
+.panelcard .pchd-tools {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.searchbox {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.searchbox svg {
+  position: absolute;
+  left: 11px;
+  color: var(--ink-3);
+  pointer-events: none;
+}
+.searchbox input {
+  width: 250px;
+  max-width: 44vw;
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  padding: 9px 12px 9px 33px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+}
+.searchbox input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.pchd-tools .count {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  background: var(--panel-3);
+  border-radius: 999px;
+  padding: 5px 11px;
+  white-space: nowrap;
+}
+.pcbody {
+  max-height: 70vh;
+  overflow: auto;
+  padding: 2px 4px 6px;
+}
+
+.console-soon {
+  max-width: 520px;
+  margin: 24px auto 0;
+  border: 1px dashed var(--line);
+  border-radius: var(--r-l);
+  padding: 40px 28px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+  background: var(--panel);
+}

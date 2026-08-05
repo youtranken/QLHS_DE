@@ -1,0 +1,146 @@
+/* vào bảng: card trượt lên so le */
+.cb .tcard {
+  animation: cardin 0.42s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.cb .tcard:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.cb .tcard:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.cb .tcard:nth-child(4) {
+  animation-delay: 0.15s;
+}
+@keyframes cardin {
+  from {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.tcard.flc {
+  border-left-color: var(--contract);
+}
+.tcard.flp {
+  border-left-color: var(--payment);
+}
+.tcard.flg {
+  border-left-color: var(--general);
+}
+.tcard.over {
+  border-left-color: var(--sla);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--sla-bg) 32%, var(--panel-2)),
+    var(--panel-2) 40%
+  );
+}
+.tcard .r1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tcard .code {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-2);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.tcard .slapill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--sla);
+  background: var(--sla-bg);
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+.tcard .who {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* hàng đáy thẻ: số tiền (trái) + nút hành-động-chính (phải). Cho wrap để nhãn
+   nút dài (label server chưa rút gọn) rớt xuống dòng thay vì tràn cột hẹp. */
+.tcard .actrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+  flex-wrap: wrap;
+}
+.tcard .amt {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.tcard .amt .u {
+  color: var(--ink-3);
+  font-size: 10px;
+}
+.tcard .actbtns {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+/* Phương án A — bước tiến an toàn = 1 chạm (STRONG, tô accent). Nút thứ 2 (ngoại
+   lệ: Trình BOP) nhẹ hơn. Hành động lùi/nguy hiểm không bao giờ lên đây (ở ⋯). */
+.tcard .pact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+  background: var(--accent-soft);
+  color: var(--accent);
+  white-space: nowrap;
+  max-width: 100%;
+  transition: background 0.14s, color 0.14s, border-color 0.14s, box-shadow 0.14s;
+}
+.tcard .pact:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent);
+}
+.tcard .pact:disabled {
+  opacity: 0.5;
+  cursor: default;
+  background: var(--accent-soft);
+  color: var(--accent);
+  box-shadow: none;
+}
+.tcard .pact.sec {
+  border-color: var(--line);
+  background: none;
+  color: var(--ink-2);
+}
+.tcard .pact.sec:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: none;
+  box-shadow: none;
+}

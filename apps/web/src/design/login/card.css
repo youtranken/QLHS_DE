@@ -1,0 +1,255 @@
+/* card đăng nhập — cột phải, glass tối nổi trên cảnh 3D */
+.logincard {
+  position: relative;
+  flex: 0 0 404px;
+  max-width: 404px;
+  border-radius: 16px;
+  box-shadow: 0 34px 74px -22px rgba(0, 0, 0, 0.62), 0 0 0 1px rgba(74, 163, 255, 0.14),
+    0 0 40px rgba(74, 163, 255, 0.08);
+}
+/* vạch nhấn azure mảnh trên đỉnh card (chữ ký thị giác kiểu PMH ID) */
+.logincard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 28px;
+  right: 28px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+@media (max-width: 860px) {
+  .logincard {
+    flex: 0 0 auto;
+    width: min(404px, 100%);
+  }
+}
+.logincard .panel-bd {
+  padding: 22px 28px 26px;
+}
+/* banner bị-chặn (group gate / auth_error) — trên form, tông cảnh báo */
+.logincard .lc-alert {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--sla);
+  background: color-mix(in srgb, var(--sla) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sla) 38%, transparent);
+  border-radius: 9px;
+}
+.lc-hd {
+  padding: 26px 28px 0;
+}
+.lc-hd h2 {
+  font-family: var(--display);
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.lc-hd .sub {
+  color: var(--ink-3);
+  font-size: 12.5px;
+  margin-top: 4px;
+}
+.btn.sso {
+  width: 100%;
+  justify-content: center;
+  padding: 12px 16px;
+  font-size: 13.5px;
+  border-radius: 11px;
+}
+.btn.sso svg {
+  width: 16px;
+  height: 16px;
+}
+.or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 14px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--ink-3);
+}
+.or::before,
+.or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line-soft);
+}
+
+/* form đăng nhập nội bộ */
+.localform {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.localform .localhd {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-2);
+  margin: 0;
+}
+.localform .field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.localform .field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+/* ô nhập có icon dẫn (mail / khóa) — kiểu PMH ID */
+.localform .field-inp {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.localform .field-ic {
+  position: absolute;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  color: var(--ink-3);
+  pointer-events: none;
+  transition: color 0.15s;
+}
+.localform .field input {
+  width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 11px 12px 11px 38px;
+  font-size: 13.5px;
+  color: var(--ink);
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+.localform .field input::placeholder {
+  color: var(--ink-3);
+}
+.localform .field input:hover {
+  border-color: var(--ink-3);
+}
+.localform .field input:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(74, 163, 255, 0.18);
+}
+.localform .field-inp:focus-within .field-ic {
+  color: var(--accent);
+}
+/* nút hiện/ẩn mật khẩu — con mắt ở mép phải ô; input mật khẩu chừa lề phải cho nó */
+.localform .field-inp:has(.pw-eye) input {
+  padding-right: 42px;
+}
+.localform .pw-eye {
+  position: absolute;
+  right: 5px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.localform .pw-eye:hover {
+  color: var(--ink);
+  background: var(--panel-3, rgba(255, 255, 255, 0.06));
+}
+.localform .pw-eye svg {
+  width: 17px;
+  height: 17px;
+}
+.localform .field .err {
+  font-size: 11px;
+  color: var(--sla);
+}
+/* nút chính — to, block, hover nhấc nhẹ + đổ bóng azure */
+.localform > .btn {
+  justify-content: center;
+  padding: 11px 16px;
+  font-size: 13.5px;
+  border-radius: 10px;
+}
+.localform > .btn.primary {
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.15s;
+}
+.localform > .btn.primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--accent-2);
+  box-shadow: 0 10px 22px rgba(74, 163, 255, 0.32);
+}
+.localform > .btn.primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+/* 1.3 identifier-first: the confirmed email + a "đổi" affordance on step 2. */
+.localform .idrow {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.localform .idrow .idlabel {
+  color: var(--ink-3);
+}
+.localform .idrow .idemail {
+  font-weight: 600;
+  color: var(--ink);
+}
+.localform .linkbtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.localform .linkbtn:disabled {
+  color: var(--ink-3);
+  cursor: default;
+}
+.footnote {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+/* Hàng tiêu đề card login: tiêu đề + toggle ngôn ngữ ở mép phải. */
+.logincard .lc-hd-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Banner "phiên hết hạn" khi bị điều hướng về login với ?expired=1 (FR #3). */
+.localform .login-notice {
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ink);
+  background: var(--accent-soft, color-mix(in srgb, var(--accent) 12%, transparent));
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
+  border-radius: 9px;
+}
+
+@media (max-width: 560px) {
+  .brandmark-top small {
+    display: none;
+  }
+}

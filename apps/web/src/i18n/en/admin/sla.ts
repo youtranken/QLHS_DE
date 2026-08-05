@@ -1,0 +1,87 @@
+/** SLA thresholds config + SLA pause monitor. */
+export const adminSla = {
+  config: {
+    title: 'SLA thresholds',
+    // Split around <b>working</b>.
+    infoPrefix: 'Working ',
+    infoBold: 'days',
+    infoSuffix: ' (Sat/Sun excluded). Minimum threshold is 1 day; save your change and the ▲ badge applies immediately.',
+    savedMsg: 'Saved {n} SLA thresholds — the ▲ badge applies immediately system-wide.',
+    saveFail: 'Save failed — try again.',
+    sectionAria: '{flow} SLA thresholds',
+    stationCount: '{n} stations with thresholds',
+    decAria: 'Decrease {flow} {status} threshold',
+    incAria: 'Increase {flow} {status} threshold',
+    inputAria: '{flow} {status} SLA threshold (days)',
+    dirty: 'Unsaved',
+    saved: 'Saved',
+    savebarAria: 'Save SLA threshold changes',
+    // Rendered after <b>{n}</b>.
+    unsavedSuffix: ' unsaved changes',
+    cancel: 'Cancel',
+    saving: 'Saving…',
+    saveBtn: 'Save SLA thresholds',
+    tablistAria: 'Choose a flow to configure thresholds',
+    unitDay: 'days',
+    // Pill in place of the station order number on the General tab (threshold applies to all flows).
+    stationPill: 'all flows',
+    sharedNote:
+      'Beyond the stations above, the flow also uses thresholds in the General group (Submitted, Andy, Returned…).',
+    loading: 'Loading threshold config…',
+    loadError: 'Could not load the threshold config.',
+    empty: 'No SLA thresholds to configure yet.',
+  },
+  /** Flow tab labels — General/Contract-Budget/Payment are the canonical EN names
+   *  (rendered lang="en" in the component); only "General" is the shared group. */
+  tabs: {
+    all: 'General',
+  },
+  flowDesc: {
+    all: 'Applies to all flows — the stations shared at the start and on return.',
+    general: 'Short route — DCC1 handles the whole route, skipping DCC2/DCC3.',
+    contract: 'Long route — DCC2 → ACC → BOP → hardcopy.',
+    payment: 'Shortest route — DCC3.',
+  },
+  /** EN subtitle per canonical EN status (AD-13 — presentation only). */
+  statusNote: {
+    Submitted: 'Applicant submitted, awaiting DCC1 to receive',
+    'Submitted to DCC2': 'DCC1 handed off, awaiting DCC2 to receive',
+    'Received by DCC2': 'DCC2 received, checking the ticket',
+    'Submitted to DCC3': 'DCC1 handed off, awaiting DCC3 to receive',
+    'Received by DCC3': 'DCC3 received, processing',
+    'Submitted to VP Andy': 'Submitted to VP Andy for approval',
+    'Submitted to Accounting': 'Sent to Accounting, awaiting result',
+    'Received from ACC': 'Accounting returned the result, awaiting next step',
+    'Submitted to BOP': 'Submitted to BOP for sign-off',
+    Hardcopy: 'Awaiting hardcopy submission / reconciliation',
+    'Submitted to DCC2 (Hardcopy)': 'Handing the hardcopy to DCC2',
+    Returned: 'Returned to Applicant for additional info',
+    'Return-fixing': 'Applicant is fixing the returned ticket',
+    Reopened: 'A closed ticket was reopened',
+  } as Record<string, string>,
+  pauses: {
+    title: 'SLA pauses',
+    loadError: 'Could not load the report — try again later.',
+    loading: 'Loading report…',
+    // Split around the two <b> spans; a literal ' ' JSX space follows infoP2.
+    infoP1: 'A stopped clock means the ticket is ',
+    infoB1: 'not counted as late',
+    infoP2: '. From',
+    infoB2: '{n} working days',
+    infoP3: ' onward without resuming, it is worth checking back with the holder.',
+    openTitle: 'Clock stopped',
+    openCount: '{n} tickets',
+    staleSuffix: ' · {n} too long',
+    openEmptyTitle: 'Clock running',
+    openEmpty: 'No clocks are stopped — every ticket is being counted for SLA.',
+    pausedDays: '{n} days',
+    daysUnit: 'days',
+    staleTag: 'too long',
+    byStationAria: 'Pause frequency by station',
+    byStationTitle: 'Frequency by station',
+    windowDays: 'last {n} days',
+    byStationEmpty: 'No clock stops in the period yet.',
+    stationMeta: '{pauses} times · {tickets} tickets · longest {days} days',
+    openNow: '{n} stopped',
+  },
+} as const

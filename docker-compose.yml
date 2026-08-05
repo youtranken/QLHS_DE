@@ -1,0 +1,137 @@
+# On-prem single-deployable: web (nginx SPA) → api (NestJS) → postgres.
+# Local always-on: web also serves HTTPS on :5173 with the real *.pmh.com.vn cert
+# so it reuses the PMH ID SSO redirect already registered for :5173. restart:
+# unless-stopped keeps the whole stack up across machine reboots (no manual start).
+services:
+  postgres:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: qlhs
+      POSTGRES_PASSWORD: qlhs
+      POSTGRES_DB: qlhs
+    ports:
+      # Loopback-only: reachable for host dev/ops, never off-box on the LAN. The
+      # append-only audit (AD-4) rests on the app connecting as non-superuser
+      # qlhs_app; exposing 5432 would let a LAN peer log in as superuser and drop
+      # the immutability trigger. api reaches postgres over the compose network.
+      - '127.0.0.1:5432:5432'
+    volumes:
+      # PostgreSQL 18+ expects the mount at the parent dir (major-version
+      # subdirs live under it) — mounting .../data directly errors on boot.
+      - qlhs-pg:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U qlhs -d qlhs']
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  # 1.5 — nightly full backup + rolling retention. Uses the postgres:18 image only
+  # for its client tools (pg_dump/pg_dumpall); the loop lives in ops/backup. Dumps
+  # land in ./data-backups on the host so an operator can copy them off-box (the
+  # scripts live in ops/backup; the dated dumps live in data-backups). Overriding
+  # the entrypoint skips the image's DB-init.
+  pg-backup:
+    image: postgres:18
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: qlhs
+      PGPASSWORD: qlhs
+      PGDATABASE: qlhs
+      KEEP: 30 # rolling window: keep the newest 30 of each artefact, prune the rest
+      BACKUP_HOUR: 2 # 02:00 container-local
+      BACKUP_ON_START: 0 # set 1 to also dump immediately on boot
+    volumes:
+      - ./ops/backup:/ops:ro
+      - ./data-backups:/backups
+    entrypoint: ['bash', '/ops/backup.sh']
+
+  # SMTP test server (email outbox testing) — DEV ONLY. Web UI at :18025. Gated
+  # behind the `dev` profile so it never starts in prod (`up -d` skips it); dev.sh
+  # names it explicitly, which activates the profile. Prod sends real mail via the
+  # SMTP_* in apps/api/.env — NOT this catch-all inbox.
+  mailpit:
+    image: axllent/mailpit:latest
+    profiles: ['dev']
+    restart: unless-stopped
+    ports:
+      # Loopback-only: api reaches mailpit over the compose network; these host
+      # ports are just for a human viewing the outbox, not for the LAN.
+      - '127.0.0.1:11025:1025' # SMTP
+      - '127.0.0.1:18025:8025' # Web UI
+    environment:
+      MP_MAX_MESSAGES: 5000
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    # OIDC (:5173 redirect), local-admin bootstrap creds, and admin emails come
+    # from the same file the host dev uses → SSO reuses the existing registration.
+    env_file:
+      - apps/api/.env
+    environment:
+      # Container-specific overrides — these win over env_file. Pinned here (NOT
+      # left to apps/api/.env) so a stray/blank NODE_ENV in the dev env file can
+      # never silently ship prod with dev-login open, non-secure cookies, the
+      # superuser guard off, or an empty group-gate admitting everyone (BLOCK-3).
+      NODE_ENV: production
+      # App runs as the restricted role; the entrypoint migrates as the superuser
+      # (needs CREATE ROLE + CREATE-in-schema, which qlhs_app lacks on PG15+).
+      DATABASE_URL: postgresql://qlhs_app:qlhs_app@postgres:5432/qlhs?schema=public
+      MIGRATE_DATABASE_URL: postgresql://qlhs:qlhs@postgres:5432/qlhs?schema=public
+      PORT: 3000
+      # SMTP is NOT pinned here — it comes from apps/api/.env so prod delivers to
+      # the company's real relay (SMTP_HOST/SMTP_PORT/SMTP_FROM). Dev points those
+      # at the Mailpit container (localhost:11025). Leaving mailpit hardcoded here
+      # would silently swallow every prod notification into the test inbox.
+      # Trust the PMH ID cert chain (same as the host start script's flag).
+      NODE_EXTRA_CA_CERTS: /certs/fullchain.pem
+    volumes:
+      - ./pmh.com.vn:/certs:ro
+    # PMH ID runs host-local (hosts file → 127.0.0.1). Inside the container that
+    # loopback is the container itself, so map the IdP host to the Docker host
+    # gateway — the api's back-channel (token/jwks/directory) must reach it.
+    extra_hosts:
+      - 'id.pmh.com.vn:host-gateway'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      # No mailpit dependency — email is best-effort and prod uses a real relay
+      # (mailpit is a dev-profile service that isn't present in prod at all).
+    # Ready = /health responds; start_period covers migrate deploy + Nest boot.
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/health']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 40s
+    ports:
+      # Loopback-only: nginx (web) proxies to api over the compose network
+      # (http://api:3000), so this host port is ops/debug only. Publishing it to
+      # 0.0.0.0 let a LAN client hit the API directly and, with trust proxy=1,
+      # spoof X-Forwarded-For to defeat the login throttle (BLOCK-2).
+      - '127.0.0.1:13000:3000'
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./pmh.com.vn:/certs:ro
+    ports:
+      - '18080:80' # on-prem HTTP
+      - '5173:5173' # local HTTPS (reuses the SSO redirect)
+
+volumes:
+  qlhs-pg:

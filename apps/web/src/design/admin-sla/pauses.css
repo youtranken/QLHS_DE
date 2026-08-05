@@ -1,0 +1,345 @@
+/* thanh lưu sticky — chỉ trải trên vùng nội dung (chừa sidebar 252px) */
+.savebar {
+  position: fixed;
+  left: 252px;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 11px 16px;
+  background: color-mix(in srgb, var(--bg-2) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+}
+.savebar .msg {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+.savebar .msg b {
+  font-family: var(--mono);
+  color: var(--accent-2);
+}
+
+@media (max-width: 900px) {
+  .savebar {
+    left: 0;
+  }
+}
+@media (max-width: 680px) {
+  .slarow {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+  .slarow .chip {
+    flex: 1 0 100%;
+  }
+}
+
+/* ── F8 giám sát: "Tạm dừng SLA" · Aurora (Vân Đài) (khớp preview 05) ────────── */
+
+/* dải thông tin đầu trang — nền aurora nhạt + hộp biểu tượng */
+.pause-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0 0 24px;
+  padding: 16px 20px;
+  border-radius: var(--r-l);
+  border: 1px solid var(--stroke);
+  background: var(--aurora-soft);
+  box-shadow: inset 0 1px 0 var(--top-hi);
+  font-size: var(--fs-body);
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+.pause-info p {
+  margin: 0;
+}
+.pause-info b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.pause-info .pi-ic {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-s);
+  display: grid;
+  place-items: center;
+  background: var(--panel);
+  border: 1px solid var(--stroke);
+  color: var(--accent);
+}
+.pause-info .pi-ic svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* hai cột: đang dừng (rộng hơn) + tần suất theo ga */
+.pause-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.pause-sec {
+  min-width: 0;
+}
+.pause-sechd {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0 0 14px;
+}
+.pause-sechd .sec-title {
+  margin: 0;
+}
+.pause-count {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-mini);
+  font-weight: 600;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+/* Chỉ khi CÓ hồ sơ trễ (stale) mới đóng khung cảnh báo; trạng thái "0 hồ sơ"
+   bình thường để chữ trơn cho gọn. */
+.pause-count.warn {
+  padding: 4px 11px;
+  border-radius: var(--r-pill);
+  color: var(--rush);
+  background: var(--rush-soft);
+  border: 1px solid color-mix(in srgb, var(--rush) 32%, transparent);
+}
+.pause-note {
+  margin-left: auto;
+  font-size: var(--fs-cap);
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.pause-list,
+.freq-list {
+  padding: 6px;
+}
+
+/* hàng "đang dừng đồng hồ" */
+.pzrow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 16px;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--hairline);
+  transition: background 0.15s;
+}
+.pzrow:last-child {
+  border-bottom: 0;
+}
+.pzrow:hover {
+  background: var(--panel-2);
+  border-radius: var(--r-m);
+}
+.pzmain {
+  min-width: 0;
+}
+.pztop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pzcode {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: var(--fs-md);
+  letter-spacing: 0.3px;
+  color: var(--ink);
+}
+.pzreason {
+  margin-top: 5px;
+  font-size: var(--fs-body);
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+.pzmeta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  font-size: var(--fs-mini);
+  color: var(--ink-3);
+}
+.pzmeta .st {
+  color: var(--ink-2);
+  font-weight: 500;
+}
+.pzmeta .dot {
+  flex: none;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+}
+.pzdays {
+  justify-self: end;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: var(--fs-title);
+  color: var(--ink);
+  white-space: nowrap;
+}
+.pzdays .u {
+  font-size: var(--fs-cap);
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+/* nhãn "quá lâu" (chip cảnh báo) */
+.tag-stale {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sla);
+  background: var(--sla-bg);
+  border: 1px solid color-mix(in srgb, var(--sla) 34%, transparent);
+}
+.tag-stale svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* hàng quá lâu = vạch đỏ mép trái, số ngày đỏ (cùng ngữ pháp với quá SLA) */
+.pzrow.stale {
+  padding-left: 22px;
+}
+.pzrow.stale::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--sla), #f43f5e);
+  box-shadow: 0 0 10px 0 color-mix(in srgb, var(--sla) 50%, transparent);
+}
+.pzrow.stale .pzdays {
+  color: var(--sla);
+}
+
+/* tần suất theo ga */
+.freq-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 16px;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--hairline);
+  transition: background 0.15s;
+}
+.freq-row:last-child {
+  border-bottom: 0;
+}
+.freq-row:hover {
+  background: var(--panel-2);
+  border-radius: var(--r-m);
+}
+.freq-main {
+  min-width: 0;
+}
+.freq-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.freq-status .st-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  color: var(--accent);
+  background: currentColor;
+  box-shadow: 0 0 8px 0 currentColor;
+}
+.freq-name {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--ink);
+}
+.freq-meta {
+  margin-top: 5px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-mini);
+  color: var(--ink-3);
+}
+.freq-active {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: var(--r-pill);
+  font-family: var(--mono);
+  font-size: var(--fs-mini);
+  font-weight: 600;
+  color: var(--ink-3);
+  background: var(--panel-2);
+  border: 1px solid var(--stroke);
+  white-space: nowrap;
+}
+.freq-active::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.freq-active.over {
+  color: var(--rush);
+  background: var(--rush-soft);
+  border-color: color-mix(in srgb, var(--rush) 32%, transparent);
+}
+
+/* trạng thái rỗng của cột "tần suất theo ga" (cột trái có empty riêng, có icon) */
+.pz-empty {
+  margin: 0;
+  padding: 24px 16px;
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
+}
+
+@media (max-width: 980px) {
+  .pause-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 760px) {
+  .pzrow,
+  .freq-row {
+    padding: 12px;
+  }
+}

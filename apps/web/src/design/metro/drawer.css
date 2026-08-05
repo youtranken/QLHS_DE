@@ -1,0 +1,196 @@
+/* drawer chi tiết ga (scope .stndrawer để tránh đụng .drawer khác) */
+.stndrawer-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 69;
+  background: rgba(4, 10, 20, 0.35);
+}
+.stndrawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(440px, 94vw);
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+  box-shadow: var(--elev-2);
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.22s ease;
+}
+.stndrawer.open {
+  transform: none;
+}
+.stndrawer .dh {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.stndrawer .dh .r1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.stndrawer .dh .t {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+.stndrawer .dh .s {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin-top: 3px;
+}
+.dstats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 14px 20px 4px;
+}
+.dstat {
+  background: var(--panel-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 11px;
+  padding: 9px 12px;
+}
+.dstat .l {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.dstat .v {
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 700;
+  margin-top: 1px;
+}
+.dstat.hot {
+  border-color: color-mix(in srgb, var(--sla) 50%, var(--line-soft));
+}
+.dstat.hot .v {
+  color: var(--sla);
+}
+.dsla {
+  padding: 10px 20px 4px;
+}
+.stndrawer .slameter {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.stndrawer .slameter .bar {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--panel-3);
+  overflow: hidden;
+}
+.stndrawer .slameter .bar i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--grad-general);
+}
+.stndrawer .slameter.over .bar i {
+  background: linear-gradient(90deg, #e05a4e, #f4776b);
+}
+.stndrawer .slameter .cap {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+.stndrawer .db {
+  padding: 12px 20px 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+.stndrawer .db .cap2 {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 6px 0 2px;
+}
+.pi {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--panel-2);
+  border: 1px solid var(--line-soft);
+  border-radius: 11px;
+  padding: 10px 12px;
+  text-align: left;
+  width: 100%;
+  border-left: 3px solid var(--line);
+}
+.pi:hover {
+  transform: translateY(-1px);
+}
+.pi.flc {
+  border-left-color: var(--contract);
+}
+.pi.flp {
+  border-left-color: var(--payment);
+}
+.pi.flg {
+  border-left-color: var(--general);
+}
+.pi.ov {
+  border-left-color: var(--sla);
+}
+.pi .r1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.pi .pc {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+.pi .pd {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+}
+.pi .pd.ovt {
+  color: var(--sla);
+  font-weight: 700;
+}
+.pi .pw {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stndrawer .df {
+  padding: 12px 20px;
+  border-top: 1px solid var(--line-soft);
+}
+.stndrawer .df .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+@media (max-width: 680px) {
+  .mapinner {
+    padding: 26px 16px 6px;
+  }
+}

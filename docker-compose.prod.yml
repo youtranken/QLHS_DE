@@ -1,0 +1,63 @@
+# PROD OVERRIDE — đưa QLHS vào CỤM edge (Model B). Dùng CHUNG với compose gốc:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# - web: chạy nginx chỉ HTTP :80 (mount nginx.prod.conf đè lên default.conf) → EDGE lo TLS
+#   bằng cert CHUNG *.pmh.com.vn. QLHS KHÔNG cần cert riêng.
+# - web+api join mạng `edge`: edge route qlhs.pmh.com.vn:8443 → qlhs-web:80; api gọi ngược
+#   admin-de.pmh.com.vn:8443 (OIDC token/jwks) qua edge.
+# - api: cert cụm là public → dùng CA hệ thống, tắt NODE_EXTRA_CA_CERTS (khỏi cert riêng).
+# KHÔNG đổi dev (dev vẫn dùng docker-compose.yml gốc + nginx.conf gốc + :5173).
+services:
+  # Mật khẩu SUPERUSER mạnh từ env (thay 'qlhs' hardcode). ${..} lấy từ shell do
+  # 50-qlhs-up.sh / update-qlhs.sh bắc cầu ra từ apps/api/.env → chạy qua script đó.
+  postgres:
+    mem_limit: 14g
+    mem_reservation: 2g
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD chưa set — dựng QLHS qua 50-qlhs-up.sh/update-qlhs.sh}
+
+  web:
+    mem_limit: 256m
+    mem_reservation: 64m
+    networks:
+      default: {}
+      edge:
+        aliases:
+          - qlhs-web
+    volumes:
+      # Đè config chỉ-:80 lên bản gốc (bản gốc có listen 5173 ssl cần cert — bỏ ở prod).
+      - ./apps/web/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+
+  api:
+    mem_limit: 8g
+    mem_reservation: 1g
+    environment:
+      NODE_EXTRA_CA_CERTS: ''   # cert cụm public → CA hệ thống trust sẵn, khỏi cert riêng
+      # Mật khẩu MẠNH cho cả 2 role (thay qlhs_app/qlhs hardcode). qlhs_app được
+      # entrypoint ALTER ROLE về đúng mật khẩu này lúc boot.
+      DATABASE_URL: postgresql://qlhs_app:${QLHS_APP_PASSWORD:?QLHS_APP_PASSWORD chưa set}@postgres:5432/qlhs?schema=public
+      MIGRATE_DATABASE_URL: postgresql://qlhs:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD chưa set}@postgres:5432/qlhs?schema=public
+      QLHS_APP_PASSWORD: ${QLHS_APP_PASSWORD:?QLHS_APP_PASSWORD chưa set}
+    # api KHÔNG join edge: alias service mặc định `api` sẽ TRÙNG trên mạng edge với
+    # cái qlts-web dùng (qlts-web ở cả edge+qlts_default → resolve `api` ra nhầm
+    # QLHS api → QLTS /api 404). Chỉ `web` cần edge. Back-channel OIDC tới
+    # de-admin:8443 đi qua host-gateway (host publish edge:8443), giống cách QLTS làm.
+    extra_hosts:
+      - "de-admin.pmh.com.vn:host-gateway"
+    networks:
+      default: {}
+
+  # pg-backup dùng superuser → mật khẩu mạnh mới
+  pg-backup:
+    mem_limit: 512m
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD chưa set}
+
+# mailpit KHÔNG chạy ở prod (profiles: ['dev'] trong compose gốc) — prod gửi qua SMTP
+# thật. TRẦN RAM prod cho QLHS ≤ 24GB: postgres 14g + api 8g + web 256m + pg-backup
+# 512m = ~22.75g. Trần (kill nếu vượt), không cấp cứng — thực tế dùng ít hơn nhiều.
+networks:
+  # Tạo ngoài: docker network create --subnet 172.20.0.0/16 --gateway 172.20.0.1 edge (đã có sẵn từ PMH ID)
+  edge:
+    external: true

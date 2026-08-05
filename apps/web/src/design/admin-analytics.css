@@ -1,0 +1,293 @@
+/* 2.4 — Analytics quản lý · Aurora (Vân Đài). Card/segmented/meter/empty ăn theo kit
+   (.adminshell); chart + heatmap + delay-list là phần riêng của màn này. Token màu
+   kế thừa từ .adminshell nên mọi var() dưới đây resolve trong subtree quản trị. */
+
+.az-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+  align-items: start;
+}
+.az-grid > * {
+  min-width: 0;
+}
+.az-wide {
+  grid-column: 1 / -1;
+}
+@media (max-width: 1080px) {
+  .az-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---- panel (card body) ---- */
+.az-panel {
+  padding: var(--sp-5) var(--sp-5) var(--sp-6);
+  display: flex;
+  flex-direction: column;
+}
+.az-phead {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+.az-ptitle {
+  font-family: var(--display);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-lg);
+  letter-spacing: 0.3px;
+  margin: 0;
+}
+.az-pnote {
+  font-size: var(--fs-cap);
+  color: var(--ink-3);
+  margin-left: auto;
+}
+.az-phead .segmented {
+  margin-left: auto;
+}
+
+.az-empty {
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  margin: var(--sp-2) 2px;
+}
+
+/* ---- throughput twin-bar chart (SVG, shared scale) ---- */
+.az-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-2);
+}
+.az-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--fs-cap);
+  color: var(--ink-2);
+  font-weight: var(--fw-medium);
+}
+.az-sw {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  flex: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+/* in = "Tạo mới" (teal flow token) · out = "Hoàn tất" (emerald accent) — two clearly
+ * distinct hues, not neighbouring shades, so the categorical split reads at a glance. */
+.az-sw.in {
+  background: var(--general);
+}
+.az-sw.out {
+  background: var(--accent);
+}
+.az-chartwrap {
+  width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+}
+.az-barchart {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.az-barchart .grid-line {
+  stroke: var(--hairline);
+  stroke-width: 1;
+}
+.az-barchart .axis-num {
+  fill: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+}
+.az-barchart .x-lbl {
+  fill: var(--ink-3);
+  font-family: var(--mono);
+  font-size: var(--fs-eyebrow);
+}
+.az-barchart .bar-in {
+  fill: var(--general);
+}
+.az-barchart .bar-out {
+  fill: var(--accent);
+}
+
+/* ---- return-rate rows (per-flow meters) ---- */
+.az-retlist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  margin-top: var(--sp-2);
+}
+.az-rrow {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  align-items: center;
+  gap: var(--sp-4);
+}
+.az-rflow {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  color: var(--ink);
+}
+.az-rval {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.az-rval b {
+  color: var(--ink);
+  font-weight: var(--fw-bold);
+}
+.az-rval em {
+  font-style: normal;
+  color: var(--ink-3);
+}
+
+/* ---- dwell heatmap (separated, rounded cells; tint scaled to worst) ---- */
+.az-heatwrap {
+  overflow-x: auto;
+  margin: 0 calc(-1 * var(--sp-1));
+  padding: 0 var(--sp-1);
+}
+.az-heat {
+  width: 100%;
+  min-width: 480px;
+  border-collapse: separate;
+  border-spacing: 4px;
+}
+.az-heat th {
+  font-size: var(--fs-eyebrow);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: var(--fw-semibold);
+  padding: 6px var(--sp-3);
+  text-align: center;
+}
+.az-heat th.az-hcorner {
+  text-align: left;
+  white-space: nowrap;
+}
+.az-heat th.az-hrow {
+  text-align: left;
+  white-space: nowrap;
+  font-size: var(--fs-sm);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-2);
+  font-weight: var(--fw-medium);
+  padding: 8px var(--sp-3);
+}
+.az-hcell {
+  text-align: center;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--ink);
+  padding: 11px var(--sp-3);
+  border-radius: var(--r-xs);
+  border: 1px solid var(--hairline);
+  min-width: 72px;
+}
+.az-hcell.empty {
+  color: var(--ink-faint);
+  font-weight: var(--fw-normal);
+}
+.az-heatlegend {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+  font-size: var(--fs-mini);
+  color: var(--ink-3);
+}
+.az-heatscale {
+  display: inline-flex;
+  height: 10px;
+  width: 120px;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  border: 1px solid var(--stroke);
+}
+.az-heatscale span {
+  flex: 1;
+}
+
+/* ---- top-overdue (delay list) ---- */
+.az-delaylist {
+  display: flex;
+  flex-direction: column;
+}
+.az-delayrow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  width: 100%;
+  text-align: left;
+  padding: 13px var(--sp-1);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  cursor: pointer;
+}
+.az-delayrow:last-child {
+  border-bottom: 0;
+}
+.az-delayrow:hover .az-dcode {
+  color: var(--accent-2);
+}
+.az-dcode {
+  font-family: var(--mono);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+  flex: none;
+}
+.az-dmain {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.az-dstatus {
+  font-size: var(--fs-body);
+  color: var(--ink);
+  font-weight: var(--fw-medium);
+}
+.az-dsub {
+  font-size: var(--fs-mini);
+  color: var(--ink-3);
+}
+.az-dpill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-mini);
+  color: var(--sla);
+  background: var(--sla-bg);
+  border: 1px solid rgba(251, 113, 133, 0.3);
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  flex: none;
+}
+
+@media (max-width: 520px) {
+  .az-rrow {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .az-rval {
+    justify-self: start;
+  }
+}

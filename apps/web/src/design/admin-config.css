@@ -1,0 +1,123 @@
+/* Admin › Cấu hình › Email (SMTP) panel. Fallback values keep it usable even if a
+   token name drifts; inherits color/typography from the admin shell. */
+.cfg-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 760px;
+}
+.cfg-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cfg-head h1 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+.cfg-src {
+  font-size: 0.78rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--az-border, #34344a);
+  opacity: 0.9;
+}
+.cfg-src.src-db {
+  color: var(--az-ok, #4ade80);
+  border-color: currentColor;
+}
+.cfg-src.src-env {
+  color: var(--az-warn, #fbbf24);
+  border-color: currentColor;
+}
+.cfg-src.src-none {
+  opacity: 0.55;
+}
+.cfg-warn {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--az-warn, #fbbf24);
+  background: color-mix(in srgb, var(--az-warn, #fbbf24) 14%, transparent);
+  font-size: 0.86rem;
+}
+.cfg-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 20px;
+}
+.cfg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.cfg-field.cfg-wide {
+  grid-column: 1 / -1;
+}
+.cfg-field > span {
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+.cfg-field input {
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--az-border, #34344a);
+  background: var(--az-input-bg, rgba(255, 255, 255, 0.03));
+  color: inherit;
+  font: inherit;
+}
+.cfg-field input:focus-visible {
+  outline: 2px solid var(--az-accent, #4a9eff);
+  outline-offset: 1px;
+}
+.cfg-field.cfg-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.cfg-field.cfg-check input {
+  width: auto;
+}
+.cfg-hint {
+  font-size: 0.76rem;
+  opacity: 0.6;
+  font-style: normal;
+}
+.cfg-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+.cfg-test {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cfg-test h2 {
+  font-size: 1rem;
+  margin: 0;
+}
+.cfg-test-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.cfg-test-row input {
+  flex: 1;
+  min-width: 220px;
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--az-border, #34344a);
+  background: var(--az-input-bg, rgba(255, 255, 255, 0.03));
+  color: inherit;
+  font: inherit;
+}
+@media (max-width: 640px) {
+  .cfg-form {
+    grid-template-columns: 1fr;
+  }
+}

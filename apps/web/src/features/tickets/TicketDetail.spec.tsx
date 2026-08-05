@@ -1,0 +1,59 @@
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+vi.mock('./api', () => ({ getTicketDetail: vi.fn() }))
+import { getTicketDetail, type TicketDetail as Detail } from './api'
+import { TicketDetail } from './TicketDetail'
+
+const fixture: Detail = {
+  id: 't1', code: 'CT-2026-0042', status: 'Received from ACC', documentType: 'Contract',
+  description: 'Thanh toán đợt 4/8', paymentTerm: 'Net 30', contractNo: 'HD-118',
+  projectTeam: 'Landmark 81', budgetCode: 'B-04', contractor: 'Coteccons',
+  amount: '3480500000', currency: 'VND', roundNo: 0, overdueDays: 4, dwellDays: 4,
+  isClosed: false,
+  route: [
+    { status: 'Submitted', phase: 'past', holder: 'An', enteredAt: '2026-06-28T09:20:00Z' },
+    { status: 'Received from ACC', phase: 'now', holder: 'Trâm', enteredAt: '2026-07-03T16:12:00Z' },
+    { status: 'Completed', phase: 'next', holder: null, enteredAt: null },
+  ],
+  paused: false,
+  pauseReason: null,
+  pauses: [],
+  timeline: [
+    { action: 'submit', fromStatus: '', toStatus: 'Submitted', actorSub: 'sub-an', occurredAt: '2026-06-28T09:20:00Z', reason: null },
+    { action: 'sendBack', fromStatus: 'x', toStatus: 'Returned', actorSub: 'sub-kt', occurredAt: '2026-07-01T10:00:00Z', reason: 'Thiếu biên bản' },
+  ],
+  directory: { 'sub-an': 'Nguyễn Thị An', 'sub-kt': 'Phòng Kế toán' },
+}
+
+describe('TicketDetail — read-only deep-link page', () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  it('renders code, EN status, a field and an immutable-log line with its reason', async () => {
+    vi.mocked(getTicketDetail).mockResolvedValue(fixture)
+    render(<TicketDetail ticketId="t1" />)
+    await waitFor(() => expect(screen.getByText('CT-2026-0042')).toBeInTheDocument())
+    // EN status shows in the header chip (and the timeline "now" station).
+    expect(screen.getAllByText('Received from ACC').length).toBeGreaterThan(0)
+    expect(screen.getByText('HD-118')).toBeInTheDocument()
+    // Immutable log keeps the Return reason verbatim + resolves the actor sub to
+    // a directory name (never the raw sub).
+    expect(screen.getByText(/Thiếu biên bản/)).toBeInTheDocument()
+    expect(screen.getByText('Phòng Kế toán')).toBeInTheDocument()
+    expect(screen.queryByText('sub-kt')).not.toBeInTheDocument()
+    // Over-SLA badge is present.
+    expect(screen.getByLabelText('Quá hạn 4 ngày')).toBeInTheDocument()
+  })
+
+  // A transient failure shows the error screen with Retry; clicking it must
+  // recover and render the ticket (regression: load() didn't clear `error`).
+  it('recovers on Retry after a transient load failure', async () => {
+    vi.mocked(getTicketDetail).mockRejectedValueOnce(new Error('boom')).mockResolvedValueOnce(fixture)
+    render(<TicketDetail ticketId="t1" />)
+    const retry = await screen.findByRole('button', { name: /thử lại|retry/i })
+    await userEvent.click(retry)
+    await waitFor(() => expect(screen.getByText('CT-2026-0042')).toBeInTheDocument())
+    expect(screen.queryByRole('button', { name: /thử lại|retry/i })).not.toBeInTheDocument()
+  })
+})

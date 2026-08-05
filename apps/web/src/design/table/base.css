@@ -1,0 +1,79 @@
+/* Applicant table + inline horizontal "ga tàu" (rail2). Closed-tickets lookup. */
+.atbl {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  overflow-x: auto;
+}
+table.qtbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+table.qtbl thead th {
+  text-align: left;
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+table.qtbl th.r,
+table.qtbl td.r {
+  text-align: right;
+}
+table.qtbl tbody td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--line-soft);
+}
+table.qtbl tbody tr.click:hover td {
+  background: var(--panel-2);
+  cursor: pointer;
+}
+table.qtbl tbody tr.open td {
+  background: var(--accent-soft);
+}
+table.qtbl .code {
+  font-family: var(--mono);
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 12px;
+}
+table.qtbl .amt {
+  font-family: var(--mono);
+  font-weight: 600;
+}
+table.qtbl .amt .u {
+  color: var(--ink-3);
+  font-size: 9.5px;
+}
+table.qtbl .upd {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.exprow td {
+  background: var(--panel-2);
+}
+.expwrap {
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--r-m) var(--r-m) 0;
+  background: var(--bg-2);
+  padding: 8px 14px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.expcap {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  margin-bottom: 12px;
+}
+.expcap .warn {
+  color: var(--sla);
+  font-weight: 600;
+}

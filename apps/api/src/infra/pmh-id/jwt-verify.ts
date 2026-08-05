@@ -1,0 +1,42 @@
+import { jwtVerify, createLocalJWKSet, type JSONWebKeySet, type JWTPayload } from 'jose'
+import type { AuthenticatedUser } from '../../domain/auth/identity.port'
+
+export interface VerifyConfig {
+  jwks: JSONWebKeySet
+  issuer: string
+  audience: string
+}
+
+/**
+ * Offline JWT verification (AD-8): verify the RS256 signature against a cached
+ * JWKS (key chosen by `kid`) and REQUIRE matching `iss` + `aud`. The aud check
+ * is the confused-deputy guard in a multi-client SSO. No network per request.
+ */
+export async function verifyAccessToken(
+  token: string,
+  cfg: VerifyConfig,
+): Promise<AuthenticatedUser> {
+  const jwkSet = createLocalJWKSet(cfg.jwks)
+  const { payload } = await jwtVerify(token, jwkSet, {
+    issuer: cfg.issuer,
+    audience: cfg.audience,
+    algorithms: ['RS256'],
+  })
+  return claimsToUser(payload)
+}
+
+export function claimsToUser(payload: JWTPayload): AuthenticatedUser {
+  const sub = payload.sub
+  if (!sub) throw new Error('JWT missing required claim: sub')
+  const groups = Array.isArray(payload['groups'])
+    ? (payload['groups'] as unknown[]).filter((g): g is string => typeof g === 'string')
+    : []
+  const name = payload['name']
+  const email = payload['email']
+  return {
+    sub,
+    groups,
+    displayName: typeof name === 'string' ? name : undefined,
+    email: typeof email === 'string' ? email : undefined,
+  }
+}

@@ -1,0 +1,365 @@
+/* Ticket detail: dcard, vertical timeline, summary/log side panel, actionbar.
+   Back navigation reuses .closedhead/.backchip (design/table/closed-lookup.css).
+   Spacing + cỡ chữ dùng token sp/fs. */
+.dcard {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.dhead {
+  padding: var(--sp-4) 20px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex-wrap: wrap;
+}
+.dhead .clg {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  font-family: var(--mono);
+}
+.dhead .clg.nocode {
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--sans);
+  color: var(--ink-3);
+}
+.dhead .clg .c {
+  color: var(--accent);
+}
+.dhead .plg {
+  font-size: 13px;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.flowbadge {
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.dbody {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 0;
+}
+@media (max-width: 920px) {
+  .dbody {
+    grid-template-columns: 1fr;
+  }
+}
+.dleft {
+  padding: var(--sp-4) 20px;
+  border-right: 1px solid var(--line);
+}
+.dright {
+  padding: var(--sp-4) 18px;
+  background: var(--panel-2);
+}
+.blk {
+  margin-bottom: 20px;
+}
+.blk h3 {
+  font-family: var(--sans);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 10px;
+}
+
+/* field grid (Applicant/DCC data blocks) — mỗi giá trị kẻ khung riêng cho dễ đọc */
+.fgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px var(--sp-3);
+}
+.fgrid .f {
+  border: 1px solid var(--line-soft);
+  border-radius: 9px;
+  padding: var(--sp-2) 11px;
+  background: var(--panel-2);
+}
+.f .k {
+  font-family: var(--sans);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.f .v {
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 3px;
+}
+.f .v.mono {
+  font-family: var(--mono);
+}
+.f .v.full {
+  grid-column: 1 / -1;
+  font-weight: 400;
+}
+.f.wide {
+  grid-column: 1 / -1;
+}
+.blk.flush {
+  margin-bottom: 0;
+}
+.chip small.chipvi {
+  color: var(--ink-3);
+  font-weight: 400;
+}
+
+/* vertical timeline */
+.tl ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.tl .st {
+  position: relative;
+  padding-left: 34px;
+  padding-bottom: var(--sp-4);
+}
+.tl .st:last-child {
+  padding-bottom: 2px;
+}
+.tl .st::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 20px;
+  bottom: -2px;
+  width: 3px;
+  background: var(--line);
+}
+.tl .st.past::before {
+  background: var(--accent);
+}
+.tl .st:last-child::before {
+  display: none;
+}
+.tl .nd {
+  position: absolute;
+  left: 2px;
+  top: 1px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 3px solid var(--line);
+  display: grid;
+  place-items: center;
+}
+.tl .st.past .nd {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.tl .st.past .nd::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background-color: var(--on-accent);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><path d='M20 6 9 17l-5-5'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'><path d='M20 6 9 17l-5-5'/></svg>") center / contain no-repeat;
+}
+.tl .st.now .nd {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.tl .st.now .nd::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.tl .st.next .nd {
+  opacity: 0.6;
+}
+.tl .nm {
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+.tl .st.next .nm {
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.tl .nm .vi {
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  color: var(--ink-3);
+}
+.tl .here {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--on-accent);
+  background: var(--accent);
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+/* "Chờ X nhận/duyệt" — ga hiện tại đã bàn giao nhưng người kế chưa tiếp nhận. */
+.tl .waitfor {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--rush);
+  background: color-mix(in srgb, var(--rush) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rush) 40%, transparent);
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+.tl .waitfor::before {
+  content: '⏳';
+  font-size: 10px;
+}
+.tl .hold {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+}
+.tl .hn {
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.tl .tm {
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+  margin-top: 4px;
+}
+.tl .tm .over {
+  color: var(--sla);
+  font-weight: 600;
+}
+
+/* edit-in-pool (Submitted) */
+.editbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.editbar .hint {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+.editbox {
+  margin-bottom: var(--sp-4);
+  padding: 14px var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel-2);
+}
+.editbox .editactions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.editbox .editerr {
+  grid-column: 1 / -1;
+  color: var(--sla);
+  margin: 0;
+}
+
+/* summary + immutable log */
+.kv {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 12px;
+}
+.kv .k {
+  color: var(--ink-2);
+}
+.kv .v {
+  font-weight: 600;
+}
+.kv .v.mono {
+  font-family: var(--mono);
+}
+.kv .v.warn {
+  color: var(--sla);
+}
+.log .li {
+  display: flex;
+  gap: 9px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.log .dt {
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+  white-space: nowrap;
+  padding-top: 2px;
+}
+.log .tx {
+  font-size: 11.5px;
+}
+.log .tx b {
+  font-weight: 600;
+}
+.log .logempty {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+
+/* action bar + buttons */
+.abar {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 13px 20px;
+  border-top: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.abar .hint {
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+.abar .sp {
+  margin-left: auto;
+}
+/* .btn đã chuyển sang design/components.css (layer component chung, SPEC §3). */
+
+/* F8 — dòng nhật ký "dừng/chạy lại đồng hồ": ghép ở read từ ticket_sla_pause,
+   không phải sự kiện ticket_event, nên nhìn khác một chút. */
+.dcard .li.pauseli .tx {
+  color: var(--ink-2);
+  font-style: italic;
+}
+.dcard .pausetag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--rush);
+  background: var(--rush-bg, transparent);
+  border: 1px solid var(--line-soft);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+/* đã trễ TRƯỚC khi dừng đồng hồ — giữ số, hạ giọng */
+.dcard .sla.held {
+  color: var(--ink-2);
+  background: var(--panel-2);
+}

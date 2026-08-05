@@ -1,0 +1,328 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// TWO-ROLE MODEL (AD-4). The app connects as the NON-owner role `qlhs_app`
+// (DATABASE_URL) so the append-only GRANT/REVOKE on ticket_event bites. Run
+// `prisma migrate` as the table OWNER/superuser `qlhs` — NEVER as `qlhs_app`
+// (an owner bypasses its own REVOKE, silently re-enabling audit mutation; and
+// the migration that CREATEs qlhs_app can't be applied by qlhs_app itself).
+// Defense-in-depth: migration 20260725120000 adds a trigger that blocks
+// UPDATE/DELETE on ticket_event for any non-superuser regardless of ownership.
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Minimal base table proving migrate up/down works on the on-prem Postgres.
+/// Business tables (ticket, ticket_event append-only, sla_config composite) are
+/// owned by stories 1.3/1.4 — this scaffold only establishes the migration
+/// pipeline and the append-only GRANT step (added alongside ticket_event in 1.3).
+model HealthCheck {
+  id        Int      @id @default(autoincrement())
+  checkedAt DateTime @default(now())
+
+  @@map("health_check")
+}
+
+/// Local cache of PMH ID users. `sub` is the identity and every user FK
+/// joins on it (AD-7) — email is display-only and may change.
+model User {
+  sub          String   @id
+  employeeCode String?  @map("employee_code")
+  email        String?
+  fullName     String?  @map("full_name")
+  status       String   @default("active")
+  syncedAt     DateTime @default(now()) @updatedAt @map("synced_at")
+  /// F11 — opt-OUT of the morning digest. Default off (i.e. digest on) because
+  /// the digest is silent unless something needs the person that day.
+  digestOptOut Boolean  @default(false) @map("digest_opt_out")
+
+  @@map("user")
+}
+
+/// Local role assignment (SA-managed). Identity = PMH ID `sub`; an Admin grants
+/// QLHS roles here. This — not PMH groups — is the source of authorization.
+model UserRole {
+  sub  String
+  role String
+
+  @@id([sub, role])
+  @@map("user_role")
+}
+
+/// Local (non-SSO) credentials for the break-glass Admin/SA. Password is scrypt-
+/// hashed; `sub` joins to User like any other identity. SSO users never appear
+/// here — this exists so an SA can manage roles even when PMH ID is unreachable.
+model LocalCredential {
+  sub          String   @id
+  // Break-glass login identifier (a username like "admin.ssa", NOT an email —
+  // email → SSO). Column stays "email" (@map) so no migration is needed.
+  username     String   @unique @map("email")
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("local_credential")
+}
+
+/// Per-(prefix,year) code counter (AD-5). Incremented under a row lock inside
+/// the mint transaction — NOT a Postgres sequence (which would skip on rollback).
+model NumberCounter {
+  prefixYear String @id @map("prefix_year")
+  nextSeq    Int    @default(1) @map("next_seq")
+
+  @@map("number_counter")
+}
+
+/// Soft lock (AD-9): one holder per ticket for up to 5 min of inactivity.
+/// UNIQUE ticket_id is the final DB guard; acquire/seize is a conditional upsert.
+model TicketLock {
+  ticketId   String   @id @map("ticket_id")
+  holderSub  String   @map("holder_sub")
+  acquiredAt DateTime @default(now()) @map("acquired_at")
+  expiresAt  DateTime @map("expires_at")
+
+  @@map("ticket_lock")
+}
+
+/// A ticket. The 9 Applicant business fields are added by story 1.4; this story
+/// owns the state columns. `current_holder_sub` and `status` are only ever
+/// written by transition() (AD-2). User refs are `sub` (AD-7).
+model Ticket {
+  id               String        @id @default(uuid())
+  status           String
+  flow             String
+  code             String?       @unique
+  priority         String        @default("normal")
+  applicantSub     String        @map("applicant_sub")
+  currentHolderSub String?       @map("current_holder_sub")
+  roundNo          Int           @default(0) @map("round_no")
+  statusEnteredAt  DateTime      @default(now()) @map("status_entered_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+
+  // 2-phase handover (AD-10/AD-11): DCC2 flags "missing paper" OR "đẩy ngược
+  // DCC1" → the ticket keeps its status but bounces off DCC2's board into DCC1's
+  // reconcile lane. `reconcileReason` distinguishes what DCC1 must do:
+  // 'missing_paper' → re-hand over; 'return_requested' → Return. Both clear when
+  // resolved. Minimal flag, not a duplicate status column.
+  reconcileFlag    Boolean       @default(false) @map("reconcile_flag")
+  reconcileReason  String?       @map("reconcile_reason")
+
+  // Path to the scanned hardcopy on the shared drive (Contract Hardcopy step,
+  // FR-12/M10). A path string only — NEVER a file attachment (AD-7).
+  scanPath         String?       @map("scan_path")
+
+  // 9 Applicant fields (PRD §3.1). Nullable at the DB; presence is enforced by
+  // the create DTO. Amount is an integer in the currency's smallest unit.
+  // Document No (contract number) entered by DCC2/DCC3 (FR-11/FR-13). Distinct
+  // from `code`. Global partial-unique excluding Cancelled — the index is defined
+  // in migration SQL (Prisma can't express the WHERE); M5, AD-20.
+  documentNo   String? @map("document_no")
+
+  documentType String? @map("document_type")
+  description  String?
+  paymentTerm  String? @map("payment_term")
+  contractNo   String? @map("contract_no")
+  projectTeam  String? @map("project_team")
+  currency     String?
+  amount       BigInt?
+  budgetCode   String? @map("budget_code")
+  contractor   String?
+
+  events TicketEvent[]
+
+  @@index([status, flow])
+  @@index([applicantSub])
+  @@index([currentHolderSub])
+  @@index([status, statusEnteredAt])
+  @@map("ticket")
+}
+
+/// Immutable audit (AD-4). Append-only enforced by GRANT (INSERT+SELECT only)
+/// on the app DB role. The sole writer is transition().
+model TicketEvent {
+  id         BigInt   @id @default(autoincrement())
+  ticketId   String   @map("ticket_id")
+  actorSub   String   @map("actor_sub")
+  action     String
+  fromStatus String   @map("from_status")
+  toStatus   String   @map("to_status")
+  reason     String?
+  roundNo    Int      @map("round_no")
+  occurredAt DateTime @default(now()) @map("occurred_at")
+  meta       Json?
+  ticket     Ticket   @relation(fields: [ticketId], references: [id])
+
+  @@index([ticketId, occurredAt])
+  @@map("ticket_event")
+}
+
+/// Notification outbox (AD-15/M4). Completion/return transitions write an intent
+/// row in the SAME transaction; the Epic 5 dispatcher sends it at-least-once and
+/// marks `sent_at`. UNIQUE (ticket, round, kind) — added in migration — gives
+/// idempotency. The dispatcher/reminder logic is Story 5.2; 3.4 only writes.
+model NotificationOutbox {
+  id           BigInt    @id @default(autoincrement())
+  ticketId     String    @map("ticket_id")
+  roundNo      Int       @map("round_no")
+  kind         String
+  recipientSub String?   @map("recipient_sub")
+  status       String    @default("pending")
+  attempts     Int       @default(0)
+  createdAt    DateTime  @default(now()) @map("created_at")
+  sentAt       DateTime? @map("sent_at")
+  lastError    String?   @map("last_error")
+  // Exponential-backoff gate (AD-15): after a failed send the dispatcher parks the
+  // row here (now + backoff) so a transient SMTP outage isn't hammered every tick
+  // and isn't lost after a few quick retries. NULL = due immediately.
+  nextAttemptAt DateTime? @map("next_attempt_at")
+
+  @@index([status, createdAt])
+  @@index([status, nextAttemptAt])
+  @@map("notification_outbox")
+}
+
+/// F11 — one row per (recipient, day) that owes a morning digest. Separate from
+/// NotificationOutbox because that one is per-ticket (ticket+round+kind); a digest
+/// spans many tickets for one person. UNIQUE (recipient, date) — in the migration —
+/// is what guarantees "at most one digest per person per day". Body is rendered at
+/// send time from live data, so a retry never mails a stale picture.
+model DigestOutbox {
+  id            BigInt    @id @default(autoincrement())
+  recipientSub  String    @map("recipient_sub")
+  digestDate    DateTime  @map("digest_date") @db.Date
+  status        String    @default("pending")
+  attempts      Int       @default(0)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  sentAt        DateTime? @map("sent_at")
+  lastError     String?   @map("last_error")
+  nextAttemptAt DateTime? @map("next_attempt_at")
+
+  @@unique([recipientSub, digestDate])
+  @@index([status, nextAttemptAt])
+  @@map("digest_outbox")
+}
+
+/// F8 — SLA pause windows ("chờ bổ sung"). The clock stops while a ticket waits
+/// on something outside the office; the ticket KEEPS its status (a pause is not a
+/// station), so `overdue()`/`dwell()` subtract these windows instead. This table is
+/// its own audit record — ticket_event keeps its single writer, transition() (AD-4).
+/// A partial unique index (migration) allows at most one open window per ticket.
+model TicketSlaPause {
+  id           BigInt    @id @default(autoincrement())
+  ticketId     String    @map("ticket_id")
+  pausedAt     DateTime  @default(now()) @map("paused_at")
+  resumedAt    DateTime? @map("resumed_at")
+  reason       String
+  pausedBySub  String    @map("paused_by_sub")
+  resumedBySub String?   @map("resumed_by_sub")
+  /// Station the clock stopped at, captured at pause time (a resumed ticket has moved on).
+  status       String
+
+  @@index([ticketId, pausedAt])
+  @@index([status, pausedAt])
+  @@map("ticket_sla_pause")
+}
+
+/// Per-viewer "seen" state (AD-18). One row per (ticket, viewer sub); opening a
+/// ticket upserts last_viewed_at. The "unseen >24h" badge is DERIVED at read time
+/// (AD-6 — no stored flag). Server-side so it is consistent across devices.
+model TicketView {
+  ticketId     String   @map("ticket_id")
+  viewerSub    String   @map("viewer_sub")
+  lastViewedAt DateTime @map("last_viewed_at")
+
+  @@id([ticketId, viewerSub])
+  @@map("ticket_view")
+}
+
+/// SLA thresholds keyed by (status, flow) (B4). flow '*' is the baseline;
+/// flow-specific rows override. Terminal statuses have NO row (no badge).
+/// Day numbers are never hardcoded in the engine (AD-6).
+model SlaConfig {
+  status       String
+  flow         String   @default("*")
+  slaDays      Int      @map("sla_days")
+  updatedBySub String?  @map("updated_by_sub")
+  updatedAt    DateTime @default(now()) @map("updated_at")
+
+  @@id([status, flow])
+  @@map("sla_config")
+}
+
+/// Admin-managed dropdown values for the create-ticket form (N3): Payment Term
+/// and Project Team. Values are NEVER deleted — old tickets keep their string —
+/// only deactivated, which hides a value from new forms while preserving history.
+/// `kind` groups the two independent lists; `sort_order` drives display order.
+model OptionItem {
+  id        String   @id @default(uuid())
+  kind      String
+  value     String
+  sortOrder Int      @default(0) @map("sort_order")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([kind, value])
+  @@index([kind, active, sortOrder])
+  @@map("option_item")
+}
+
+/// 2.2 notification center — one row per event (never fanned out per user).
+/// Addressed to a person OR a role inbox (CHECK enforces exactly one). Written by
+/// a DB trigger in the transition transaction; read via a join to notification_read.
+/// 2.5 also writes escalation rows here (hourly scheduler); a partial unique index
+/// on (ticket_id, kind, waiting_status) WHERE kind LIKE 'Escalate%' — defined in
+/// migration 20260727140000, Prisma can't express it — makes that hourly re-run
+/// idempotent. `db push` would drop it; this project deploys via migrate.
+model Notification {
+  id            BigInt   @id @default(autoincrement())
+  ticketId      String   @map("ticket_id")
+  code          String?
+  recipientSub  String?  @map("recipient_sub")
+  recipientRole String?  @map("recipient_role")
+  kind          String
+  waitingStatus String?  @map("waiting_status")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([recipientSub, createdAt])
+  @@index([recipientRole, createdAt])
+  @@map("notification")
+}
+
+/// Per-user read marks for notifications — "read" is personal, so a shared role
+/// notification read by one DCC stays unread for the others.
+model NotificationRead {
+  notificationId BigInt   @map("notification_id")
+  sub            String
+  readAt         DateTime @default(now()) @map("read_at")
+
+  @@id([notificationId, sub])
+  @@map("notification_read")
+}
+
+/// Idempotency ledger for the PMH ID offboarding webhook: one row per delivered
+/// event_id so an at-least-once retry (or replay) is a no-op, not a re-kick.
+model ProcessedWebhookEvent {
+  eventId    String   @id @map("event_id")
+  receivedAt DateTime @default(now()) @map("received_at")
+
+  @@map("processed_webhook_event")
+}
+
+/// Runtime SMTP config editable from the admin UI (Cấu hình › Email). Singleton
+/// (id always 1). The password is AES-256-GCM encrypted (password_enc) — never
+/// plaintext. When host is null the app falls back to the SMTP_* env vars.
+model SmtpConfig {
+  id          Int      @id @default(1)
+  host        String?
+  port        Int?
+  secure      Boolean  @default(false)
+  username    String?
+  passwordEnc String?  @map("password_enc")
+  fromAddr    String?  @map("from_addr")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  updatedBy   String?  @map("updated_by")
+
+  @@map("smtp_config")
+}

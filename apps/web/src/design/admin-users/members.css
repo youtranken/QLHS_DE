@@ -1,0 +1,145 @@
+/* ===== avatar dùng chung (thành viên + ứng viên) ===== */
+.grp-detail .av {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-s);
+  background: linear-gradient(135deg, var(--contract), var(--payment));
+  color: #fff;
+  font-family: var(--display);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* ===== danh sách thành viên (card, padding 0) ===== */
+.mcard {
+  padding: 0;
+  overflow: hidden;
+}
+.mlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.mrow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 13px var(--sp-4);
+  transition: background var(--dur-fast);
+}
+.mrow + .mrow {
+  border-top: 1px solid var(--hairline);
+}
+.mrow:hover {
+  background: var(--panel-2);
+}
+.mr-who {
+  min-width: 0;
+  flex: 1;
+}
+.mr-who .nm {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mr-who .em {
+  display: block;
+  font-size: var(--fs-mini);
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mr-id {
+  flex: none;
+  font-family: var(--mono);
+  font-size: var(--fs-mini);
+  color: var(--ink-3);
+  background: var(--panel-2);
+  border: 1px solid var(--stroke);
+  border-radius: 7px;
+  padding: 3px 8px;
+}
+/* "Gỡ" = ghost + mực danger (override .btn.ghost) */
+.grp-detail .mrow .btn.mr-rm {
+  flex: none;
+  color: var(--sla);
+}
+.grp-detail .mrow .btn.mr-rm:hover {
+  background: var(--sla-bg);
+  color: var(--sla);
+}
+
+/* chip roster ("Tất cả"): trạng thái tài khoản + vai hiện tại */
+.mr-tags {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.role-chip {
+  font-size: var(--fs-mini);
+  font-weight: var(--fw-semibold);
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  color: var(--accent);
+  background: var(--aurora-soft);
+  border: 1px solid var(--stroke-strong);
+}
+.role-chip.plain {
+  color: var(--ink-3);
+  background: var(--panel-2);
+  border-color: var(--stroke);
+}
+
+/* nhóm rỗng — dùng khối .empty (icon + tiêu đề + trợ giúp) */
+.grp-empty {
+  padding: var(--sp-8) var(--sp-6);
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--ink-3);
+}
+
+@media (max-width: 760px) {
+  .grp {
+    grid-template-columns: 1fr;
+  }
+  .grp-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .grp-eyebrow {
+    flex: 1 0 100%;
+  }
+  .grp-item {
+    flex: 1 1 auto;
+  }
+  .grp-item .gi-desc {
+    display: none;
+  }
+  .grp-note {
+    flex: 1 0 100%;
+  }
+  .mrow {
+    flex-wrap: wrap;
+  }
+  .mr-id {
+    order: -1;
+  }
+  .mr-tags {
+    width: 100%;
+    justify-content: flex-start;
+    padding-left: 50px;
+  }
+}

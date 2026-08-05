@@ -1,0 +1,220 @@
+/* ga: node NEON đặt TUYỆT ĐỐI theo --x = i/(n-1); vạch | nối mép dưới node xuống
+   ray; nhãn dưới ray. Màu quầng = --lc (kế thừa từ .track theo tuyến); quá SLA → đỏ.
+   Nạp sau rail.css. */
+.stn {
+  position: absolute;
+  top: 0;
+  left: calc(var(--pad) + var(--x, 0) * (100% - var(--pad) - var(--padR)));
+  transform: translateX(-50%);
+  z-index: 2;
+  display: block;
+  flex: none;
+  min-width: 0; /* ghi đè min-width:74px rò từ board.css cũ */
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: center;
+}
+/* Tắt đường-nối kiểu CŨ còn sót trong board.css (.stn::before). */
+.stn::before {
+  content: none;
+}
+
+/* vạch | bắt đầu đúng MÉP DƯỚI node (bán kính = 15 + n*1.2) rồi chạy xuống ray —
+   không xuyên vào trong viên. Ga trống/ga cuối bán kính riêng nên override. */
+.stn .tick {
+  position: absolute;
+  left: 50%;
+  width: 3px;
+  transform: translateX(-50%);
+  border-radius: 2px;
+  background: var(--lc);
+  opacity: 0.9;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--lc) 70%, transparent);
+  top: calc(var(--ny) + 15px + var(--n, 1) * 1.2px);
+  height: calc(var(--gy) - var(--ny) - 15px - var(--n, 1) * 1.2px);
+}
+.stn.empty .tick {
+  opacity: 0.32;
+  box-shadow: none;
+  width: 2px;
+  top: calc(var(--ny) + 11px);
+  height: calc(var(--gy) - var(--ny) - 11px);
+}
+.stn.done .tick {
+  top: calc(var(--ny) + 16px);
+  height: calc(var(--gy) - var(--ny) - 16px);
+}
+.stn.over .tick {
+  background: var(--sla);
+  box-shadow: 0 0 7px var(--sla);
+}
+
+/* cờ ▲ trên node khi quá SLA */
+.stn .flag {
+  position: absolute;
+  left: 50%;
+  top: 20px;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--sla);
+  background: var(--sla-bg);
+  border: 1px solid color-mix(in srgb, var(--sla) 55%, transparent);
+  border-radius: 99px;
+  padding: 1px 7px;
+  white-space: nowrap;
+  box-shadow: 0 0 12px rgba(244, 119, 107, 0.35);
+  z-index: 5;
+}
+
+/* sóng lan phía sau node (chỉ ga đang giữ hồ sơ) */
+.stn .halo {
+  position: absolute;
+  left: 50%;
+  top: var(--ny);
+  width: calc(44px + var(--n, 1) * 13px);
+  height: calc(44px + var(--n, 1) * 13px);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+.stn .halo b {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--lc);
+  opacity: 0;
+  animation: msonar 2.8s ease-out infinite;
+}
+.stn .halo b:nth-child(2) {
+  animation-delay: 1s;
+}
+.stn .halo b:nth-child(3) {
+  animation-delay: 1.8s;
+}
+.stn.over .halo b {
+  border-color: var(--sla);
+}
+@keyframes msonar {
+  0% {
+    transform: scale(0.34);
+    opacity: 0.5;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* viên node — kích thước + độ sáng scale theo --n (số hồ sơ, chặn 1..5) */
+.stn .nd {
+  position: absolute;
+  left: 50%;
+  top: var(--ny);
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  width: calc(30px + var(--n, 1) * 2.4px);
+  height: calc(30px + var(--n, 1) * 2.4px);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: calc(11px + var(--n, 1) * 0.6px);
+  color: var(--ink);
+  border: 2px solid var(--lc);
+  background: radial-gradient(circle at 34% 28%, color-mix(in srgb, var(--lc) 14%, var(--panel)), var(--bg) 74%);
+  box-shadow:
+    0 0 calc(7px + var(--n, 1) * 3px) var(--lc),
+    0 0 3px var(--lc),
+    inset 0 0 10px color-mix(in srgb, var(--lc) 26%, transparent);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.stn:hover .nd {
+  transform: translate(-50%, -50%) scale(1.12);
+}
+.stn:focus-visible {
+  outline: none;
+}
+.stn:focus-visible .nd {
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 5px var(--accent);
+}
+
+/* ga trống — viên mờ nhỏ, không quầng, không nhãn số */
+.stn.empty .nd {
+  width: 22px;
+  height: 22px;
+  border-color: var(--line);
+  color: transparent;
+  background: var(--panel);
+  box-shadow: none;
+  opacity: 0.6;
+}
+/* ga cuối đã đóng — ✓ xanh completed */
+.stn.done .nd {
+  border-color: var(--done);
+  color: #04170f;
+  background: radial-gradient(circle, #6ff0ad, #2fae74);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--done) 55%, transparent), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+/* ga TIỀN-TUYẾN — ring nhấn "đây là mũi nhọn tuyến" */
+.stn.front .nd {
+  box-shadow:
+    0 0 calc(9px + var(--n, 1) * 3px) var(--lc),
+    0 0 0 4px color-mix(in srgb, var(--lc) 22%, transparent),
+    0 0 3px var(--lc),
+    inset 0 0 10px color-mix(in srgb, var(--lc) 26%, transparent);
+}
+/* quá SLA — đập đỏ (chỉ node này, đỡ tải máy yếu) */
+.stn.over .nd {
+  border-color: var(--sla);
+  animation: mhot 1.6s ease-in-out infinite;
+  box-shadow: 0 0 12px var(--sla), 0 0 4px var(--sla), inset 0 0 12px rgba(244, 119, 107, 0.4);
+}
+@keyframes mhot {
+  50% {
+    box-shadow: 0 0 22px var(--sla), 0 0 10px var(--sla), inset 0 0 16px rgba(244, 119, 107, 0.55);
+  }
+}
+
+/* Khối nhãn đặt tuyệt đối DƯỚI ray; xếp dọc: tên ga → số hồ sơ → ▲ quá hạn. */
+.stn .cap {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--gy) + 12px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.stn .cn {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  line-height: 1.1;
+}
+.stn.empty .cn {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.stn .cs {
+  /* Vietnamese short label — sans (mono cramps diacritics at 10px). */
+  font-family: var(--sans);
+  font-size: 10px;
+  color: var(--ink-3);
+  line-height: 1.1;
+}

@@ -1,0 +1,51 @@
+# Docker build context excludes. Nothing here reaches the build engine, so it can
+# never end up in a prod image. The build installs its own deps and compiles from
+# source under apps/*, so host build outputs and dev/planning artefacts are noise.
+
+# Deps & build outputs — the image runs `pnpm install` + build itself
+node_modules
+**/node_modules
+dist
+**/dist
+.pnpm-store
+# tsc -b incremental cache — if copied in while `dist` is excluded, tsc thinks the
+# package is already built and skips emit → @qlhs/contracts has no dist/*.d.ts and
+# the web/api build fails with TS2307. Never ship it into the build context.
+**/*.tsbuildinfo
+
+# Tests & e2e — belong in git, never needed to RUN the app in prod
+apps/api/test
+apps/web/e2e
+apps/web/.playwright
+.playwright-mcp
+
+# Planning / design / docs / generated maps — dev-only, huge, unused at runtime
+_bmad
+_bmad-output
+docs
+design-previews
+graphify-out
+vbsec-reports
+Img
+*.png
+*.md
+!apps/*/README.md
+
+# Backups & DB dumps
+backups
+data_backups
+
+# Secrets & certs — must never be baked into an image (mounted at runtime instead)
+.env
+.env.*
+!.env.example
+pmh.com.vn
+TEST-ACCOUNTS.md
+
+# VCS, CI, editor
+.git
+.gitignore
+.gitattributes
+.github
+.vscode
+.idea

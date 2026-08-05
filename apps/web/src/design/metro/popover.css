@@ -1,0 +1,74 @@
+/* popover hover ga — vị trí do React đặt (fixed) */
+.stnpop {
+  position: fixed;
+  z-index: 65;
+  width: 256px;
+  background: var(--panel-3);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--elev-2);
+  padding: 10px 12px;
+  pointer-events: none;
+}
+.stnpop .ph {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+.stnpop .pt {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 13px;
+  flex: 1;
+}
+.stnpop .pn {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink-3);
+}
+.stnpop .row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 0;
+  font-size: 11.5px;
+}
+.stnpop .row .c {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--accent-2);
+}
+.stnpop .row .w {
+  flex: 1;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stnpop .row .d {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink-3);
+}
+.stnpop .row .d.ov {
+  color: var(--sla);
+  font-weight: 700;
+}
+.stnpop .more {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink-3);
+  padding-top: 3px;
+}
+.stnpop .hint {
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--line-soft);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}

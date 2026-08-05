@@ -1,0 +1,16 @@
+{
+  "name": "QLHS — Quản lý hồ sơ",
+  "short_name": "QLHS",
+  "description": "Theo dõi hồ sơ qua các ga điều độ — bản đồ tuyến, SLA, thông báo.",
+  "lang": "vi",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0a111c",
+  "theme_color": "#0e1622",
+  "icons": [
+    { "src": "/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "/icon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "maskable" }
+  ]
+}

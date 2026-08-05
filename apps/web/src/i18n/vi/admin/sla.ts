@@ -1,0 +1,87 @@
+/** SLA thresholds config + SLA pause monitor. */
+export const adminSla = {
+  config: {
+    title: 'Ngưỡng SLA',
+    // Split around <b>làm việc</b>.
+    infoPrefix: 'Ngày ',
+    infoBold: 'làm việc',
+    infoSuffix: ' (bỏ T7/CN). Ngưỡng tối thiểu 1 ngày; đổi xong bấm lưu là áp ngay badge ▲.',
+    savedMsg: 'Đã lưu {n} ngưỡng SLA — badge ▲ áp dụng ngay trên toàn hệ thống.',
+    saveFail: 'Lưu thất bại — thử lại.',
+    sectionAria: 'Ngưỡng SLA {flow}',
+    stationCount: '{n} ga có ngưỡng',
+    decAria: 'Giảm ngưỡng {flow} {status}',
+    incAria: 'Tăng ngưỡng {flow} {status}',
+    inputAria: 'Ngưỡng SLA {flow} {status} (ngày)',
+    dirty: 'Chưa lưu',
+    saved: 'Đã lưu',
+    savebarAria: 'Lưu thay đổi ngưỡng SLA',
+    // Rendered after <b>{n}</b>.
+    unsavedSuffix: ' thay đổi chưa lưu',
+    cancel: 'Hủy',
+    saving: 'Đang lưu…',
+    saveBtn: 'Lưu ngưỡng SLA',
+    tablistAria: 'Chọn luồng để cấu hình ngưỡng',
+    unitDay: 'ngày',
+    // Pill thay cho số thứ tự ga ở tab Chung (ngưỡng áp cho mọi luồng).
+    stationPill: 'mọi luồng',
+    sharedNote:
+      'Ngoài các ga trên, luồng còn tính ngưỡng ở nhóm Chung (Submitted, Andy, Returned…).',
+    loading: 'Đang tải cấu hình ngưỡng…',
+    loadError: 'Không tải được cấu hình ngưỡng.',
+    empty: 'Chưa có ngưỡng SLA nào để cấu hình.',
+  },
+  /** Nhãn tab luồng — General/Contract-Budget/Payment là tên canonical EN
+   *  (render lang="en" ở component); chỉ "Chung" là tiếng Việt. */
+  tabs: {
+    all: 'Chung',
+  },
+  flowDesc: {
+    all: 'Áp cho mọi luồng — các ga dùng chung ở đầu & khi trả lại.',
+    general: 'Tuyến ngắn — DCC1 ôm cả tuyến, không qua DCC2/DCC3.',
+    contract: 'Tuyến dài — DCC2 → ACC → BOP → bản cứng.',
+    payment: 'Tuyến ngắn nhất — DCC3.',
+  },
+  /** VI subtitle per canonical EN status (AD-13 — presentation only). */
+  statusNote: {
+    Submitted: 'Applicant đã nộp, chờ DCC1 nhận',
+    'Submitted to DCC2': 'DCC1 đã bàn giao, chờ DCC2 nhận',
+    'Received by DCC2': 'DCC2 đã nhận, đang kiểm tra hồ sơ',
+    'Submitted to DCC3': 'DCC1 đã bàn giao, chờ DCC3 nhận',
+    'Received by DCC3': 'DCC3 đã nhận, đang xử lý',
+    'Submitted to VP Andy': 'Đã trình VP Andy phê duyệt',
+    'Submitted to Accounting': 'Đã gửi kế toán, chờ kết quả',
+    'Received from ACC': 'Kế toán trả kết quả, chờ bước sau',
+    'Submitted to BOP': 'Đã trình BOP ký duyệt',
+    Hardcopy: 'Chờ nộp / đối chiếu bản cứng',
+    'Submitted to DCC2 (Hardcopy)': 'Bàn giao bản cứng cho DCC2',
+    Returned: 'Bị trả lại Applicant để bổ sung',
+    'Return-fixing': 'Applicant đang sửa hồ sơ bị trả',
+    Reopened: 'Hồ sơ đã đóng được mở lại',
+  } as Record<string, string>,
+  pauses: {
+    title: 'Tạm dừng SLA',
+    loadError: 'Không tải được báo cáo — thử lại sau.',
+    loading: 'Đang tải báo cáo…',
+    // Split around the two <b> spans; a literal ' ' JSX space follows infoP2.
+    infoP1: 'Đồng hồ dừng nghĩa là hồ sơ ',
+    infoB1: 'không bị tính trễ',
+    infoP2: '. Từ',
+    infoB2: '{n} ngày làm việc',
+    infoP3: ' trở lên mà chưa chạy lại thì nên hỏi lại người giữ.',
+    openTitle: 'Đang dừng đồng hồ',
+    openCount: '{n} hồ sơ',
+    staleSuffix: ' · {n} quá lâu',
+    openEmptyTitle: 'Đồng hồ đang chạy',
+    openEmpty: 'Không có đồng hồ nào đang dừng — mọi hồ sơ đều đang được tính SLA.',
+    pausedDays: '{n} ngày',
+    daysUnit: 'ngày',
+    staleTag: 'quá lâu',
+    byStationAria: 'Tần suất pause theo ga',
+    byStationTitle: 'Tần suất theo ga',
+    windowDays: '{n} ngày gần nhất',
+    byStationEmpty: 'Chưa có lần dừng đồng hồ nào trong kỳ.',
+    stationMeta: '{pauses} lần · {tickets} hồ sơ · lâu nhất {days} ngày',
+    openNow: '{n} đang dừng',
+  },
+} as const

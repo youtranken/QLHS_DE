@@ -1,0 +1,50 @@
+/** Ops analytics: throughput chart, return rates, dwell heatmap, top overdue. */
+export const adminAnalytics = {
+  ariaLabel: 'Management analytics',
+  title: 'Operational analytics',
+  exportAria: 'Export the entire audit log to CSV',
+  exportCsv: 'Export CSV',
+  loadError: 'Could not load metrics — try again later.',
+  loading: 'Computing metrics…',
+  /** Display name per canonical flow (fallback: raw flow). */
+  flows: {
+    General: 'General',
+    Contract: 'Contract',
+    Payment: 'Payment',
+  } as Record<string, string>,
+  throughput: {
+    aria: 'Throughput by period',
+    title: 'Created ↔ completed by period',
+    granularityAria: 'Period unit',
+    week: 'Week',
+    month: 'Month',
+    legendIn: 'Created',
+    legendOut: 'Completed',
+    chartAria: 'Tickets created and completed by period',
+    empty: 'No data for this period yet.',
+    createdTitle: '{n} created',
+    completedTitle: '{n} completed',
+  },
+  returns: {
+    title: 'Return rate by flow',
+    note: 'lower is better',
+  },
+  dwell: {
+    aria: 'Where tickets dwell longest',
+    title: 'Where tickets pile up (avg days / station)',
+    note: 'darker = longer dwell',
+    empty: 'No transitions yet to measure.',
+    station: 'Station',
+    cellTitle: '{status} · {flow}: {days} avg days · {count} transitions',
+    legendLow: 'Low',
+    legendHigh: 'High · longest {n} days',
+  },
+  topOverdue: {
+    aria: 'Most overdue tickets in progress',
+    title: 'Most overdue in progress',
+    count: '{n} tickets past SLA',
+    emptyTitle: 'All on time',
+    emptyHelp: 'No tickets are past SLA.',
+    overdueDays: '▲ {n} days',
+  },
+} as const

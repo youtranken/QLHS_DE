@@ -1,0 +1,162 @@
+/* ===== Hoạt động gần đây ===== */
+.act {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 2px;
+  font-size: var(--fs-cap);
+}
+.act + .act {
+  border-top: 1px solid var(--hairline);
+}
+.act .tm {
+  flex: none;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+  width: 42px;
+}
+.act .who {
+  flex: 0 1 128px;
+  color: var(--ink-2);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.act .code {
+  margin-left: auto;
+  flex: none;
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--accent-2);
+}
+.actft {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 10px;
+  margin-top: 4px;
+  border-top: 1px dashed var(--line-soft);
+}
+@media (max-width: 680px) {
+  .act {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+  .act .who {
+    flex: 1;
+  }
+}
+
+/* ===== cột phụ: Việc cần làm + Hệ thống ===== */
+.scard {
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-l);
+  box-shadow: var(--elev-1);
+  padding: 14px 15px;
+}
+.scard h3 {
+  font-family: var(--display);
+  font-size: var(--fs-body);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.scard h3 .n {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--ink-2);
+  background: var(--panel-3);
+  border-radius: 99px;
+  padding: 0 8px;
+  line-height: 18px;
+}
+.tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.task {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 9px 11px;
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  background: var(--panel-2);
+  text-decoration: none;
+  color: var(--ink-2);
+  box-shadow: 0 1px 0 var(--hairline) inset;
+  transition:
+    transform 0.12s ease-out,
+    border-color 0.15s,
+    box-shadow 0.15s,
+    color 0.15s;
+}
+.task:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent);
+  color: var(--ink);
+}
+.task.warn {
+  border-left-color: var(--sla);
+}
+.task.warn:hover {
+  border-color: color-mix(in srgb, var(--sla) 55%, var(--line-soft));
+  box-shadow: var(--glow-sla);
+}
+.task .tt {
+  display: block;
+  font-size: var(--fs-cap);
+  font-weight: 600;
+  line-height: 1.35;
+}
+.task .ts {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+.task .go {
+  margin-left: auto;
+  flex: none;
+  color: var(--ink-3);
+  align-self: center;
+}
+.task:hover .go {
+  color: var(--accent);
+}
+.sysrow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: var(--fs-mini);
+  color: var(--ink-2);
+}
+.sysrow + .sysrow {
+  border-top: 1px solid var(--hairline);
+}
+.sysrow .k {
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+}
+.sysrow .v {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.sysrow .v.ok {
+  color: var(--done);
+}

@@ -1,0 +1,81 @@
+/* signals: flow chip + priority pill (cỡ chữ nhỏ nhất = --fs-xs) */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 3px 9px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.chip .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.chip.fl-contract .dot {
+  background: var(--contract);
+}
+.chip.fl-payment .dot {
+  background: var(--payment);
+}
+.chip.fl-general .dot {
+  background: var(--general);
+}
+.chip small {
+  color: var(--ink-3);
+  font-weight: 400;
+  font-family: var(--sans);
+  letter-spacing: 0;
+}
+.chip.done {
+  color: var(--done);
+  border-color: color-mix(in srgb, var(--done) 40%, var(--line));
+}
+.chip.done .dot {
+  background: var(--done);
+}
+.chip.sla,
+.chip.ret {
+  color: var(--sla);
+  border-color: color-mix(in srgb, var(--sla) 40%, var(--line));
+}
+.chip.sla .dot,
+.chip.ret .dot {
+  background: var(--sla);
+}
+.pill-prio {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px var(--sp-2);
+  border-radius: 5px;
+}
+.pill-prio.urgent {
+  color: var(--urgent);
+  background: var(--urgent-soft);
+}
+.pill-prio.rush {
+  color: var(--rush);
+  background: var(--rush-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb .tcard {
+    animation: none;
+  }
+  .tcard:hover,
+  .tcard:focus-within {
+    transform: none;
+  }
+}

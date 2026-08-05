@@ -1,0 +1,119 @@
+/* Danh mục (admin-aurora screen 03): kind segmented tabs · note bar · catalog
+   table (switch toggle + inline rename) · Add-value Dialog. Kit primitives
+   (.segmented/.seg/.tbl/.table-card/.switch/.btn/.empty/.pill/.aa-modal*) come
+   from admin-aurora/*.css; only screen-specific glue lives here. */
+
+/* ---- toolbar (segmented tabs row) ---- */
+.adminshell .cat-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin: 0 0 var(--sp-4);
+}
+
+/* ---- note bar ---- */
+.adminshell .note-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--panel-2);
+  border: 1px solid var(--stroke);
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+}
+.adminshell .note-bar svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--accent);
+}
+
+/* ---- value cell ---- */
+.adminshell .cat-val {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.adminshell .cat-val .val-text {
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  color: var(--ink);
+}
+.adminshell .tbl tr.off .cat-val .val-text {
+  color: var(--ink-3);
+}
+
+/* inline rename */
+.adminshell .cat-edit {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.adminshell .cat-edit .txt-input {
+  flex: 1;
+  min-width: 180px;
+  width: auto;
+}
+
+/* ---- usage count ---- */
+.adminshell .usage {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.adminshell .usage .n {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--fw-semibold);
+  color: var(--ink);
+}
+.adminshell .usage .u {
+  font-size: var(--fs-mini);
+  color: var(--ink-3);
+}
+
+/* ---- state cell (switch + label) ---- */
+.adminshell .state-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.adminshell .state-cell .state-lbl {
+  font-size: var(--fs-mini);
+  color: var(--ink-3);
+  font-weight: var(--fw-medium);
+  min-width: 22px;
+}
+
+/* ---- Add-value Dialog: centre the portalled content (Radix renders Overlay and
+   Content as siblings, so Content positions itself). Combined selector beats
+   .aa-modal's own `width:100%`. ---- */
+.aa-modal.cat-modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(440px, calc(100vw - 2 * var(--sp-5)));
+  /* Sit ABOVE the blurred overlay (Radix renders them as siblings, so the
+     content needs its own z-index or the overlay paints over it → the modal
+     looked dimmed/blurred). Still below toasts (--z-toast: 90). */
+  z-index: calc(var(--z-overlay) + 1);
+}
+/* Keep the modal on its own panel surface — never repaint the page canvas.
+   The `adminshell` class is borrowed only to re-expose the scoped kit (btn/
+   txt-input); reset the shell's page LAYOUT (flex + stretch + min-height:100vh)
+   so the dialog hugs its content instead of filling the whole viewport. */
+.aa-modal.adminshell {
+  background-image: none;
+  background-attachment: initial;
+  display: block;
+  align-items: initial;
+  min-height: 0;
+}

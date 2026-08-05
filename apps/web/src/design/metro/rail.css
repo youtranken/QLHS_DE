@@ -1,0 +1,158 @@
+/* Ray LIỀN một mạch (không đoạn rời): 1 ống nền (.rline) + 1 lớp "đã đi qua" (.lit)
+   MỌC DẦN tới ga tiền-tuyến qua --p; đầu máy chạy tới đó rồi đậu. Node đặt tuyệt đối
+   trong .track theo --x (xem station.css). Nạp SAU board.css để thắng .rail/.node cũ. */
+.track {
+  position: relative;
+  flex: 1;
+  height: 148px;
+  min-width: 0;
+  --lc: var(--accent);
+  --rc: var(--rail-contract);
+  --ny: 64px; /* tâm node tính từ trên */
+  --gy: 108px; /* mức ray (hạ xuống → vạch | dài hơn) */
+  --pad: 20px; /* lề trái: ga đầu thụt vào */
+  --padR: 64px; /* lề phải: chừa cho nhãn ga cuối dài (vd "Sent to Accounting") */
+  --p: 0;
+}
+.track.fl-general {
+  --lc: var(--general);
+  --rc: var(--rail-general);
+}
+.track.fl-contract {
+  --lc: var(--contract);
+  --rc: var(--rail-contract);
+}
+.track.fl-payment {
+  --lc: var(--payment);
+  --rc: var(--rail-payment);
+}
+
+/* ống ray nền — một mạch, chạy suốt từ ga đầu đến ga cuối */
+.rline {
+  position: absolute;
+  left: var(--pad);
+  right: var(--padR);
+  top: var(--gy);
+  height: 6px;
+  display: block;
+  border-radius: 99px;
+  background: var(--rc);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08);
+}
+/* lớp ĐÃ ĐI QUA — sáng; MỌC DẦN theo tàu (mgrow) rồi giữ; shimmer chảy dịu sau đó */
+.rline .lit {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--p) * 100%);
+  border-radius: 99px;
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) 0 / 54px 100% repeat-x,
+    linear-gradient(90deg, var(--lc), color-mix(in srgb, var(--lc) 72%, #fff 16%));
+  background-blend-mode: overlay, normal;
+  box-shadow: 0 0 14px var(--lc), 0 0 5px var(--lc);
+  animation: mgrow 3.8s cubic-bezier(0.3, 0.6, 0.25, 1) both, mflow 3.2s linear infinite 3.8s;
+}
+@keyframes mgrow {
+  from {
+    width: 0;
+  }
+  to {
+    width: calc(var(--p) * 100%);
+  }
+}
+@keyframes mflow {
+  to {
+    background-position: 54px 0, 0 0;
+  }
+}
+
+/* ĐẦU MÁY — chạy tới ga tiền-tuyến rồi đậu (bob nhẹ). Tông dịu, không chói. */
+.train {
+  position: absolute;
+  top: var(--gy);
+  left: calc(var(--pad) + var(--p) * (100% - var(--pad) - var(--padR)));
+  z-index: 4;
+  pointer-events: none;
+  animation: mride 3.8s cubic-bezier(0.3, 0.6, 0.25, 1) both;
+}
+.train .loco {
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  transform: translateX(-50%);
+  display: block;
+  width: 34px;
+  height: 19px;
+  color: var(--lc);
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--lc) 55%, transparent));
+  animation: mbob 2.6s ease-in-out infinite 3.8s;
+}
+.train .loco .cab {
+  fill: color-mix(in srgb, var(--lc) 72%, var(--panel) 28%);
+  stroke: color-mix(in srgb, var(--lc) 50%, transparent);
+  stroke-width: 0.5;
+}
+.train .loco .win {
+  fill: color-mix(in srgb, var(--lc) 24%, #cdddf0);
+}
+.train .loco .lamp {
+  fill: color-mix(in srgb, #fff 70%, var(--lc));
+}
+.train .loco .wh {
+  fill: var(--bg);
+  stroke: var(--lc);
+  stroke-width: 1.2;
+}
+
+/* LIGHT — đầu máy đọc rõ trên giấy sáng: thân ĐẶC màu tuyến, cửa sổ trắng, bánh
+   sẫm, đèn hổ phách; bỏ neon, dùng đổ bóng thật. */
+:root[data-theme='light'] .train .loco {
+  filter: drop-shadow(0 1.5px 2px rgba(60, 50, 35, 0.28));
+}
+:root[data-theme='light'] .train .loco .cab {
+  fill: var(--lc);
+  stroke: color-mix(in srgb, var(--lc) 62%, #000);
+  stroke-width: 0.6;
+}
+:root[data-theme='light'] .train .loco .win {
+  fill: #fbfdff;
+}
+:root[data-theme='light'] .train .loco .wh {
+  fill: #33383f;
+  stroke: color-mix(in srgb, var(--lc) 55%, #000);
+  stroke-width: 1;
+}
+:root[data-theme='light'] .train .loco .lamp {
+  fill: #ffcf5a;
+}
+
+/* LIGHT — ray "đã đi qua": bỏ quầng neon (chói trên giấy), giữ màu tuyến đặc hơi
+   trầm để đọc rõ, thay glow bằng đổ bóng thật (khớp cách xử đầu máy ở trên). */
+:root[data-theme='light'] .rline .lit {
+  background: linear-gradient(90deg, var(--lc), color-mix(in srgb, var(--lc) 82%, #000 10%));
+  background-blend-mode: normal;
+  box-shadow: 0 1px 2px rgba(60, 50, 35, 0.22);
+}
+
+@keyframes mride {
+  0% {
+    left: calc(var(--pad) - 24px);
+    opacity: 0;
+  }
+  22% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(var(--pad) + var(--p) * (100% - var(--pad) - var(--padR)));
+    opacity: 1;
+  }
+}
+@keyframes mbob {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, -1.5px);
+  }
+}

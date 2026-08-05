@@ -1,0 +1,288 @@
+/* Audit log (screen 7 · Nhật ký hệ thống) — filter bar with custom Select +
+   DatePicker, event table, pager, "Hôm nay" mini-card. Scoped to .adminshell;
+   tokens come from admin-aurora. The kit supplies card, sec, field, btn, tbl,
+   the aa-select, datefield and aa-cal families; only screen-specific pieces here. */
+
+.adminshell .audit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: var(--sp-6);
+  align-items: start;
+}
+.adminshell .audit-main,
+.adminshell .audit-side {
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .adminshell .audit-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---- filter form: ONE compact row (small sized fields; wraps only if needed) ---- */
+.adminshell .filter-card {
+  padding: var(--sp-4) var(--sp-5);
+}
+.adminshell .filter-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--sp-3) var(--sp-4);
+}
+.adminshell .filter-grid > .field {
+  min-width: 0;
+  gap: 5px;
+}
+.adminshell .field-code { width: 150px; }
+.adminshell .field-actor { width: 140px; }
+.adminshell .field-event { width: 190px; }
+/* denser controls so the row stays tidy */
+.adminshell .filter-grid .txt-input,
+.adminshell .filter-grid .aa-select-trigger,
+.adminshell .filter-grid .date-trigger {
+  padding: 8px 11px;
+  font-size: var(--fs-sm);
+}
+.adminshell .daterange {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.adminshell .daterange > .datefield {
+  width: 124px;
+  min-width: 0;
+}
+.adminshell .daterange .arrow {
+  display: inline-flex;
+  color: var(--ink-faint);
+}
+.adminshell .daterange .arrow svg {
+  width: 15px;
+  height: 15px;
+}
+/* actions ride the same row, pushed to the right end */
+.adminshell .filter-actions {
+  display: flex;
+  gap: var(--sp-2);
+  margin-left: auto;
+}
+.adminshell .filter-actions .btn {
+  padding: 8px 14px;
+}
+@media (max-width: 760px) {
+  .adminshell .filter-actions { margin-left: 0; }
+}
+/* Màn rất hẹp (≤400px): 2 ô ngày cạnh nhau quá chật → xếp dọc, mũi tên quay xuống. */
+@media (max-width: 400px) {
+  .adminshell .field-dates { width: 100%; }
+  .adminshell .daterange {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .adminshell .daterange > .datefield { width: 100%; }
+  .adminshell .daterange .arrow { align-self: center; transform: rotate(90deg); }
+}
+
+/* Portalled calendar day is a <button> (kit .day was authored for <div>): drop
+   UA padding so the number stays centred in the aspect-ratio cell. */
+.aa-date-pop .day {
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* ---- event table cells ---- */
+.adminshell .tbl-scroll {
+  overflow-x: auto;
+}
+.adminshell .tbl-scroll .tbl {
+  min-width: 640px;
+}
+/* Khớp ngưỡng card-collapse của bảng (responsive.css @860): dải 681–860 bảng đã
+   xếp thẻ nên bỏ luôn scroll-box min-width, tránh cuộn ngang thừa trên thẻ. */
+@media (max-width: 860px) {
+  .adminshell .tbl-scroll {
+    overflow-x: visible;
+  }
+  .adminshell .tbl-scroll .tbl {
+    min-width: 0;
+  }
+}
+
+.adminshell .tm {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.adminshell .tm .d {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--ink);
+}
+.adminshell .tm .h {
+  font-size: var(--fs-mini);
+  color: var(--ink-3);
+}
+.adminshell .code-btn {
+  font-family: var(--mono);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--ink);
+  background: var(--panel-2);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r-xs);
+  padding: 4px 9px;
+  cursor: pointer;
+  transition: border-color var(--dur-fast), color var(--dur-fast);
+}
+.adminshell .code-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.adminshell .who {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.adminshell .who .nm {
+  font-size: var(--fs-sm);
+}
+.adminshell .who .sub {
+  font-family: var(--mono);
+  font-size: var(--fs-mini);
+  color: var(--ink-3);
+}
+
+/* event chip tones (per §6) */
+.adminshell .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-mini);
+  font-weight: var(--fw-semibold);
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  line-height: 1.35;
+  color: var(--ink-2);
+  background: var(--panel-2);
+}
+.adminshell .chip.ok {
+  color: var(--done);
+  background: var(--done-soft);
+}
+.adminshell .chip.bad {
+  color: var(--sla);
+  background: var(--sla-bg);
+}
+.adminshell .chip.acc {
+  color: var(--contract);
+  background: var(--rail-contract);
+}
+
+.adminshell .trans {
+  font-family: var(--mono);
+  font-size: var(--fs-mini);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.adminshell .trans .arw {
+  color: var(--ink-faint);
+}
+.adminshell .trans .none {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+.adminshell .reason {
+  display: block;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+.adminshell .reason.dash {
+  color: var(--ink-faint);
+}
+
+/* returned-event tinted row */
+.adminshell .tbl tr.ev-return td {
+  background: var(--sla-bg);
+}
+.adminshell .tbl tr.ev-return:hover td {
+  background: var(--sla-bg);
+}
+
+/* ---- pager ---- */
+.adminshell .pager {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+.adminshell .pager .pinfo {
+  font-size: var(--fs-cap);
+  color: var(--ink-3);
+}
+.adminshell .pager .pgap {
+  flex: 1;
+}
+
+/* ---- "Hôm nay" mini-card ---- */
+.adminshell .today-card {
+  padding: var(--sp-5);
+}
+.adminshell .today-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+.adminshell .today-head .n {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: var(--fs-cap);
+  color: var(--ink-3);
+}
+.adminshell .today-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: 11px 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.adminshell .today-row:last-child {
+  border-bottom: 0;
+}
+.adminshell .today-row .lbl {
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+.adminshell .today-row .cnt {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-num-sm);
+  color: var(--ink);
+}
+.adminshell .today-row.hot {
+  margin: 0 calc(-1 * var(--sp-3));
+  padding: 11px var(--sp-3);
+  border-radius: var(--r-xs);
+  background: var(--sla-bg);
+  border-bottom: 0;
+}
+.adminshell .today-row.hot + .today-row {
+  border-top: 1px solid var(--hairline);
+}
+.adminshell .today-row.hot .lbl {
+  color: var(--sla);
+  font-weight: var(--fw-semibold);
+}
+.adminshell .today-row.hot .cnt {
+  color: var(--sla);
+}

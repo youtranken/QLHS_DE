@@ -1,0 +1,136 @@
+/* Admin › Người dùng & Vai (AdminUsers.tsx) — master-detail THEO NHÓM: chọn nhóm
+   vai trái, xem/thêm/gỡ thành viên phải. Hợp 300–400 user (hầu hết Applicant). */
+.grp {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: var(--sp-5);
+  align-items: start;
+}
+.grp > * {
+  min-width: 0;
+}
+
+/* ===== cột trái: rail nhóm vai (aside dùng chung .card) ===== */
+.grp-list {
+  padding: var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.grp-eyebrow {
+  font-size: var(--fs-eyebrow);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  padding: 2px var(--sp-2) var(--sp-3);
+}
+.grp-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--r-m);
+  padding: var(--sp-3);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    background var(--dur-fast),
+    border-color var(--dur-fast);
+}
+.grp-item:hover {
+  background: var(--panel-2);
+}
+.grp-item.on {
+  background: var(--aurora-soft);
+  border-color: var(--stroke-strong);
+  box-shadow: inset 0 1px 0 var(--top-hi);
+}
+.grp-item.on::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 3px;
+  background: var(--aurora);
+  box-shadow: 0 0 12px 1px rgba(59, 130, 246, 0.7);
+}
+
+/* badge vai — nền aurora (nhóm vai) hoặc viền trung tính (roster "Tất cả") */
+.grp-item .gi-code {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-s);
+  background: var(--aurora);
+  color: var(--on-accent);
+  font-family: var(--display);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.5px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.grp-item .gi-code.roster {
+  background: var(--panel-2);
+  color: var(--accent);
+  border: 1px solid var(--stroke-strong);
+  box-shadow: none;
+  font-size: var(--fs-md);
+}
+.grp-item .gi-txt {
+  min-width: 0;
+  flex: 1;
+}
+.grp-item .gi-nm {
+  display: block;
+  font-family: var(--display);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.3px;
+  line-height: 1.25;
+}
+.grp-item .gi-desc {
+  display: block;
+  font-size: var(--fs-mini);
+  color: var(--ink-3);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.grp-item .gi-ct {
+  flex: none;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-cap);
+  font-weight: var(--fw-semibold);
+  color: var(--ink-2);
+  background: var(--panel-2);
+  border: 1px solid var(--stroke);
+  border-radius: var(--r-pill);
+  min-width: 24px;
+  text-align: center;
+  padding: 2px 9px;
+}
+.grp-item.on .gi-ct {
+  color: var(--accent);
+}
+.grp-note {
+  font-size: var(--fs-mini);
+  line-height: 1.55;
+  color: var(--ink-3);
+  margin: 6px var(--sp-2) 2px;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--hairline);
+}
+.grp-note b {
+  color: var(--ink-2);
+}

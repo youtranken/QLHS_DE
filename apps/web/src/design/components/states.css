@@ -1,0 +1,195 @@
+/* ===== reveal (entrance), empty, skeleton ===== */
+.reveal {
+  animation: up 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.reveal.d1 {
+  animation-delay: 0.06s;
+}
+.reveal.d2 {
+  animation-delay: 0.12s;
+}
+.reveal.d3 {
+  animation-delay: 0.18s;
+}
+.reveal.d4 {
+  animation-delay: 0.24s;
+}
+@keyframes up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 44px 20px;
+  color: var(--ink-3);
+  text-align: center;
+}
+.empty svg {
+  width: 34px;
+  height: 34px;
+  opacity: 0.6;
+}
+.empty b {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.skel {
+  border-radius: 8px;
+  background: linear-gradient(100deg, var(--panel-2) 40%, var(--panel-3) 50%, var(--panel-2) 60%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+.skelrows {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 14px;
+}
+.skelrows .skel {
+  height: 38px;
+}
+
+/* ===== state notices: loading / error / empty (distinct, not one dashed box) ===== */
+.statebox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 18px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.statebox.loading {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+}
+.statebox.empty {
+  border: 1px dashed var(--line);
+  color: var(--ink-3);
+  justify-content: center;
+}
+.statebox.error {
+  background: var(--sla-bg);
+  border: 1px solid color-mix(in srgb, var(--sla) 45%, transparent);
+  color: var(--ink);
+}
+.statebox .sb-msg {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.4;
+}
+.statebox .sb-retry {
+  flex: none;
+}
+.statebox .spin {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  border-top-color: var(--accent);
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== toasts ===== */
+.toasts {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(380px, calc(100vw - 36px));
+}
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  border-radius: 11px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+  color: var(--ink);
+  font-size: 12.5px;
+  animation: up 0.28s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.toast .tico {
+  flex: none;
+}
+.toast.ok .tico {
+  color: var(--general);
+}
+.toast.err {
+  border-color: color-mix(in srgb, var(--sla) 50%, var(--line));
+}
+.toast.err .tico {
+  color: var(--sla);
+}
+.toast.info .tico {
+  color: var(--accent);
+}
+.toast .tmsg {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
+}
+.toast .tact {
+  flex: none;
+  border: 1px solid var(--line);
+  background: var(--panel-3);
+  color: var(--ink);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.toast .tact:hover {
+  border-color: var(--ink-3);
+}
+.toast .tx {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--ink-3);
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.toast .tx:hover {
+  color: var(--ink);
+}
+
+/* Honour prefers-reduced-motion globally (SPEC a11y): kill entrance/loops. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

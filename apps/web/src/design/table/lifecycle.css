@@ -1,0 +1,324 @@
+/* ===== Applicant lifecycle table (mock 01) ===== */
+.filterbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+}
+.filterbar .cnt {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-3);
+}
+/* Create button sits on the filter row (current-work zone), pushed to the right. */
+.filterbar .fb-action {
+  margin-left: auto;
+}
+.seg button.hotf {
+  color: var(--sla);
+}
+.tblwrap {
+  overflow-x: auto;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-l);
+  background: var(--panel);
+  box-shadow: var(--elev-1);
+}
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.tbl thead th {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--ink-2);
+  text-align: left;
+  padding: 8px 8px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel-2);
+  white-space: nowrap;
+}
+.tbl td {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: middle;
+  /* Subject is the wide column; every other cell stays on one line so the row
+     reads compact and the horizontal budget goes to Subject. */
+  white-space: nowrap;
+}
+.tbl td.strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+/* Subject is the primary content column — give it the room, ellipsize the rest
+   (full text on hover). min-width claims horizontal space from the compact cols. */
+.tbl td.subj {
+  min-width: 240px;
+  max-width: 460px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+}
+/* flow identity dot on the Document Type cell (replaces the separate Flow column) */
+.tbl .fdot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+  background: var(--ink-3);
+}
+.tbl .fdot.fl-contract {
+  background: var(--contract);
+}
+.tbl .fdot.fl-payment {
+  background: var(--payment);
+}
+.tbl .fdot.fl-general {
+  background: var(--general);
+}
+.tbl .seq {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+}
+.tbl td.act {
+  /* display: guard against the global `.act{display:flex}` (admin activity list)
+     leaking in and collapsing this cell's height below the row. */
+  display: table-cell;
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* two-line status (EN canonical + VI gloss) */
+.statuscell {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+.statuscell .vi {
+  font-size: 10px;
+  color: var(--ink-3);
+}
+
+/* priority chip */
+.prchip {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 2px 9px;
+  border-radius: 999px;
+}
+.prchip.normal {
+  color: var(--ink-3);
+  background: var(--panel-3);
+}
+.prchip.rush {
+  color: var(--rush);
+  background: var(--rush-soft);
+}
+.prchip.urgent {
+  color: var(--urgent);
+  background: var(--urgent-soft);
+}
+
+/* row overflow (⋯) menu */
+.rowmenu {
+  position: relative;
+  display: inline-flex;
+}
+.rowmenu .dots {
+  /* Transparent by default so it blends into the row (incl. its hover tint);
+     only shows a box when the button itself is hovered — no white patch. */
+  border: 1px solid transparent;
+  background: none;
+  color: var(--ink-3);
+  border-radius: 8px;
+  width: 30px;
+  height: 28px;
+  font-size: 15px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+.rowmenu .dots:hover {
+  background: var(--panel-3);
+  border-color: var(--line);
+  color: var(--ink);
+}
+.rowmenu-pop {
+  position: fixed;
+  z-index: 60;
+  /* left is set to the button's right edge; shift back by own width to right-align. */
+  transform: translateX(-100%);
+  min-width: 136px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+}
+.rowmenu-pop button {
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.rowmenu-pop button:hover {
+  background: var(--panel-2);
+  color: var(--ink);
+}
+.rowmenu-pop button.danger:hover {
+  color: var(--sla);
+}
+.tbl tbody tr:last-child td {
+  border-bottom: 0;
+}
+.tbl tbody tr.click {
+  cursor: pointer;
+}
+.tbl tbody tr.click:hover td {
+  background: var(--panel-2);
+}
+.tbl tr.open td {
+  background: var(--panel-2);
+  border-bottom-color: transparent;
+}
+.tbl .num {
+  text-align: right;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.tbl .num .u {
+  color: var(--ink-3);
+  font-size: 9.5px;
+}
+.tbl .code {
+  font-family: var(--mono);
+  font-weight: 600;
+  color: var(--accent-2);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-size: 12px;
+}
+.tbl .code:hover {
+  text-decoration: underline;
+}
+.grouphd td {
+  /* Vietnamese group labels — sans (mono cramps diacritics); keep the eyebrow feel
+     with weight + tracking instead of monospace. */
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--bg-2);
+  padding: 7px 14px;
+}
+.grouphd.warn td {
+  color: var(--sla);
+  background: color-mix(in srgb, var(--sla-bg) 45%, var(--bg-2));
+}
+.doct {
+  font-size: 10.5px;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+.upd {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.unseen {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-right: 7px;
+  box-shadow: var(--glow-accent);
+  vertical-align: 1px;
+}
+.trow.new .code {
+  font-weight: 700;
+}
+
+/* return-reason box inside an expanded returned row */
+.retbox {
+  border: 1px solid color-mix(in srgb, var(--sla) 45%, transparent);
+  background: color-mix(in srgb, var(--sla-bg) 70%, var(--panel));
+  border-radius: var(--r-m);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.retbox .r1 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.retbox .r1 b {
+  color: var(--sla);
+  font-size: 12.5px;
+}
+.retbox .roundpill {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--sla);
+  background: var(--sla-bg);
+  border: 1px solid color-mix(in srgb, var(--sla) 45%, transparent);
+  border-radius: 99px;
+  padding: 1px 9px;
+}
+.retbox .actor {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+.retbox p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+.retbox .retreason .rl {
+  font-weight: 600;
+  color: var(--sla);
+  margin-right: 4px;
+}
+.retbox form.fg {
+  margin-top: 4px;
+}
+.retbox .err {
+  color: var(--sla);
+}
+.retbox .btn {
+  align-self: flex-start;
+  margin-top: 3px;
+}

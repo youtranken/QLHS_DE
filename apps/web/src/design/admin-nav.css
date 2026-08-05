@@ -1,0 +1,391 @@
+/* Admin sidebar nội dung (AdminShell.tsx): brand đỉnh (.nvhd) · nav 6 mục
+   (.adminnav) · cụm user+vai+theme+thoát đáy (.sidefoot). Admin bỏ topbar nên
+   mọi chrome nằm ở đây. <900px: sidebar xếp dọc, chỉ hàng nav cuộn ngang. */
+
+/* brand đỉnh */
+.adminside .nvhd {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 4px 8px 12px;
+  border-bottom: 1px solid var(--line-soft);
+  margin-bottom: 8px;
+}
+.adminside .nvhd .brandmark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--aurora);
+  color: var(--on-accent);
+  box-shadow: 0 8px 18px -8px rgba(59, 130, 246, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  flex: none;
+}
+.adminside .nvhd .t {
+  font-family: var(--display);
+  font-size: var(--fs-base);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  display: block;
+}
+.adminside .nvhd .s {
+  font-family: var(--sans);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--ink-3);
+  display: block;
+}
+
+/* nav */
+.adminnav {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.adminnav button {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+  padding: 9px 10px;
+  color: var(--ink-2);
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+.adminnav button:hover {
+  background: var(--panel-2);
+  color: var(--ink);
+}
+.adminnav button .ic {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  color: var(--ink-3);
+  margin-top: 1px;
+}
+.adminnav button .txt {
+  min-width: 0;
+}
+.adminnav button .lbl {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.3;
+}
+.adminnav button .sub {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+  line-height: 1.35;
+}
+.adminnav button.on {
+  background: var(--aurora-soft);
+  border-left-color: var(--accent);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--stroke-strong), 0 8px 24px -14px rgba(59, 130, 246, 0.8);
+}
+.adminnav button.on .lbl {
+  color: var(--ink);
+}
+.adminnav button.on .ic {
+  color: var(--accent);
+}
+.adminnav button.on .sub {
+  color: color-mix(in srgb, var(--accent-2) 60%, var(--ink-3));
+}
+.adminnav .soon-tag {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--panel-3);
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+
+/* cụm cuối sidebar: vai (nếu >1) + user + đổi theme + thoát */
+.sidefoot {
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.sidefoot .roles {
+  align-self: flex-start;
+}
+/* footer: [≡ thu gọn] + [nút tên user → mở menu tài khoản] (kiểu QLTS) */
+.suser-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.adminside .sb-collapse {
+  width: 36px;
+  height: 40px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  border: 1px solid var(--stroke);
+  background: var(--panel-2);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: color 0.16s, border-color 0.16s, background 0.16s;
+}
+.adminside .sb-collapse:hover {
+  color: var(--ink);
+  border-color: var(--stroke-strong);
+  background: var(--panel-3);
+}
+.adminside .sb-userbtn {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 8px;
+  border-radius: 11px;
+  border: 1px solid var(--stroke);
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  box-shadow: inset 0 1px 0 var(--top-hi);
+  transition: border-color 0.16s;
+}
+.adminside .sb-userbtn:hover {
+  border-color: var(--stroke-strong);
+}
+.adminside .sb-userbtn[aria-expanded='true'] {
+  border-color: var(--accent);
+}
+.suser-row .av {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: var(--aurora);
+  color: var(--on-accent);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.sb-userbtn .who {
+  min-width: 0;
+  flex: 1;
+}
+.sb-userbtn .nm {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sb-userbtn .id {
+  display: block;
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* account menu (hiện khi bấm tên) */
+.sb-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 5px;
+  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid var(--stroke-strong);
+  box-shadow: var(--shadow);
+}
+.adminside .sb-act {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: var(--fs-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s;
+}
+.adminside .sb-act:hover {
+  background: var(--panel-2);
+  color: var(--ink);
+}
+.adminside .sb-act[aria-disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+.adminside .sb-act[aria-disabled]:hover {
+  background: transparent;
+  color: var(--ink-2);
+}
+.adminside .sb-act .sb-badge {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid var(--stroke);
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+.adminside .sb-act.danger:hover {
+  color: var(--sla);
+  background: var(--sla-bg);
+}
+/* Ngôn ngữ + Giao diện (icon) chung 1 hàng cho gọn */
+.sb-actions .sb-act-row {
+  display: flex;
+  gap: 4px;
+}
+.adminside .sb-act-row .lang {
+  flex: 1;
+}
+.adminside .sb-act.theme-ic {
+  flex: none;
+  width: 40px;
+  justify-content: center;
+  padding: 9px 0;
+}
+
+/* ---- collapsed rail (icon-only) ---- */
+.adminside {
+  transition: flex-basis 0.18s var(--ease, ease), width 0.18s var(--ease, ease);
+}
+.adminshell.collapsed .adminside {
+  flex: 0 0 68px;
+  width: 68px;
+  padding: 14px 10px;
+}
+.adminshell.collapsed .nvhd {
+  justify-content: center;
+  padding: 4px 0 12px;
+}
+.adminshell.collapsed .nvhd .t,
+.adminshell.collapsed .nvhd .s {
+  display: none;
+}
+.adminshell.collapsed .adminnav button {
+  justify-content: center;
+  padding: 10px 0;
+  border-left: 0;
+  border-radius: 10px;
+}
+.adminshell.collapsed .adminnav button .txt {
+  display: none;
+}
+.adminshell.collapsed .sidefoot {
+  position: relative;
+}
+.adminshell.collapsed .suser-row {
+  flex-direction: column;
+  gap: 6px;
+}
+.adminshell.collapsed .sb-collapse {
+  width: 100%;
+}
+.adminshell.collapsed .sb-userbtn {
+  justify-content: center;
+  padding: 5px;
+}
+.adminshell.collapsed .sb-userbtn .who {
+  display: none;
+}
+/* account menu pops out beside the rail when collapsed */
+.adminshell.collapsed .sb-actions {
+  position: absolute;
+  left: 72px;
+  bottom: 10px;
+  width: 200px;
+  z-index: 40;
+}
+
+@media (max-width: 900px) {
+  /* sidebar vẫn xếp dọc (brand · nav · footer đều thấy); hàng nav thành dải
+     "vuốt ngang": ẩn scrollbar thô + fade mép còn pill ẩn (data-fade-* do JS set). */
+  .adminnav {
+    flex: none;
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+  .adminnav::-webkit-scrollbar {
+    display: none;
+  }
+  .adminnav[data-fade-end='true'] {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 26px), transparent);
+  }
+  .adminnav[data-fade-start='true']:not([data-fade-end='true']) {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 26px);
+    mask-image: linear-gradient(to right, transparent, #000 26px);
+  }
+  .adminnav[data-fade-start='true'][data-fade-end='true'] {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 26px, #000 calc(100% - 26px), transparent);
+    mask-image: linear-gradient(to right, transparent, #000 26px, #000 calc(100% - 26px), transparent);
+  }
+  .adminnav button {
+    flex: none;
+    width: auto;
+    align-items: center;
+    border-left: 0;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    padding: 6px 13px;
+    white-space: nowrap;
+  }
+  .adminnav button .sub {
+    display: none;
+  }
+  .adminnav button.on {
+    border-color: var(--accent);
+  }
+  .sidefoot {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .sidefoot .suser {
+    flex: 1;
+  }
+}

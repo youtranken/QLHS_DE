@@ -1,0 +1,123 @@
+/* Màn đăng nhập (App.tsx anon) — cột trái: chữ hero ở trên + dây chuyền hồ sơ (3D)
+   chạy bên dưới; card kính bên phải. Cảnh 3D trong suốt, hòa vào nền (không khung).
+   Luôn tối — ép token dark cục bộ để card cũng tối kể cả khi app đang theme sáng. */
+.loginbg {
+  --bg: #0a111c;
+  --bg-2: #0e1622;
+  --panel: #121c2b;
+  --panel-2: #162233;
+  --panel-3: #1b2a3f;
+  --line: #243550;
+  --line-soft: #1c2a3e;
+  --hairline: rgba(140, 180, 235, 0.09);
+  --ink: #e9f1fc;
+  --ink-2: #9fb3c9;
+  --ink-3: #67809c;
+  --accent: #4aa3ff;
+  --accent-2: #7cc0ff;
+  --accent-soft: #14304f;
+  --on-accent: #071322;
+
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  overflow: hidden;
+  color: #e9f1fc;
+  background: #070f1c;
+  background-image: radial-gradient(1100px 520px at 12% -8%, rgba(74, 163, 255, 0.14), transparent 60%),
+    radial-gradient(900px 460px at 92% 112%, rgba(124, 192, 255, 0.08), transparent 60%);
+}
+
+/* wrap căn giữa: hero trái + card phải */
+.login-wrap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 56px;
+  width: 100%;
+  max-width: 1060px;
+  padding: 24px 8px;
+}
+
+/* ===== cột trái: chữ + cảnh 3D ===== */
+.login-hero {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 480px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+.login-hero__brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.login-hero__brand .q {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #14304f;
+  color: #4aa3ff;
+  box-shadow: 0 0 0 1px rgba(74, 163, 255, 0.35), 0 0 18px rgba(74, 163, 255, 0.22);
+}
+.login-hero__brand b {
+  font-family: var(--display);
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+.login-hero__eyebrow {
+  margin-top: 26px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-2);
+}
+.login-hero__title {
+  margin: 14px 0 0;
+  font-family: var(--display);
+  font-size: clamp(28px, 3.2vw, 44px);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: #eef5fe;
+}
+.login-hero__title em {
+  font-style: normal;
+  color: var(--accent);
+}
+.login-hero__lead {
+  margin: 16px 0 0;
+  max-width: 420px;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #9fb3c9;
+}
+/* dây chuyền hồ sơ chạy ngay dưới text — chỗ dựa cho RecordVault3D (absolute inset:0) */
+.login-hero__scene {
+  position: relative;
+  margin-top: 12px;
+  height: 260px;
+}
+.login-hero__scene .rec3 {
+  transform: scale(1.28);
+  transform-origin: 40% 58%;
+}
+
+/* hẹp: ẩn cột trái, card ra giữa */
+@media (max-width: 860px) {
+  .login-hero {
+    display: none;
+  }
+  .login-wrap {
+    gap: 0;
+  }
+}

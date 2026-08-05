@@ -1,0 +1,87 @@
+/* Chỉ số điều độ GỘP trong header "Bản đồ tuyến" (đang chạy · quá SLA): số đậm +
+   nhãn mono, nằm cạnh tiêu đề. Không tốn chiều dọc — metro/board giữ nguyên vị trí.
+   Spacing + cỡ chữ dùng token sp/fs. */
+.panel-hd .mapstats {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--sp-4);
+}
+.panel-hd .mapstat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--sp-1);
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.03em;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.panel-hd .mapstat b {
+  font-family: var(--display);
+  font-size: var(--fs-md);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.panel-hd .mapstat.hot,
+.panel-hd .mapstat.hot b {
+  color: var(--sla);
+}
+
+/* Chú giải màu node: đang giữ · quá SLA · hoàn tất. Trang trí (aria-hidden) —
+   node đã có aria-label riêng cho screen reader. */
+.panel-hd .legend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+}
+.panel-hd .legend .lg {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  white-space: nowrap;
+}
+.panel-hd .legend .lg i {
+  width: 9px;
+  height: 9px;
+  border-radius: 99px;
+  flex: none;
+}
+.panel-hd .legend .lg-front i {
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+.panel-hd .legend .lg-over i {
+  background: var(--sla);
+}
+.panel-hd .legend .lg-done i {
+  background: var(--done);
+}
+/* Điện thoại: ẩn chú giải (trang trí) để header khỏi tràn ra ngoài panel — màu
+   node vẫn tự nói (xanh=hoàn tất, đỏ=quá SLA) và có gợi ý cuộn bên dưới. */
+@media (max-width: 560px) {
+  .panel-hd .legend {
+    display: none;
+  }
+}
+
+/* Gợi ý cuộn ngang cho bản đồ tuyến — chỉ hiện khi màn ≤900px (metro min-width
+   900 nên chắc chắn tràn, cần cuộn). Ẩn hoàn toàn ở desktop. */
+.metrohint {
+  display: none;
+}
+@media (max-width: 900px) {
+  .metrohint {
+    display: block;
+    margin: var(--sp-1) 14px 0;
+    font-family: var(--mono);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.04em;
+    color: var(--ink-3);
+    text-align: center;
+  }
+}
