@@ -48,7 +48,9 @@ services:
       BACKUP_ON_START: 0 # set 1 to also dump immediately on boot
     volumes:
       - ./ops/backup:/ops:ro
-      - ./data-backups:/backups
+      # Đường dẫn host chứa dump — đổi qua BACKUP_PATH trong .env (vd ổ ngoài),
+      # mặc định ./data-backups nếu không set.
+      - ${BACKUP_PATH:-./data-backups}:/backups
     entrypoint: ['bash', '/ops/backup.sh']
 
   # SMTP test server (email outbox testing) — DEV ONLY. Web UI at :18025. Gated
