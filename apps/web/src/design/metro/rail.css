@@ -78,52 +78,30 @@
 .train .loco {
   position: absolute;
   left: 50%;
-  bottom: -3px;
+  bottom: -4px;
   transform: translateX(-50%);
   display: block;
-  width: 34px;
-  height: 19px;
+  width: 30px;
+  height: auto;
   color: var(--lc);
   filter: drop-shadow(0 0 4px color-mix(in srgb, var(--lc) 55%, transparent));
   animation: mbob 2.6s ease-in-out infinite 3.8s;
 }
-.train .loco .cab {
-  fill: color-mix(in srgb, var(--lc) 72%, var(--panel) 28%);
-  stroke: color-mix(in srgb, var(--lc) 50%, transparent);
-  stroke-width: 0.5;
-}
-.train .loco .win {
-  fill: color-mix(in srgb, var(--lc) 24%, #cdddf0);
-}
-.train .loco .lamp {
-  fill: color-mix(in srgb, #fff 70%, var(--lc));
-}
-.train .loco .wh {
-  fill: var(--bg);
+/* Icon line-art (người + giỏ Lucide): nét theo màu tuyến; bánh giỏ = vòng rỗng. */
+.train .loco .lnf {
+  fill: none;
   stroke: var(--lc);
-  stroke-width: 1.2;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-/* LIGHT — đầu máy đọc rõ trên giấy sáng: thân ĐẶC màu tuyến, cửa sổ trắng, bánh
-   sẫm, đèn hổ phách; bỏ neon, dùng đổ bóng thật. */
+/* LIGHT — đọc rõ trên giấy sáng: nét đậm màu tuyến hơi trầm + đổ bóng thật (bỏ neon). */
 :root[data-theme='light'] .train .loco {
   filter: drop-shadow(0 1.5px 2px rgba(60, 50, 35, 0.28));
 }
-:root[data-theme='light'] .train .loco .cab {
-  fill: var(--lc);
-  stroke: color-mix(in srgb, var(--lc) 62%, #000);
-  stroke-width: 0.6;
-}
-:root[data-theme='light'] .train .loco .win {
-  fill: #fbfdff;
-}
-:root[data-theme='light'] .train .loco .wh {
-  fill: #33383f;
-  stroke: color-mix(in srgb, var(--lc) 55%, #000);
-  stroke-width: 1;
-}
-:root[data-theme='light'] .train .loco .lamp {
-  fill: #ffcf5a;
+:root[data-theme='light'] .train .loco .lnf {
+  stroke: color-mix(in srgb, var(--lc) 78%, #000);
 }
 
 /* LIGHT — ray "đã đi qua": bỏ quầng neon (chói trên giấy), giữ màu tuyến đặc hơi

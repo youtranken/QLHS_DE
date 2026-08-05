@@ -11,19 +11,22 @@ export function flowMeta(flow: string): { cls: string; letter: string; badge: st
   return { cls: 'fl-general', letter: 'A', badge: 'a' }
 }
 
-/** Đầu máy chạy trên ray tới ga tiền-tuyến rồi đậu (màu theo tuyến qua --lc). */
+/** Người đẩy giỏ hàng chạy trên ray tới ga tiền-tuyến rồi đậu (màu theo tuyến qua
+ *  --lc). Người side-view + giỏ Lucide đã canh để mép sau giỏ khớp tay người đẩy. */
 function Loco() {
   return (
-    <svg className="loco" viewBox="0 0 36 20" aria-hidden>
-      <g className="wh">
-        <circle cx="11" cy="16" r="2.3" />
-        <circle cx="25" cy="16" r="2.3" />
+    <svg className="loco" viewBox="0 0 32 30" aria-hidden>
+      <g className="lnf">
+        <circle cx="8.5" cy="7" r="2.8" fill="none" />
+        <path d="M8.5 9.8 L10.6 17.6" />
+        <path d="M8.9 12.2 L16 14" />
+        <path d="M10.6 17.6 L7.4 26.6 M10.6 17.6 L14.6 25" />
       </g>
-      <rect className="cab" x="8" y="2" width="2.6" height="3.6" rx=".8" />
-      <path className="cab" d="M4 14 V8 Q4 5 7 5 H22 L31 10 V14 Z" />
-      <rect className="win" x="7.5" y="7.2" width="8.5" height="3.4" rx="1" />
-      <path className="win" d="M19.5 7 H23 L27.5 10 H19.5 Z" />
-      <circle className="lamp" cx="30" cy="12" r="1.5" />
+      <g className="lnf" transform="translate(14.8,12.8) scale(0.585)">
+        <circle cx="8" cy="21" r="1.6" />
+        <circle cx="19" cy="21" r="1.6" />
+        <path d="M2.05 2.05 H4 L6.66 14.47 A2 2 0 0 0 8.66 16.05 H18.44 A2 2 0 0 0 20.39 14.48 L22.04 7.05 H5.12" />
+      </g>
     </svg>
   )
 }

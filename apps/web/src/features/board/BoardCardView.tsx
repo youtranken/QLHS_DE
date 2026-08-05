@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { MoreVertical, Pause, TriangleAlert } from 'lucide-react'
 import { groupAmount } from '../../shared/format'
 import { openTicketDetail } from '../../shared/route'
@@ -42,6 +42,25 @@ export function BoardCardView({
   // behind the modal/confirm the action pops.
   const detailsRef = useRef<HTMLDetailsElement>(null)
   const closeMenu = () => detailsRef.current?.removeAttribute('open')
+
+  // Native <details> chỉ đóng khi bấm lại ⋯ — thêm: mở ra thì click ngoài (hoặc
+  // qua thẻ/cột khác) tự đóng. Chỉ gắn listener khi đang mở, tháo khi đóng.
+  useEffect(() => {
+    const el = detailsRef.current
+    if (!el) return
+    const onOutside = (e: PointerEvent) => {
+      if (el.open && !el.contains(e.target as Node)) el.removeAttribute('open')
+    }
+    const onToggle = () => {
+      if (el.open) document.addEventListener('pointerdown', onOutside, true)
+      else document.removeEventListener('pointerdown', onOutside, true)
+    }
+    el.addEventListener('toggle', onToggle)
+    return () => {
+      el.removeEventListener('toggle', onToggle)
+      document.removeEventListener('pointerdown', onOutside, true)
+    }
+  }, [])
   return (
     <article className={`${cls}${selected ? ' picked' : ''}`}>
       <div className="r1">
