@@ -1,5 +1,5 @@
 import type { DwellRow } from './api'
-import { t } from '../../i18n'
+import { applyVp, t } from '../../i18n'
 import { statusVi } from '../tickets/statusLabel'
 import { flowVi } from './flowLabel'
 
@@ -27,7 +27,7 @@ export function DwellHeatmap({ rows, flows }: { rows: DwellRow[]; flows: string[
           <tbody>
             {rows.map((r) => (
               <tr key={r.status}>
-                <th scope="row" className="az-hrow" lang="en" title={statusVi(r.status)}>{r.status}</th>
+                <th scope="row" className="az-hrow" lang="en" title={statusVi(r.status)}>{applyVp(r.status)}</th>
                 {r.cells.map((c) => (
                   <td
                     key={c.flow}

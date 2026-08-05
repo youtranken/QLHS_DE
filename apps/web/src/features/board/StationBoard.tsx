@@ -17,7 +17,7 @@ import { useBoardActions } from './useBoardActions'
 import { statusVi } from '../tickets/statusLabel'
 import { TriangleAlert } from 'lucide-react'
 import { openSearch } from '../../shared/route'
-import { t } from '../../i18n'
+import { applyVp, t } from '../../i18n'
 
 /** DCC "Trạm của tôi" board: columns per station, each card has a keyboard-
  *  accessible ⋯ menu of legal actions (AD-17). Drag-drop is an enhancement of
@@ -170,7 +170,7 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
               <div className="ch">
                 <div className="r1">
                   <span className="st" lang={col.label ? undefined : 'en'}>
-                    {col.label ?? col.status}
+                    {col.label ?? applyVp(col.status)}
                   </span>
                   {col.overSla && (
                     <span className="colwarn" aria-label={t('board.column.overSla')} title={t('board.column.overSla')}>

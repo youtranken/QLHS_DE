@@ -1,7 +1,7 @@
 import { groupAmount } from '../../shared/format'
 import { openTicketDetail } from '../../shared/route'
 import type { DupHint } from './api'
-import { t } from '../../i18n'
+import { applyVp, t } from '../../i18n'
 
 export interface DupBadgeProps {
   hints: DupHint[]
@@ -32,7 +32,7 @@ export function DupBadge({ hints }: DupBadgeProps) {
               <button type="button" className="code" onClick={() => openTicketDetail(h.code ?? h.id)}>
                 {h.code ?? t('board.card.draft')}
               </button>
-              <span className="st" lang="en">{h.status}</span>
+              <span className="st" lang="en">{applyVp(h.status)}</span>
             </div>
             <div className="why">{tierLabel(h.tier)}</div>
             <div className="meta">

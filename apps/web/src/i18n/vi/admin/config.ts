@@ -29,4 +29,14 @@ export const adminConfig = {
   testSending: 'Đang gửi…',
   testSent: 'Đã gửi email thử tới {to}.',
   testErr: 'Gửi thử thất bại.',
+  vp: {
+    title: 'Tên VP hiển thị',
+    hint: 'Đổi ở đây là đổi tên hiển thị "VP …" ở mọi nơi (tab, chip, metro, tuyến). Không ảnh hưởng dữ liệu hồ sơ hay nhật ký.',
+    label: 'Tên VP',
+    placeholder: 'Andy',
+    save: 'Lưu tên VP',
+    saving: 'Đang lưu…',
+    saved: 'Đã đổi tên VP thành "{name}".',
+    saveErr: 'Lưu tên VP thất bại.',
+  },
 } as const

@@ -9,7 +9,7 @@ import { ReturnPanel } from './ReturnPanel'
 import { SubmittedEditForm } from './SubmittedEditForm'
 import { RETURN_STATES } from './ticketStates'
 import { StateNotice } from '../../shared/StateNotice'
-import { t } from '../../i18n'
+import { applyVp, t } from '../../i18n'
 
 const FLOW_OF: Record<string, string> = {
   General: 'General', Contract: 'Contract', VO: 'Contract', Annex: 'Contract',
@@ -160,7 +160,7 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
           </span>
           <span className={`chip${d.status === 'Completed' ? ' done' : ''}`}>
             <span className="dot" aria-hidden />
-            <span lang="en">{d.status}</span>
+            <span lang="en">{applyVp(d.status)}</span>
             <small className="chipvi">· {statusVi(d.status)}</small>
           </span>
           {d.overdueDays > 0 && (
@@ -218,7 +218,7 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
                   <li key={i} className={`st ${s.phase}`}>
                     <span className="nd" aria-hidden />
                     <div className="nm">
-                      <span lang="en">{s.status}</span>
+                      <span lang="en">{applyVp(s.status)}</span>
                       <span className="vi">{statusVi(s.status)}</span>
                       {s.phase === 'now' && <span className="here">{t('tickets.routeRail.here')}</span>}
                       {s.phase === 'now' && waitingHint(s.status) && (
@@ -243,7 +243,7 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
               <div className="kv">
                 <span className="k">{t('tickets.detail.kvStatus')}</span>
                 <span className="v" lang="en">
-                  {d.status}
+                  {applyVp(d.status)}
                 </span>
               </div>
               <div className="kv">

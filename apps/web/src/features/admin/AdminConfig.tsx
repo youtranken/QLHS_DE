@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { t } from '../../i18n'
+import { setVpName, t } from '../../i18n'
 import { StateNotice } from '../../shared/StateNotice'
 import { toast } from '../../shared/toast'
 import {
+  getAppConfig,
   getSmtpConfig,
+  saveAppConfig,
   saveSmtpConfig,
   testSmtpConfig,
   type SmtpConfigInput,
@@ -21,13 +23,16 @@ export function AdminConfig() {
   const [loadErr, setLoadErr] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [testing, setTesting] = useState(false)
+  const [vp, setVp] = useState('')
+  const [vpBusy, setVpBusy] = useState(false)
 
   const load = useCallback(async () => {
     setLoadErr(null)
     try {
-      const v = await getSmtpConfig()
+      const [v, app] = await Promise.all([getSmtpConfig(), getAppConfig()])
       setCfg(v)
       setForm({ host: v.host, port: v.port, secure: v.secure, username: v.username, password: '', from: v.from })
+      setVp(app.vpName)
     } catch {
       setLoadErr(t('adminConfig.loadErr'))
     }
@@ -55,6 +60,22 @@ export function AdminConfig() {
     }
   }
 
+  async function saveVp(e: React.FormEvent) {
+    e.preventDefault()
+    const name = vp.trim()
+    if (!name || vpBusy) return
+    setVpBusy(true)
+    try {
+      await saveAppConfig(name)
+      setVpName(name) // apply live so labels update without a reload
+      toast.ok(t('adminConfig.vp.saved', { name }))
+    } catch (err) {
+      toast.err((err as { message?: string })?.message ?? t('adminConfig.vp.saveErr'))
+    } finally {
+      setVpBusy(false)
+    }
+  }
+
   async function test() {
     if (!testTo.trim()) return
     setTesting(true)
@@ -76,6 +97,26 @@ export function AdminConfig() {
       <header className="cfg-head">
         <h1>{t('adminConfig.title')}</h1>
       </header>
+
+      <form className="panel cfg-form cfg-vp" onSubmit={saveVp}>
+        <h2>{t('adminConfig.vp.title')}</h2>
+        <p className="cfg-hint">{t('adminConfig.vp.hint')}</p>
+        <div className="cfg-vp-row">
+          <label className="cfg-field">
+            <span>{t('adminConfig.vp.label')}</span>
+            <input
+              value={vp}
+              onChange={(e) => setVp(e.target.value)}
+              placeholder={t('adminConfig.vp.placeholder')}
+              maxLength={40}
+              autoComplete="off"
+            />
+          </label>
+          <button type="submit" className="btn primary" disabled={vpBusy || !vp.trim()}>
+            {vpBusy ? t('adminConfig.vp.saving') : t('adminConfig.vp.save')}
+          </button>
+        </div>
+      </form>
 
       {!cfg.encKeyReady && <p className="cfg-warn" role="alert">{t('adminConfig.noEncKey')}</p>}
 

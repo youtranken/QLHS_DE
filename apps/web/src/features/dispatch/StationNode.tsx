@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 import { Check, TriangleAlert } from 'lucide-react'
-import { t } from '../../i18n'
+import { applyVp, t } from '../../i18n'
 import type { StationNode as SN } from './api'
 import { statusVi } from '../tickets/statusLabel'
 
@@ -8,12 +8,15 @@ import { statusVi } from '../tickets/statusLabel'
  *  Cancelled). Dùng chung cho StationNode + MetroLine — một nguồn duy nhất. */
 export const TERMINAL = /done|completed|sent|closed|cancelled/i
 
-/** Tên ga ngắn cho node (bỏ tiền tố dài, giữ tên ga). */
+/** Tên ga ngắn cho node (bỏ tiền tố dài, giữ tên ga). applyVp thay tên VP hiển
+ *  thị (mặc định "Andy") — một nguồn cho mọi nhãn metro. */
 export function shortStation(status: string): string {
-  return status
-    .replace(/^Submitted to /i, '')
-    .replace(/^Received by /i, '')
-    .replace(/^Received from /i, '')
+  return applyVp(
+    status
+      .replace(/^Submitted to /i, '')
+      .replace(/^Received by /i, '')
+      .replace(/^Received from /i, ''),
+  )
 }
 
 /** Số vòng sóng lan theo tải (nhiều hồ sơ → nhiều vòng). */

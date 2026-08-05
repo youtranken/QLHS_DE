@@ -1,4 +1,4 @@
-import { fmtDate, t } from '../../i18n'
+import { applyVp, fmtDate, t } from '../../i18n'
 import type { TicketView } from '../tickets/api'
 import { statusVi } from '../tickets/statusLabel'
 import { groupAmount } from '../../shared/format'
@@ -70,7 +70,7 @@ export function ClosedResultsTable({ rows, role, onReopen, onPropose }: ClosedRe
               <td data-label={t('closed.thStatus')}>
                 <span className={`chip${tk.status === 'Cancelled' ? '' : ' done'}`}>
                   <span className="dot" aria-hidden />
-                  <span lang="en">{tk.status}</span>
+                  <span lang="en">{applyVp(tk.status)}</span>
                 </span>
                 <span className="vi">{statusVi(tk.status)}</span>
               </td>

@@ -9,7 +9,7 @@ import {
 import { TicketFieldsFieldset } from './TicketFieldsFieldset'
 import { displaySub } from '../../shared/format'
 import { toast } from '../../shared/toast'
-import { t } from '../../i18n'
+import { applyVp, t } from '../../i18n'
 
 function toBody(d: TicketDetail): CreateTicketBody {
   return {
@@ -81,7 +81,7 @@ export function ReturnPanel({ detail, onDone }: { detail: TicketDetail; onDone: 
     <section className="retbox">
       <div className="r1">
         <b>
-          <span lang="en">{detail.status}</span>
+          <span lang="en">{applyVp(detail.status)}</span>
           {t('tickets.returnPanel.needsFix')}
         </b>
         <span className="roundpill">{t('tickets.returnPanel.round', { n: detail.roundNo })}</span>

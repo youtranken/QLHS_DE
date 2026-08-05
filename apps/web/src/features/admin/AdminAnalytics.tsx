@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { CircleCheck, Download } from 'lucide-react'
-import { t } from '../../i18n'
+import { applyVp, t } from '../../i18n'
 import { StateNotice } from '../../shared/StateNotice'
 import { openTicketDetail } from '../../shared/route'
 import { statusVi } from '../tickets/statusLabel'
@@ -122,7 +122,7 @@ export function AdminAnalytics() {
                   >
                     <span className="az-dcode mono">{row.code ?? row.id.slice(0, 8)}</span>
                     <span className="az-dmain">
-                      <span className="az-dstatus" lang="en">{row.status}</span>
+                      <span className="az-dstatus" lang="en">{applyVp(row.status)}</span>
                       <span className="az-dsub">{statusVi(row.status)} · {flowVi(row.flow)}</span>
                     </span>
                     <span className="az-dpill">{t('adminAnalytics.topOverdue.overdueDays', { n: row.overdueDays })}</span>

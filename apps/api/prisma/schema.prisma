@@ -329,3 +329,16 @@ model SmtpConfig {
 
   @@map("smtp_config")
 }
+
+/// Mutable app-wide display settings (singleton, id always 1). Currently the VP
+/// display name (default "Andy"): the canonical status "Submitted to VP Andy"
+/// stays fixed in the state machine/audit; only the shown name reads from here,
+/// so a rename changes every UI surface at once.
+model AppConfig {
+  id        Int      @id @default(1)
+  vpName    String   @default("Andy") @map("vp_name")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  @@map("app_config")
+}

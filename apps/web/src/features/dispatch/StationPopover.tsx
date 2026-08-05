@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 import { TriangleAlert } from 'lucide-react'
-import { t } from '../../i18n'
+import { applyVp, t } from '../../i18n'
 import type { StationTicket } from './api'
 
 /** Popover preview khi hover ga: ≤3 hồ sơ + "n nữa". Vị trí do LineMap tính từ
@@ -23,7 +23,7 @@ export function StationPopover({
     <div className="stnpop" role="tooltip" style={{ left, top } as CSSProperties}>
       <div className="ph">
         <span className="pt" lang="en">
-          {status}
+          {applyVp(status)}
         </span>
         <span className="pn">{t('dispatch.ticketCount', { n: tickets.length })}</span>
       </div>

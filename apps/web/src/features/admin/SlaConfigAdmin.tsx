@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import * as Tabs from '@radix-ui/react-tabs'
 import { Minus, Plus } from 'lucide-react'
-import { t } from '../../i18n'
+import { applyVp, t } from '../../i18n'
 import { StateNotice } from '../../shared/StateNotice'
 import { toast } from '../../shared/toast'
 import { getSlaConfig, updateSla, type SlaConfigRow } from './api'
@@ -196,7 +196,7 @@ export function SlaConfigAdmin() {
                           )}
                         </div>
                         <div className="st-meta">
-                          <div className="st-name" lang="en">{r.status}</div>
+                          <div className="st-name" lang="en">{applyVp(r.status)}</div>
                           {note && <div className="st-note">{note}</div>}
                         </div>
                         <div className="st-right">

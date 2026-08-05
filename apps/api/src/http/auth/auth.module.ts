@@ -6,10 +6,15 @@ import { AuthGuard } from './auth.guard'
 import { RolesGuard } from './roles.guard'
 import { AdminController } from '../admin/admin.controller'
 import { AdminConfigController } from '../admin/admin-config.controller'
+import { AdminAppConfigController } from '../admin/admin-app-config.controller'
+import { PublicConfigController } from '../config/public-config.controller'
 import { GetSmtpConfigUseCase } from '../../application/admin/get-smtp-config.usecase'
 import { UpdateSmtpConfigUseCase } from '../../application/admin/update-smtp-config.usecase'
 import { TestSmtpUseCase } from '../../application/admin/test-smtp.usecase'
 import { SmtpConfigRepo } from '../../infra/prisma/config/smtp-config.repo'
+import { GetAppConfigUseCase } from '../../application/admin/get-app-config.usecase'
+import { UpdateAppConfigUseCase } from '../../application/admin/update-app-config.usecase'
+import { AppConfigRepo } from '../../infra/prisma/config/app-config.repo'
 import { SessionStore } from '../../infra/session/session.store'
 import { SessionAuthService } from '../../infra/session/session-auth.service'
 import { UserRoleRepo } from '../../infra/prisma/users/user-role.repo'
@@ -48,7 +53,7 @@ import { UserDirectoryRepo } from '../../infra/prisma/users/user-directory.repo'
 import { ProcessedWebhookEventRepo } from '../../infra/prisma/webhook/processed-event.repo'
 
 @Module({
-  controllers: [AuthController, WebhookController, AdminController, AdminConfigController, OptionsController, DigestPrefController],
+  controllers: [AuthController, WebhookController, AdminController, AdminConfigController, AdminAppConfigController, PublicConfigController, OptionsController, DigestPrefController],
   providers: [
     AuthGuard,
     RolesGuard,
@@ -87,6 +92,9 @@ import { ProcessedWebhookEventRepo } from '../../infra/prisma/webhook/processed-
     UpdateSmtpConfigUseCase,
     TestSmtpUseCase,
     SmtpConfigRepo,
+    GetAppConfigUseCase,
+    UpdateAppConfigUseCase,
+    AppConfigRepo,
     AnalyticsRepo,
     SlaPauseRepo,
     SlaClock,

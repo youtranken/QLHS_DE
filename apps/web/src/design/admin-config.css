@@ -116,6 +116,29 @@
   color: inherit;
   font: inherit;
 }
+/* VP display-name panel — a single field + save, laid out as its own block
+   (overrides the SMTP two-column grid it borrows .cfg-form from). */
+.cfg-vp {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cfg-vp h2 {
+  font-size: 1rem;
+  margin: 0;
+}
+.cfg-vp-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.cfg-vp-row .cfg-field {
+  flex: 1;
+  min-width: 200px;
+}
+
 @media (max-width: 640px) {
   .cfg-form {
     grid-template-columns: 1fr;

@@ -39,6 +39,22 @@ type DeepShape<T> = T extends string ? string : { [K in keyof T]: DeepShape<T[K]
 let dict: MessagesShape = vi
 let tag = 'vi-VN'
 
+/** Configured VP display name (Admin › Cấu hình › Tên VP). Defaults to "Andy" —
+ *  the same token baked into the canonical status "Submitted to VP Andy", so an
+ *  unset config leaves every label byte-identical. Set once at startup from
+ *  GET /config; substituted into any display string via applyVp(). */
+let vpName = 'Andy'
+export const setVpName = (name: string): void => {
+  if (name.trim()) vpName = name.trim()
+}
+export const getVpName = (): string => vpName
+
+/** Presentation-only VP-name substitution. Rewrites both the {vp} placeholder
+ *  (i18n strings) and the literal canonical token "Andy" (raw status strings
+ *  shown at tab/chip/metro/rail per AD-13). No-op while vpName is "Andy". */
+export const applyVp = (s: string): string =>
+  s.replace(/\{vp\}/g, vpName).replace(/\bAndy\b/g, vpName)
+
 /** Future language switch: setLocale(en, 'en-US') + re-render from the root.
  *  Components never change — t() reads the module-level dict at render time. */
 export function setLocale(d: MessagesShape, localeTag: string): void {
@@ -50,12 +66,14 @@ export const localeTag = (): string => tag
 export function t(key: MessageKey, params?: Record<string, string | number>): string {
   const raw = key.split('.').reduce<unknown>((o, k) => (o as Record<string, unknown> | undefined)?.[k], dict)
   const s = typeof raw === 'string' ? raw : key // runtime fallback; TS prevents this path
-  return params ? s.replace(/\{(\w+)\}/g, (_, p: string) => String(params[p] ?? `{${p}}`)) : s
+  const out = params ? s.replace(/\{(\w+)\}/g, (_, p: string) => String(params[p] ?? `{${p}}`)) : s
+  return applyVp(out)
 }
 
-/** AD-13 seam: canonical EN status → VI presentation label (EN key passthrough). */
+/** AD-13 seam: canonical EN status → VI presentation label (EN key passthrough).
+ *  applyVp() rewrites the VP name in both the label and the EN passthrough. */
 export const statusVi = (status: string): string =>
-  (dict.status as Record<string, string>)[status] ?? status
+  applyVp((dict.status as Record<string, string>)[status] ?? status)
 
 /** Notification kind → one-liner (kind passthrough when unmapped). */
 export const kindMessage = (kind: string): string =>

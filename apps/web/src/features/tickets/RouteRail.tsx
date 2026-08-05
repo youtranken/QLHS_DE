@@ -1,7 +1,7 @@
 import type { RouteStation } from './api'
 import { displaySub } from '../../shared/format'
 import { statusVi } from './statusLabel'
-import { t } from '../../i18n'
+import { applyVp, t } from '../../i18n'
 
 /** Horizontal mini metro in the expanded applicant row (rail2). */
 export function RouteRail({ route, directory }: { route: RouteStation[]; directory: Record<string, string> }) {
@@ -11,7 +11,7 @@ export function RouteRail({ route, directory }: { route: RouteStation[]; directo
         <li key={i} className={`st2 ${s.phase}`} title={statusVi(s.status)}>
           <span className="nd" aria-hidden />
           <span className="lb" lang="en">
-            {s.status}
+            {applyVp(s.status)}
           </span>
           <span className="sr-only">
             {s.phase === 'past'

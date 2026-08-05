@@ -1,4 +1,4 @@
-import { t, statusVi, kindMessage } from '../../i18n'
+import { t, statusVi, kindMessage, applyVp } from '../../i18n'
 import { type Block, type TicketRowVM } from './api'
 
 const FLOW_VN: Record<string, string> = { General: 'Tổng hợp', Contract: 'Hợp đồng', Payment: 'Thanh toán' }
@@ -107,7 +107,7 @@ export function AnswerCard({ block, onOpen }: { block: Block; onOpen: (code: str
           <ul>
             {block.actions.map((a) => (
               <li key={a.label}>
-                {a.label} <span className="arrow">→ {a.toStatus}</span>
+                {a.label} <span className="arrow">→ {applyVp(a.toStatus)}</span>
               </li>
             ))}
           </ul>

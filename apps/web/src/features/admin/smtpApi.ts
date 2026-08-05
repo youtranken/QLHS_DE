@@ -26,3 +26,10 @@ export const getSmtpConfig = () => apiGet<SmtpConfigView>('/admin/smtp')
 export const saveSmtpConfig = (c: SmtpConfigInput) => apiPut<{ ok: true }>('/admin/smtp', c)
 export const testSmtpConfig = (c: SmtpConfigInput & { to: string }) =>
   apiPost<{ ok: true }>('/admin/smtp/test', c)
+
+/** VP display name — single source for the shown "VP Andy" everywhere. */
+export interface AppConfigView {
+  vpName: string
+}
+export const getAppConfig = () => apiGet<AppConfigView>('/admin/app-config')
+export const saveAppConfig = (vpName: string) => apiPut<{ ok: true }>('/admin/app-config', { vpName })

@@ -29,4 +29,14 @@ export const adminConfig = {
   testSending: 'Sending…',
   testSent: 'Test email sent to {to}.',
   testErr: 'Test send failed.',
+  vp: {
+    title: 'VP display name',
+    hint: 'Changing this renames the shown "VP …" everywhere (tabs, chips, metro, rail). It does not touch ticket data or the audit log.',
+    label: 'VP name',
+    placeholder: 'Andy',
+    save: 'Save VP name',
+    saving: 'Saving…',
+    saved: 'VP name changed to “{name}”.',
+    saveErr: 'Could not save the VP name.',
+  },
 } as const

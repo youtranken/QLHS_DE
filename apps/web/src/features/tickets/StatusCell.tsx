@@ -1,3 +1,4 @@
+import { applyVp } from '../../i18n'
 import { statusVi } from './statusLabel'
 import { CLOSED, RETURN_STATES } from './ticketStates'
 
@@ -14,7 +15,7 @@ export function StatusCell({ status }: { status: string }) {
     <span className="statuscell">
       <span className={cls}>
         <span className="dot" aria-hidden />
-        <span lang="en">{status}</span>
+        <span lang="en">{applyVp(status)}</span>
       </span>
       <small className="vi">{statusVi(status)}</small>
     </span>

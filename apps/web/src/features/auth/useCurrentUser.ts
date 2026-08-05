@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Role } from '@qlhs/contracts'
 import { apiGet, apiPost } from '../../shared/api-client'
+import { loadPublicConfig } from '../../shared/appConfig'
 
 export interface CurrentUser {
   sub: string
@@ -24,7 +25,9 @@ export function useCurrentUser() {
 
   const load = useCallback(async () => {
     try {
-      const user = await apiGet<CurrentUser>('/auth/me')
+      // Apply the VP display name before the first authed render so labels never
+      // flash the default; loadPublicConfig never rejects.
+      const [user] = await Promise.all([apiGet<CurrentUser>('/auth/me'), loadPublicConfig()])
       setState({ status: 'authed', user })
     } catch {
       setState({ status: 'anon' })

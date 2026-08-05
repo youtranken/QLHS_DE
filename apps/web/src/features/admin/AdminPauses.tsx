@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { t } from '../../i18n'
+import { applyVp, t } from '../../i18n'
 import { StateNotice } from '../../shared/StateNotice'
 import { getSlaPauses, type SlaPauseReport } from './api'
 
@@ -83,7 +83,7 @@ export function AdminPauses() {
                         </div>
                         <div className="pzreason">{p.reason}</div>
                         <div className="pzmeta">
-                          <span className="st" lang="en">{p.status}</span>
+                          <span className="st" lang="en">{applyVp(p.status)}</span>
                           <span className="dot" />
                           <span>{p.pausedByName}</span>
                         </div>
@@ -112,7 +112,7 @@ export function AdminPauses() {
                       <div className="freq-main">
                         <div className="freq-status">
                           <span className="st-dot" />
-                          <span className="freq-name" lang="en">{s.status}</span>
+                          <span className="freq-name" lang="en">{applyVp(s.status)}</span>
                         </div>
                         <div className="freq-meta">
                           {t('adminSla.pauses.stationMeta', { pauses: s.pauses, tickets: s.tickets, days: s.longestDays })}

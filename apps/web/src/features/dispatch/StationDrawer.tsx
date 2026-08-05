@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { t } from '../../i18n'
+import { applyVp, t } from '../../i18n'
 import type { StationTicket } from './api'
 import { openTicketDetail } from '../../shared/route'
 import { useFocusTrap } from '../../shared/useFocusTrap'
@@ -41,7 +41,7 @@ export function StationDrawer({
       <div className="dh">
         <div className="r1">
           <span className="t" lang="en">
-            {status}
+            {applyVp(status)}
           </span>
           <button type="button" className="btn ghost icon" onClick={onClose} aria-label={t('dispatch.close')}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
