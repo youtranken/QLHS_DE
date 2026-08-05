@@ -60,4 +60,18 @@ describe('VP name substitution (single source)', () => {
     setVpName('   ')
     expect(getVpName()).toBe('Long')
   })
+
+  it('does NOT rewrite the VP name inside interpolated params (only static text)', () => {
+    setVpName('Bình')
+    // A person literally named "…Andy" must keep their own name — the template
+    // "Chào {who} 👋 …" has no VP token, so the param passes through untouched.
+    const greeting = t('assistant.welcome', { who: 'Sếp Andy' })
+    expect(greeting).toContain('Sếp Andy')
+    expect(greeting).not.toContain('Bình')
+  })
+
+  it('inserts a name containing "$" literally (no String.replace $-substitution)', () => {
+    setVpName('A$&B')
+    expect(applyVp('Submitted to VP Andy')).toBe('Submitted to VP A$&B')
+  })
 })

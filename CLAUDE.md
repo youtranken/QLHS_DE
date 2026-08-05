@@ -45,6 +45,7 @@ Web app theo dõi hồ sơ qua Applicant → DCC1 → DCC2/DCC3 → Andy/ACC/BOP
 - `domain/**` **KHÔNG** import framework/IO (`@nestjs/*`, `@prisma/*`, `http/`, `infra/`) — mọi ra-ngoài qua port (AD-1).
 - Tham chiếu user bằng PMH ID **`sub`**, KHÔNG dùng email (AD-7). **Không đính kèm file** trong hệ thống (bản cứng đi ngoài; chỉ path scan ở Hardcopy).
 - Tên status dùng **tiếng Anh canonical** y hệt ở tab/chip/metro/log/actionbar (AD-13); chú thích tiếng Việt chỉ là trình bày.
+  - **Ngoại lệ có chủ đích — tên VP (`applyVp`):** trạng thái canonical trong state-machine/DB/**nhật ký** luôn là `Submitted to VP Andy`. Riêng các bề mặt HIỂN THỊ (tab/chip/metro/tuyến/SLA/phân tích/chi tiết/trợ lý) thay tên VP qua `applyVp()` theo cấu hình Admin › Cấu hình › Tên VP. **Nhật ký (AdminAudit) CỐ Ý giữ canonical — KHÔNG bọc applyVp** (log là bản gốc). Đừng "sửa" cho khớp board. `applyVp` chỉ áp lên chuỗi tĩnh trong từ điển + chỗ in status canonical thô, KHÔNG áp lên tham số động (dữ liệu người dùng). Xem memory `qlhs-vp-name-config`.
 ## Comment tiết chế — giải thích WHY, không kể WHAT
 
 - **Comment thưa.** Code tự nói được thì KHÔNG comment. Không kể lể từng dòng, không comment hiển nhiên (`// tăng i`, `// gọi API`).

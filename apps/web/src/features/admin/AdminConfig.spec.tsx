@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 
 vi.mock('./smtpApi', () => ({
@@ -17,7 +17,7 @@ import {
   type SmtpConfigView,
 } from './smtpApi'
 import { AdminConfig } from './AdminConfig'
-import { getVpName } from '../../i18n'
+import { getVpName, setVpName } from '../../i18n'
 
 const VIEW: SmtpConfigView = {
   host: 'smtp.pmh.com.vn', port: 587, secure: true, username: 'qlhs', from: 'qlhs@pmh.com.vn',
@@ -29,6 +29,9 @@ describe('AdminConfig — SMTP settings panel', () => {
     vi.clearAllMocks()
     vi.mocked(getAppConfig).mockResolvedValue({ vpName: 'Andy' })
   })
+  // The rename test mutates the module-level VP name; reset so it can't leak
+  // into other tests/files that read a VP-bearing label.
+  afterEach(() => setVpName('Andy'))
 
   it('loads config into the form, saves, and test-sends without echoing the password', async () => {
     vi.mocked(getSmtpConfig).mockResolvedValue(VIEW)

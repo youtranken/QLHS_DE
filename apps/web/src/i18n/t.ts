@@ -51,9 +51,11 @@ export const getVpName = (): string => vpName
 
 /** Presentation-only VP-name substitution. Rewrites both the {vp} placeholder
  *  (i18n strings) and the literal canonical token "Andy" (raw status strings
- *  shown at tab/chip/metro/rail per AD-13). No-op while vpName is "Andy". */
+ *  shown at tab/chip/metro/rail per AD-13). No-op while vpName is "Andy".
+ *  Uses function replacers so a name with `$` (e.g. `A$&`) inserts literally
+ *  instead of triggering String.replace's $-substitution. */
 export const applyVp = (s: string): string =>
-  s.replace(/\{vp\}/g, vpName).replace(/\bAndy\b/g, vpName)
+  s.replace(/\{vp\}/g, () => vpName).replace(/\bAndy\b/g, () => vpName)
 
 /** Future language switch: setLocale(en, 'en-US') + re-render from the root.
  *  Components never change — t() reads the module-level dict at render time. */
@@ -66,8 +68,11 @@ export const localeTag = (): string => tag
 export function t(key: MessageKey, params?: Record<string, string | number>): string {
   const raw = key.split('.').reduce<unknown>((o, k) => (o as Record<string, unknown> | undefined)?.[k], dict)
   const s = typeof raw === 'string' ? raw : key // runtime fallback; TS prevents this path
-  const out = params ? s.replace(/\{(\w+)\}/g, (_, p: string) => String(params[p] ?? `{${p}}`)) : s
-  return applyVp(out)
+  // Substitute the VP name in the STATIC template only, BEFORE interpolating
+  // params — a param carrying user data (a person named "…Andy", a free-text
+  // reason) must stay itself, not get rewritten to the VP name.
+  const base = applyVp(s)
+  return params ? base.replace(/\{(\w+)\}/g, (_, p: string) => String(params[p] ?? `{${p}}`)) : base
 }
 
 /** AD-13 seam: canonical EN status → VI presentation label (EN key passthrough).
@@ -75,6 +80,7 @@ export function t(key: MessageKey, params?: Record<string, string | number>): st
 export const statusVi = (status: string): string =>
   applyVp((dict.status as Record<string, string>)[status] ?? status)
 
-/** Notification kind → one-liner (kind passthrough when unmapped). */
+/** Notification kind → one-liner (kind passthrough when unmapped). applyVp keeps
+ *  it consistent with statusVi should a future kind carry the VP name. */
 export const kindMessage = (kind: string): string =>
-  (dict.notificationKinds as Record<string, string>)[kind] ?? kind
+  applyVp((dict.notificationKinds as Record<string, string>)[kind] ?? kind)
