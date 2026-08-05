@@ -5,7 +5,7 @@ set -euo pipefail
 
 QLHS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"   # script ở gốc QLHS_DE
 cd "$QLHS"
-ENVF="apps/api/.env"
+ENVF=".env"   # root .env: nguồn DUY NHẤT mật khẩu DB (compose tự đọc để thay ${...})
 CJ=(docker compose -f docker-compose.yml -f docker-compose.prod.yml)
 
 echo "==> [1/4] Kiểm repo sạch rồi kéo code mới (ff-only)"
@@ -14,10 +14,10 @@ if [[ -n "$(git status --porcelain)" ]]; then
 fi
 git pull --ff-only
 
-echo "==> [2/4] Bắc cầu mật khẩu DB từ ${ENVF} cho compose"
+echo "==> [2/4] Kiểm mật khẩu DB trong ${ENVF} (compose tự đọc root .env để thay \${...})"
 set -a; . <(grep -E '^(POSTGRES_PASSWORD|QLHS_APP_PASSWORD)=' "$ENVF" || true); set +a
 { [ -n "${POSTGRES_PASSWORD:-}" ] && [ -n "${QLHS_APP_PASSWORD:-}" ]; } || {
-  echo "!! ${ENVF} thiếu POSTGRES_PASSWORD / QLHS_APP_PASSWORD." >&2; exit 1; }
+  echo "!! ${ENVF} (gốc dự án) thiếu POSTGRES_PASSWORD / QLHS_APP_PASSWORD." >&2; exit 1; }
 
 echo "==> [3/4] Build + recreate (prod overlay)"
 "${CJ[@]}" up -d --build
