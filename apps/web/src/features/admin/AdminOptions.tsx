@@ -6,6 +6,7 @@ import { ConfirmModal } from '../../shared/ConfirmModal'
 import { StateNotice } from '../../shared/StateNotice'
 import { toast } from '../../shared/toast'
 import { createOption, listOptions, updateOption, type OptionView } from './api'
+import { AdminDocTypes } from './AdminDocTypes'
 
 /** Hàm (không const) để nhãn t() đọc lại catalog mỗi render — sẵn cho đổi ngôn ngữ. */
 const kinds = () => [
@@ -283,6 +284,8 @@ export function AdminOptions() {
           onCancel={() => setConfirmOff(null)}
         />
       )}
+
+      <AdminDocTypes />
     </section>
   )
 }

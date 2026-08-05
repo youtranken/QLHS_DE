@@ -26,12 +26,13 @@ import {
 import { SearchAuditUseCase, type AuditPage } from '../../application/admin/search-audit.usecase'
 import { ListOptionsUseCase, type OptionView } from '../../application/admin/list-options.usecase'
 import { CreateOptionUseCase, UpdateOptionUseCase } from '../../application/admin/mutate-option.usecase'
+import { AddDocumentTypeUseCase } from '../../application/admin/add-document-type.usecase'
 import { SearchDirectoryUseCase, type DirectoryMatch } from '../../application/admin/search-directory.usecase'
 import { ListSlaPausesUseCase, type SlaPauseReport } from '../../application/sla/list-sla-pauses.usecase'
 import { GetAnalyticsUseCase, type AnalyticsData } from '../../application/admin/get-analytics.usecase'
 import { ExportAnalyticsUseCase } from '../../application/admin/export-analytics.usecase'
 import { isOptionKind, type OptionRow } from '../../infra/prisma/admin/option.repo'
-import { CreateOptionDto, UpdateOptionDto } from './option.dto'
+import { AddDocumentTypeDto, CreateOptionDto, UpdateOptionDto } from './option.dto'
 import { AnalyticsQueryDto, AnalyticsExportDto } from './analytics-query.dto'
 import { GetCurrentUser, type CurrentUser } from '../auth/current-user'
 import { SetRolesDto } from './set-roles.dto'
@@ -55,6 +56,7 @@ export class AdminController {
     private readonly listOptions: ListOptionsUseCase,
     private readonly createOption: CreateOptionUseCase,
     private readonly updateOption: UpdateOptionUseCase,
+    private readonly addDocType: AddDocumentTypeUseCase,
     private readonly searchDirectory: SearchDirectoryUseCase,
     private readonly listPauses: ListSlaPausesUseCase,
     private readonly getAnalytics: GetAnalyticsUseCase,
@@ -76,6 +78,12 @@ export class AdminController {
   addOption(@Param('kind') kind: string, @Body() dto: CreateOptionDto): Promise<OptionRow> {
     assertKind(kind)
     return this.createOption.execute(kind, dto.value)
+  }
+
+  /** Thêm document type mới (kèm luồng) — chỉ thêm, không sửa/xoá (hồ sơ cũ an toàn). */
+  @Post('document-types')
+  addDocumentType(@Body() dto: AddDocumentTypeDto): Promise<{ value: string; flow: string }> {
+    return this.addDocType.execute(dto.value, dto.flow)
   }
 
   @Patch('options/:id')

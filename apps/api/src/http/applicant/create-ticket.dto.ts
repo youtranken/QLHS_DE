@@ -1,9 +1,9 @@
 import { IsIn, IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator'
-import { ALL_DOCUMENT_TYPES, ALL_PRIORITIES } from '@qlhs/contracts'
+import { ALL_PRIORITIES } from '@qlhs/contracts'
 import { DOCUMENT_NO_MAX } from '../../domain/ticket/document-no'
 
-const DOC_TYPES = ALL_DOCUMENT_TYPES as unknown as string[]
 const PRIORITIES = ALL_PRIORITIES as unknown as string[]
+const DOC_TYPE_MAX = 60
 
 // Upper bounds on every free-text field: reject oversized input at the edge
 // before it reaches the DB, so a caller can't wedge a multi-MB string into a
@@ -21,7 +21,11 @@ const AMOUNT_MAX = 18
 
 /** 9 mandatory fields (FR-1). No file attachment field exists — by design. */
 export class CreateTicketDto {
-  @IsIn(DOC_TYPES)
+  // Loại hồ sơ giờ do admin quản lý (danh mục) — không giới hạn cứng 6 loại nữa;
+  // giá trị hợp lệ được kiểm ở use-case theo catalog (flowForDocType).
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(DOC_TYPE_MAX)
   documentType!: string
 
   @IsString()

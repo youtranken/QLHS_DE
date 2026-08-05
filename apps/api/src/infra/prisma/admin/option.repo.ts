@@ -12,9 +12,14 @@ export interface OptionRow {
   id: string
   kind: string
   value: string
+  flow: string | null
   sortOrder: number
   active: boolean
 }
+
+/** Document Type sống trong cùng bảng option_item nhưng mang thêm `flow` (luồng
+ *  xử lý) — admin thêm mới kèm luồng; suy luồng khi tạo hồ sơ đọc từ đây. */
+export const DOC_TYPE_KIND = 'documentType'
 
 /** Admin-managed create-form dropdowns (N3). Values are deactivated, never
  *  deleted — old tickets keep their string. Sorted by (sortOrder, value). */
@@ -64,5 +69,31 @@ export class OptionRepo {
 
   count(kind: string): Promise<number> {
     return this.prisma.optionItem.count({ where: { kind } })
+  }
+
+  /** Active document types (kèm flow) cho form tạo hồ sơ + màn Danh mục. */
+  listActiveDocTypes(): Promise<OptionRow[]> {
+    return this.prisma.optionItem.findMany({
+      where: { kind: DOC_TYPE_KIND, active: true },
+      orderBy: [{ sortOrder: 'asc' }, { value: 'asc' }],
+    })
+  }
+
+  async createDocType(value: string, flow: string): Promise<OptionRow> {
+    const max = await this.prisma.optionItem.aggregate({
+      where: { kind: DOC_TYPE_KIND },
+      _max: { sortOrder: true },
+    })
+    return this.prisma.optionItem.create({
+      data: { kind: DOC_TYPE_KIND, value, flow, sortOrder: (max._max.sortOrder ?? 0) + 1, active: true },
+    })
+  }
+
+  /** Luồng của một document type (active) — nguồn suy luồng khi tạo hồ sơ. */
+  async flowForDocType(value: string): Promise<string | null> {
+    const row = await this.prisma.optionItem.findUnique({
+      where: { kind_value: { kind: DOC_TYPE_KIND, value } },
+    })
+    return row && row.active ? row.flow : null
   }
 }

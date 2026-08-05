@@ -143,6 +143,9 @@ export interface OptionView {
 export const listOptions = (kind: string) => apiGet<OptionView[]>(`/admin/options/${kind}`)
 export const createOption = (kind: string, value: string) =>
   apiPost<{ id: string }>(`/admin/options/${kind}`, { value })
+/** Thêm document type mới (kèm luồng) — chỉ thêm, không sửa/xoá. */
+export const addDocumentType = (value: string, flow: string) =>
+  apiPost<{ value: string; flow: string }>('/admin/document-types', { value, flow })
 export const updateOption = (id: string, patch: { value?: string; active?: boolean }) =>
   apiPatch<{ id: string }>(`/admin/options/${id}`, patch)
 

@@ -89,6 +89,13 @@ export interface TicketDetail {
 /** Active create-form dropdown values for a kind ('paymentTerm' | 'projectTeam'). */
 export const getOptions = (kind: string) => apiGet<string[]>(`/options/${kind}`)
 
+/** Document type gộp theo luồng (admin quản lý ở Danh mục). */
+export interface DocTypeGroup {
+  flow: string
+  types: string[]
+}
+export const getDocumentTypes = () => apiGet<DocTypeGroup[]>('/options/document-types')
+
 export const listMyTickets = () => apiGet<TicketView[]>('/tickets/mine')
 export const createTicket = (body: CreateTicketBody) => apiPost<{ id: string }>('/tickets', body)
 export const cancelTicket = (id: string) => apiPost<{ ok: true }>(`/tickets/${id}/cancel`)

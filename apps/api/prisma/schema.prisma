@@ -259,6 +259,9 @@ model OptionItem {
   id        String   @id @default(uuid())
   kind      String
   value     String
+  /// Chỉ dùng cho kind='documentType': luồng xử lý của loại này (General/Contract/
+  /// Payment) — thay mapFlow hardcode. Null với các danh mục khác.
+  flow      String?
   sortOrder Int      @default(0) @map("sort_order")
   active    Boolean  @default(true)
   createdAt DateTime @default(now()) @map("created_at")

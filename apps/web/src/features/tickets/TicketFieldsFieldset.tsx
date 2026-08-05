@@ -1,7 +1,7 @@
 import { useEffect, useId, useState } from 'react'
 import { DOCUMENT_TYPE_GROUPS } from '@qlhs/contracts'
 import { groupAmount } from '../../shared/format'
-import { getOptions, type CreateTicketBody } from './api'
+import { getDocumentTypes, getOptions, type CreateTicketBody, type DocTypeGroup } from './api'
 import { Select, type SelectOption } from '../../shared/Select'
 import { toast } from '../../shared/toast'
 import { t } from '../../i18n'
@@ -26,6 +26,7 @@ export function TicketFieldsFieldset({
   const [payTerms, setPayTerms] = useState<string[]>([])
   const [teams, setTeams] = useState<string[]>([])
   const [currencies, setCurrencies] = useState<string[]>([])
+  const [docGroups, setDocGroups] = useState<DocTypeGroup[]>([])
   const currencyOpts = currencies.length > 0 ? currencies : CURRENCY_FALLBACK
   // Unique per instance so two mounted fieldsets (e.g. expanded row + detail modal)
   // never share label↔input ids.
@@ -44,6 +45,11 @@ export function TicketFieldsFieldset({
           failed = true
           if (alive) setter([])
         })
+    // Document type do admin quản lý (Danh mục) — fetch riêng; rỗng/lỗi thì fallback
+    // hằng số DOCUMENT_TYPE_GROUPS ở docOptions bên dưới.
+    void getDocumentTypes()
+      .then((g) => alive && setDocGroups(g))
+      .catch(() => {})
     void Promise.allSettled([
       pick('paymentTerm', setPayTerms),
       pick('projectTeam', setTeams),
@@ -64,8 +70,13 @@ export function TicketFieldsFieldset({
   const opts = (list: string[], value: string): SelectOption[] =>
     withCurrent(list, value).map((x) => ({ value: x, label: x }))
   // Document Type keeps its flow grouping via non-selectable header rows; types are
-  // indented under their flow header so the grouping reads at a glance.
-  const docOptions: SelectOption[] = DOCUMENT_TYPE_GROUPS.flatMap((g) => [
+  // indented under their flow header so the grouping reads at a glance. Nguồn: catalog
+  // (admin) nếu có, không thì hằng số 6 loại built-in.
+  const docSource: DocTypeGroup[] =
+    docGroups.length > 0
+      ? docGroups
+      : DOCUMENT_TYPE_GROUPS.map((g) => ({ flow: g.flow, types: [...g.types] }))
+  const docOptions: SelectOption[] = docSource.flatMap((g) => [
     { value: `__h-${g.flow}`, label: g.flow, header: true },
     ...g.types.map((d) => ({ value: d, label: d, indent: true })),
   ])

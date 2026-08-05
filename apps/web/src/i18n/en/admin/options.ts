@@ -46,4 +46,13 @@ export const adminOptions = {
   confirmOffTitle: 'Disable value',
   confirmOffMessage: 'Disabling hides the value from the create form. Existing tickets are unchanged. Continue?',
   confirmOffLabel: 'Disable value',
+  docTypes: {
+    title: 'Document Type',
+    hint: 'Add a new type with its processing flow (A/B/C). Add-only — no edit/delete, so existing tickets stay safe.',
+    namePlaceholder: 'New type name (e.g. Annex 2)',
+    flowLabel: 'Flow',
+    addBtn: 'Add type',
+    added: 'Document type added.',
+    addErr: 'Could not add the document type.',
+  },
 } as const

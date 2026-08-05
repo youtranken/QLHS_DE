@@ -46,4 +46,13 @@ export const adminOptions = {
   confirmOffTitle: 'Tắt giá trị',
   confirmOffMessage: 'Tắt sẽ ẩn giá trị khỏi form tạo mới. Hồ sơ cũ vẫn giữ nguyên. Tiếp tục?',
   confirmOffLabel: 'Tắt giá trị',
+  docTypes: {
+    title: 'Loại hồ sơ (Document Type)',
+    hint: 'Thêm loại mới kèm luồng xử lý (A/B/C). Chỉ thêm — không sửa/xoá để hồ sơ cũ an toàn.',
+    namePlaceholder: 'Tên loại mới (vd: Phụ lục 2)',
+    flowLabel: 'Luồng',
+    addBtn: 'Thêm loại',
+    added: 'Đã thêm loại hồ sơ.',
+    addErr: 'Không thêm được loại hồ sơ.',
+  },
 } as const

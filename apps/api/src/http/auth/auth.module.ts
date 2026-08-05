@@ -27,6 +27,8 @@ import { GetAdminOverviewUseCase } from '../../application/admin/get-admin-overv
 import { SearchAuditUseCase } from '../../application/admin/search-audit.usecase'
 import { ListOptionsUseCase } from '../../application/admin/list-options.usecase'
 import { CreateOptionUseCase, UpdateOptionUseCase } from '../../application/admin/mutate-option.usecase'
+import { GetDocumentTypesUseCase } from '../../application/admin/get-document-types.usecase'
+import { AddDocumentTypeUseCase } from '../../application/admin/add-document-type.usecase'
 import { SearchDirectoryUseCase } from '../../application/admin/search-directory.usecase'
 import { ListSlaPausesUseCase } from '../../application/sla/list-sla-pauses.usecase'
 import { GetAnalyticsUseCase } from '../../application/admin/get-analytics.usecase'
@@ -74,6 +76,8 @@ import { ProcessedWebhookEventRepo } from '../../infra/prisma/webhook/processed-
     SearchAuditUseCase,
     ListOptionsUseCase,
     CreateOptionUseCase,
+    GetDocumentTypesUseCase,
+    AddDocumentTypeUseCase,
     UpdateOptionUseCase,
     SearchDirectoryUseCase,
     ListSlaPausesUseCase,

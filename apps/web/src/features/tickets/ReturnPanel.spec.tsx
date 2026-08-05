@@ -7,6 +7,7 @@ vi.mock('./api', () => ({
   resubmitTicket: vi.fn(),
   updateFields: vi.fn(),
   getOptions: vi.fn().mockResolvedValue([]),
+  getDocumentTypes: vi.fn().mockResolvedValue([]),
 }))
 import { confirmReturnReceipt, resubmitTicket, updateFields, type TicketDetail } from './api'
 import { ReturnPanel } from './ReturnPanel'

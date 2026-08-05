@@ -117,3 +117,15 @@
   align-items: initial;
   min-height: 0;
 }
+
+/* Danh mục › Document Type — thêm mới kèm luồng (chỉ thêm) */
+.doctypes { margin-top: 22px; padding: 16px 18px 18px; }
+.doctypes h2 { font-size: 15px; margin: 0 0 4px; }
+.dt-hint { color: var(--ink-2); font-size: 12.5px; margin: 0 0 14px; }
+.dt-group { display: flex; align-items: baseline; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line-soft); }
+.dt-flow { flex: 0 0 84px; font-weight: 700; font-size: 12px; color: var(--ink-2); }
+.dt-vals { display: flex; flex-wrap: wrap; gap: 7px; }
+.dt-chip { background: var(--panel-2); border: 1px solid var(--line-soft); border-radius: 7px; padding: 2px 9px; font-size: 12.5px; }
+.dt-add { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.dt-add input { flex: 1 1 200px; }
+.dt-add select { flex: 0 0 auto; }
