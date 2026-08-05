@@ -26,7 +26,19 @@ export PGUSER="${PGUSER:-qlhs}"
 export PGPASSWORD="${PGPASSWORD:?PGPASSWORD required — pass it via env/secret, no default}"
 export PGDATABASE="${PGDATABASE:-qlhs}"
 
+# Optional at-rest encryption. A dump holds the ENTIRE DB (hồ sơ + audit) and the
+# globals hold cluster roles + PASSWORDS — so an unencrypted dump copied off-box is
+# a full credential + data leak. With BACKUP_PASSPHRASE set, each artefact is
+# AES-256-CBC (openssl, pbkdf2, salted) → *.enc; restore needs the same passphrase.
+PASS="${BACKUP_PASSPHRASE:-}"
+if [ -n "$PASS" ]; then
+  command -v openssl >/dev/null 2>&1 || { echo "openssl not found — cannot encrypt backups" >&2; exit 1; }
+fi
+
 log() { echo "[pg-backup $(date -Is)] $*"; }
+
+# Encrypt stdin → $1 with the passphrase (from env, never on the argv).
+encrypt_to() { openssl enc -aes-256-cbc -pbkdf2 -salt -pass env:BACKUP_PASSPHRASE -out "$1"; }
 
 # Keep only the newest $KEEP files matching a glob in $DIR; delete the rest.
 prune() {
@@ -35,25 +47,38 @@ prune() {
 
 backup_once() {
   mkdir -p "$DIR"
-  local ts db gl
+  local ts db gl ext=""
   ts="$(date +%Y%m%d-%H%M%S)"
-  db="$DIR/qlhs-$ts.dump"
-  gl="$DIR/globals-$ts.sql"
+  [ -n "$PASS" ] && ext=".enc"
+  db="$DIR/qlhs-$ts.dump$ext"
+  gl="$DIR/globals-$ts.sql$ext"
 
   # Write to .partial then rename, so a crash mid-dump never leaves a truncated
-  # file that a restore would trust.
-  log "dumping database → $(basename "$db")"
-  pg_dump --format=custom --file="$db.partial"
+  # file that a restore would trust. Explicit || guards catch a failed dump even
+  # when set -e is disabled (this runs inside a `backup_once || …` caller).
+  log "dumping database → $(basename "$db")${PASS:+ (mã hoá)}"
+  if [ -n "$PASS" ]; then
+    pg_dump --format=custom | encrypt_to "$db.partial" || { log "dump failed"; rm -f "$db.partial"; return 1; }
+  else
+    pg_dump --format=custom --file="$db.partial" || { log "dump failed"; rm -f "$db.partial"; return 1; }
+  fi
   mv "$db.partial" "$db"
 
   log "dumping globals → $(basename "$gl")"
-  pg_dumpall --globals-only --file="$gl.partial"
+  if [ -n "$PASS" ]; then
+    pg_dumpall --globals-only | encrypt_to "$gl.partial" || { log "globals dump failed"; rm -f "$gl.partial"; return 1; }
+  else
+    pg_dumpall --globals-only --file="$gl.partial" || { log "globals dump failed"; rm -f "$gl.partial"; return 1; }
+  fi
   mv "$gl.partial" "$gl"
 
-  prune 'qlhs-*.dump'
-  prune 'globals-*.sql'
-  log "done — $(ls -1 "$DIR"/qlhs-*.dump 2>/dev/null | wc -l) backups retained (KEEP=$KEEP)"
+  # Globs match both plain (.dump/.sql) and encrypted (.enc) so rotation is uniform.
+  prune 'qlhs-*.dump*'
+  prune 'globals-*.sql*'
+  log "done — $(ls -1 "$DIR"/qlhs-*.dump* 2>/dev/null | wc -l) backups retained (KEEP=$KEEP)"
 }
+
+[ -z "$PASS" ] && log "⚠ BACKUP_PASSPHRASE chưa set — backup KHÔNG mã hoá (dump chứa toàn bộ DB + mật khẩu role)."
 
 # One-shot mode (BACKUP_ON_START=1) — used by the first run and by tests.
 if [ "${BACKUP_ON_START:-0}" = "1" ]; then

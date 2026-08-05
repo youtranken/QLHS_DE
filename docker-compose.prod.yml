@@ -53,6 +53,9 @@ services:
     mem_limit: 512m
     environment:
       PGPASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD chưa set}
+      # Mã hoá dump at-rest (backup.sh). Bỏ trống = backup KHÔNG mã hoá (có cảnh báo
+      # trong log). GIỮ KỸ & ỔN ĐỊNH — mất passphrase là mất luôn khả năng khôi phục.
+      BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:-}
 
 # mailpit KHÔNG chạy ở prod (profiles: ['dev'] trong compose gốc) — prod gửi qua SMTP
 # thật. TRẦN RAM prod cho QLHS ≤ 24GB: postgres 14g + api 8g + web 256m + pg-backup

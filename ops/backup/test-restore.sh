@@ -15,6 +15,9 @@ export PGUSER="${PGUSER:-qlhs}"
 # No weak default — supply the DB password via env/secret (vbsec MEDIUM).
 export PGPASSWORD="${PGPASSWORD:?PGPASSWORD required — pass it via env/secret, no default}"
 
+# Encrypted (*.enc) dumps decrypt on the fly with BACKUP_PASSPHRASE.
+is_enc() { case "$1" in *.enc) return 0 ;; *) return 1 ;; esac; }
+
 TMPDB="qlhs_restore_test_$(date +%s)"
 
 echo "==> creating scratch database $TMPDB"
@@ -24,7 +27,13 @@ trap 'dropdb --if-exists "$TMPDB" >/dev/null 2>&1 && echo "==> dropped $TMPDB"' 
 echo "==> restoring $(basename "$DUMP") → $TMPDB"
 # --no-owner: reassign to the connecting user; role GRANTs still target qlhs_app,
 # which exists cluster-wide. Exit non-zero only on real errors (not GRANT notices).
-pg_restore --no-owner --exit-on-error --dbname="$TMPDB" "$DUMP"
+if is_enc "$DUMP"; then
+  : "${BACKUP_PASSPHRASE:?BACKUP_PASSPHRASE required to decrypt $DUMP}"
+  openssl enc -d -aes-256-cbc -pbkdf2 -pass env:BACKUP_PASSPHRASE -in "$DUMP" \
+    | pg_restore --no-owner --exit-on-error --dbname="$TMPDB"
+else
+  pg_restore --no-owner --exit-on-error --dbname="$TMPDB" "$DUMP"
+fi
 
 for tbl in ticket ticket_event sla_config user_role; do
   n="$(psql -tA -d "$TMPDB" -c "SELECT count(*) FROM \"$tbl\";")"

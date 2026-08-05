@@ -26,6 +26,11 @@ export PGUSER="${PGUSER:-qlhs}"
 export PGPASSWORD="${PGPASSWORD:?PGPASSWORD required — pass it via env/secret, no default}"
 TARGET_DB="${PGDATABASE:-qlhs}"
 
+# A *.enc artefact was encrypted by backup.sh — decrypt on the fly with the same
+# BACKUP_PASSPHRASE. Plain artefacts pass straight through.
+is_enc() { case "$1" in *.enc) return 0 ;; *) return 1 ;; esac; }
+decrypt_from() { openssl enc -d -aes-256-cbc -pbkdf2 -pass env:BACKUP_PASSPHRASE -in "$1"; }
+
 # Destructive overwrite of the live DB — refuse unless explicitly confirmed.
 if [ "${CONFIRM:-}" != "RESTORE" ]; then
   echo "REFUSING: this DROPs and recreates database '$TARGET_DB' on $PGHOST:$PGPORT." >&2
@@ -40,11 +45,17 @@ log() { echo "[pg-restore $(date -Is)] $*"; }
 # so it is opt-in and its errors are non-fatal. globals file is the sibling of
 # the dump: qlhs-<ts>.dump ↔ globals-<ts>.sql.
 if [ "${RELOAD_GLOBALS:-0}" = "1" ]; then
-  ts="$(basename "$DUMP" .dump)"; ts="${ts#qlhs-}"
-  GLOBALS="${GLOBALS:-$(dirname "$DUMP")/globals-$ts.sql}"
+  base="$(basename "$DUMP")"; base="${base%.enc}"; ts="${base#qlhs-}"; ts="${ts%.dump}"
+  gl_ext=""; is_enc "$DUMP" && gl_ext=".enc"
+  GLOBALS="${GLOBALS:-$(dirname "$DUMP")/globals-$ts.sql$gl_ext}"
   [ -f "$GLOBALS" ] || { echo "globals file not found: $GLOBALS" >&2; exit 1; }
   log "reloading cluster roles ← $(basename "$GLOBALS") (errors for existing roles are expected)"
-  psql --dbname=postgres -f "$GLOBALS" || log "globals reload had warnings (existing roles?) — continuing"
+  if is_enc "$GLOBALS"; then
+    : "${BACKUP_PASSPHRASE:?BACKUP_PASSPHRASE required to decrypt $GLOBALS}"
+    decrypt_from "$GLOBALS" | psql --dbname=postgres || log "globals reload had warnings (existing roles?) — continuing"
+  else
+    psql --dbname=postgres -f "$GLOBALS" || log "globals reload had warnings (existing roles?) — continuing"
+  fi
 fi
 
 # Drop + recreate from the maintenance DB (can't drop the DB you're connected to);
@@ -60,7 +71,12 @@ SQL
 # --no-owner: reassign objects to the connecting user; the schema's GRANTs still
 # target qlhs_app, which must exist (present cluster-wide, or reloaded above).
 log "restoring $(basename "$DUMP") → $TARGET_DB"
-pg_restore --no-owner --exit-on-error --dbname="$TARGET_DB" "$DUMP"
+if is_enc "$DUMP"; then
+  : "${BACKUP_PASSPHRASE:?BACKUP_PASSPHRASE required to decrypt $DUMP}"
+  decrypt_from "$DUMP" | pg_restore --no-owner --exit-on-error --dbname="$TARGET_DB"
+else
+  pg_restore --no-owner --exit-on-error --dbname="$TARGET_DB" "$DUMP"
+fi
 
 log "verifying core tables"
 for tbl in ticket ticket_event sla_config user_role; do
