@@ -77,7 +77,7 @@ services:
     # OIDC (:5173 redirect), local-admin bootstrap creds, and admin emails come
     # from the same file the host dev uses → SSO reuses the existing registration.
     env_file:
-      - apps/api/.env
+      - .env
     environment:
       # Container-specific overrides — these win over env_file. Pinned here (NOT
       # left to apps/api/.env) so a stray/blank NODE_ENV in the dev env file can
