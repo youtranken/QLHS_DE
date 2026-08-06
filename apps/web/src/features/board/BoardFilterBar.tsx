@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import { PRIORITY } from '@qlhs/contracts'
 import { t } from '../../i18n'
+import { Select } from '../../shared/Select'
 import type { BoardFilter } from './boardFilter'
 import { isViewActive, loadViews, removeView, saveViews, upsertView, type SavedView } from './boardViews'
 
 const FLOW_OPTS = ['All', 'Contract', 'Payment', 'General'] as const
+// Priority filter is a compact dropdown: "Tất cả" (default) → Gấp / Thường.
+// "Khẩn" (Urgent) dropped from the picker.
 const PRIO_OPTS = [
   { v: 'All', k: 'board.filter.all' },
-  { v: PRIORITY.Urgent, k: 'board.card.prioUrgent' },
   { v: PRIORITY.Rush, k: 'board.card.prioRush' },
   { v: PRIORITY.Normal, k: 'board.card.prioNormal' },
 ] as const
@@ -59,12 +61,14 @@ export function BoardFilterBar({
           ))}
         </div>
       )}
-      <div className="fgrp" role="group" aria-label={t('board.filter.priorityLabel')}>
-        {PRIO_OPTS.map((p) => (
-          <button key={p.v} type="button" aria-pressed={filter.priority === p.v} className={`fchip${filter.priority === p.v ? ' on' : ''}`} onClick={() => onPriority(p.v)}>
-            {t(p.k)}
-          </button>
-        ))}
+      <div className="fgrp priofilter">
+        <Select
+          value={filter.priority}
+          onChange={onPriority}
+          options={PRIO_OPTS.map((p) => ({ value: p.v, label: t(p.k) }))}
+          ariaLabel={t('board.filter.priorityLabel')}
+          className="priosel"
+        />
       </div>
 
       <div className="fgrp views" role="group" aria-label={t('board.views.label')}>

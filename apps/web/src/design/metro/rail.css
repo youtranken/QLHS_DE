@@ -13,8 +13,8 @@
   --pad: 20px; /* lề trái: ga đầu thụt vào */
   --padR: 64px; /* lề phải: chừa cho nhãn ga cuối dài (vd "Sent to Accounting") */
   --p: 0;
-  --tgap: 40px; /* đầu máy ĐẬU TRƯỚC ga tiền-tuyến chừng ~40px — chừa khoảng hở để
-                   không đè lên viên node/tick/tên ga (đọc rõ). */
+  --tgap: 14px; /* mép trước của giỏ đậu SÁT vạch | (dưới node) nhưng KHÔNG đè lên
+                   vạch; cả người đẩy nằm bên trái vạch. */
 }
 .track.fl-general {
   --lc: var(--general);

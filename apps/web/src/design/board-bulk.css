@@ -100,6 +100,10 @@
   gap: 6px;
   align-items: center;
 }
+/* Priority filter dropdown — stable compact width so it reads as one control. */
+.boardfilters .priosel {
+  min-width: 120px;
+}
 /* Nhóm "bộ lọc đã lưu" (FR #9) tách sang phải bằng một vạch mảnh */
 .boardfilters .fgrp.views {
   margin-left: auto;

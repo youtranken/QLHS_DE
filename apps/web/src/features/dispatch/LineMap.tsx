@@ -91,22 +91,6 @@ export function LineMap({ scope }: { scope?: string }) {
             </span>
           </span>
         )}
-        <div className="loadband">
-          <span className="legend" aria-hidden>
-            <span className="lg lg-front">
-              <i />
-              {t('dispatch.legendFront')}
-            </span>
-            <span className="lg lg-over">
-              <i />
-              {t('dispatch.legendOver')}
-            </span>
-            <span className="lg lg-done">
-              <i />
-              {t('dispatch.legendDone')}
-            </span>
-          </span>
-        </div>
       </div>
 
       {!loaded && error ? (
