@@ -45,6 +45,9 @@ export const adminUsers = {
   removedToast: 'Removed {name} from {group} — back to Applicant',
   undo: 'Undo',
   undoneToast: 'Undid the role change for {name}',
+  actionFailed: 'Could not change the role — try again in a moment.',
+  loading: 'Loading users…',
+  loadError: 'Could not load the user list.',
   appoint: {
     title: 'Appoint via SSO',
     formAria: 'Find staff',

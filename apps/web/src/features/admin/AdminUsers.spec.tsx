@@ -5,7 +5,11 @@ vi.mock('./api', () => ({
   listUsers: vi.fn(),
   setUserRoles: vi.fn(),
 }))
+vi.mock('../../shared/toast', () => ({
+  toast: { ok: vi.fn(), err: vi.fn(), action: vi.fn() },
+}))
 import { listUsers, setUserRoles, type UserWithRoles } from './api'
+import { toast } from '../../shared/toast'
 import { AdminUsers } from './AdminUsers'
 
 const USERS: UserWithRoles[] = [
@@ -66,5 +70,22 @@ describe('AdminUsers — quản vai theo nhóm (1 người 1 vai/nhóm)', () => 
     await waitFor(() => expect(screen.getByText('Trần Thị B')).toBeInTheDocument())
     fireEvent.click(screen.getByRole('button', { name: /Gỡ Trần Thị B khỏi DCC1/ }))
     await waitFor(() => expect(setUserRoles).toHaveBeenCalledWith('s2', []))
+  })
+
+  it('một lệnh đổi vai thất bại → báo lỗi rõ (H1: không im lặng)', async () => {
+    vi.mocked(setUserRoles).mockRejectedValueOnce(new Error('500'))
+    render(<AdminUsers />)
+    await waitFor(() => expect(screen.getByText('Trần Thị B')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: /Gỡ Trần Thị B khỏi DCC1/ }))
+    await waitFor(() => expect(toast.err).toHaveBeenCalled())
+  })
+
+  it('tải danh sách thất bại → hiện lỗi + nút thử lại (H2: không giả vờ rỗng)', async () => {
+    vi.mocked(listUsers).mockRejectedValueOnce(new Error('down'))
+    render(<AdminUsers />)
+    await waitFor(() =>
+      expect(screen.getByText(/Không tải được danh sách người dùng/)).toBeInTheDocument(),
+    )
+    expect(screen.queryByText(/Chưa có ai trong nhóm/)).not.toBeInTheDocument()
   })
 })

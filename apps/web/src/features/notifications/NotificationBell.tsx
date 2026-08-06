@@ -47,6 +47,9 @@ export function NotificationBell() {
     }
     document.addEventListener('mousedown', onDown)
     document.addEventListener('keydown', onKey)
+    // Move focus into the dropdown on open so keyboard users don't have to Tab past
+    // the whole header to reach it.
+    ref.current?.querySelector<HTMLElement>('.notifpop button, .notifpop [href]')?.focus()
     return () => {
       document.removeEventListener('mousedown', onDown)
       document.removeEventListener('keydown', onKey)
@@ -79,7 +82,7 @@ export function NotificationBell() {
         className="notifbtn"
         aria-label={unread > 0 ? t('bell.ariaUnread', { n: unread }) : t('bell.title')}
         aria-expanded={open}
-        aria-haspopup="menu"
+        aria-haspopup="true"
         onClick={() => setOpen((o) => !o)}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -90,7 +93,7 @@ export function NotificationBell() {
       </button>
 
       {open && (
-        <div className="notifpop" role="menu" aria-label={t('bell.title')}>
+        <div className="notifpop" aria-label={t('bell.title')}>
           <div className="notifhd">
             <span>{t('bell.title')}</span>
             {unread > 0 && (
@@ -108,7 +111,6 @@ export function NotificationBell() {
                   <button
                     type="button"
                     className={n.read ? 'notifitem' : 'notifitem unread'}
-                    role="menuitem"
                     onClick={() => void openItem(n)}
                   >
                     {!n.read && <span className="notifdot" aria-hidden />}

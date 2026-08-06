@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { type ReactNode, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useAnchoredMenu } from './useAnchoredMenu'
 import { t } from '../i18n'
@@ -38,6 +38,8 @@ export function Select({
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState(0)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const listId = useId()
+  const optId = (i: number) => `${listId}-opt-${i}`
 
   const selectable = options.filter((o) => !o.header)
   const selected = options.find((o) => o.value === value && !o.header)
@@ -89,6 +91,8 @@ export function Select({
         aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-controls={open ? listId : undefined}
+        aria-activedescendant={open && !options[active]?.header ? optId(active) : undefined}
         disabled={disabled}
         onClick={() => setOpen((v) => !v)}
         onKeyDown={(e) => {
@@ -113,7 +117,7 @@ export function Select({
       </button>
       {open &&
         createPortal(
-          <ul className="fsel-menu" role="listbox" style={floatingStyles} ref={refs.setFloating}>
+          <ul className="fsel-menu" role="listbox" id={listId} aria-label={ariaLabel} style={floatingStyles} ref={refs.setFloating}>
             {selectable.length === 0 && (
               <li className="fsel-none" aria-disabled="true">
                 {t('common.select.noOptions')}
@@ -128,6 +132,7 @@ export function Select({
                 <li key={o.value}>
                   <button
                     type="button"
+                    id={optId(i)}
                     role="option"
                     aria-selected={o.value === value}
                     className={`fsel-option${i === active ? ' active' : ''}${o.value === value ? ' sel' : ''}${o.indent ? ' indent' : ''}`}

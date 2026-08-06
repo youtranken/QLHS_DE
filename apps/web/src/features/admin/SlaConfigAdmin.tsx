@@ -123,6 +123,10 @@ export function SlaConfigAdmin() {
       await load()
       toast.ok(t('adminSla.config.savedMsg', { n: changed.length }))
     } catch {
+      // Saves are sequential and non-atomic — a mid-batch failure has already
+      // persisted the earlier rows. Resync from the server so the save bar reflects
+      // what actually saved instead of re-offering already-saved rows as "dirty".
+      await load().catch(() => {})
       toast.err(t('adminSla.config.saveFail'))
     } finally {
       setSaving(false)

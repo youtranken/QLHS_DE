@@ -45,6 +45,9 @@ export const adminUsers = {
   removedToast: 'Đã gỡ {name} khỏi {group} — về Applicant',
   undo: 'Hoàn tác',
   undoneToast: 'Đã hoàn tác thay đổi vai của {name}',
+  actionFailed: 'Không đổi được vai — thử lại sau giây lát.',
+  loading: 'Đang tải danh sách người dùng…',
+  loadError: 'Không tải được danh sách người dùng.',
   appoint: {
     title: 'Bổ nhiệm qua SSO',
     formAria: 'Tìm nhân sự',

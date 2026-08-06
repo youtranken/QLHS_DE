@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ROLE } from '@qlhs/contracts'
 import { t } from '../../i18n'
 import { ConfirmModal } from '../../shared/ConfirmModal'
+import { StateNotice } from '../../shared/StateNotice'
 import { toast } from '../../shared/toast'
 import { listUsers, setUserRoles, type UserWithRoles } from './api'
 
@@ -87,9 +88,17 @@ export function AdminUsers() {
   const [group, setGroup] = useState<string>(ROLE.Dcc1)
   const [q, setQ] = useState('')
   const [pendingAdmin, setPendingAdmin] = useState<UserWithRoles | null>(null)
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
 
   const load = useCallback(async () => {
-    setUsers(await listUsers())
+    setError(false)
+    try {
+      setUsers(await listUsers())
+      setLoaded(true)
+    } catch {
+      setError(true)
+    }
   }, [])
   useEffect(() => {
     void load()
@@ -125,10 +134,15 @@ export function AdminUsers() {
   /** 1 vai 1 nhóm: bỏ mọi vai managed rồi thêm đúng một → thêm cũng là "chuyển". */
   async function assign(u: UserWithRoles, to: string) {
     const name = u.fullName ?? u.sub
-    await setUserRoles(u.sub, u.roles.filter((r) => !MANAGED.includes(r)).concat(to))
-    setQ('')
-    await load()
-    toast.ok(t('adminUsers.assignedToast', { name, group: to }))
+    try {
+      await setUserRoles(u.sub, u.roles.filter((r) => !MANAGED.includes(r)).concat(to))
+      setQ('')
+      await load()
+      toast.ok(t('adminUsers.assignedToast', { name, group: to }))
+    } catch {
+      // A failed privilege write must never look like a no-op on the roles screen.
+      toast.err(t('adminUsers.actionFailed'))
+    }
   }
   /** Admin là vai toàn quyền — chặn một bước xác nhận trước khi gán. */
   function requestAssign(u: UserWithRoles) {
@@ -139,16 +153,37 @@ export function AdminUsers() {
   async function remove(u: UserWithRoles) {
     const name = u.fullName ?? u.sub
     const prevRoles = u.roles
-    await setUserRoles(u.sub, u.roles.filter((r) => !MANAGED.includes(r)))
-    await load()
-    toast.action(t('adminUsers.removedToast', { name, group }), {
-      label: t('adminUsers.undo'),
-      run: async () => {
-        await setUserRoles(u.sub, prevRoles)
-        await load()
-        toast.ok(t('adminUsers.undoneToast', { name }))
-      },
-    })
+    try {
+      await setUserRoles(u.sub, u.roles.filter((r) => !MANAGED.includes(r)))
+      await load()
+      toast.action(t('adminUsers.removedToast', { name, group }), {
+        label: t('adminUsers.undo'),
+        run: async () => {
+          try {
+            await setUserRoles(u.sub, prevRoles)
+            await load()
+            toast.ok(t('adminUsers.undoneToast', { name }))
+          } catch {
+            toast.err(t('adminUsers.actionFailed'))
+          }
+        },
+      })
+    } catch {
+      toast.err(t('adminUsers.actionFailed'))
+    }
+  }
+
+  if (!loaded) {
+    return (
+      <section aria-label={t('adminUsers.title')}>
+        <h1 className="sr-only">{t('adminUsers.title')}</h1>
+        {error ? (
+          <StateNotice kind="error" text={t('adminUsers.loadError')} onRetry={load} />
+        ) : (
+          <StateNotice kind="loading" text={t('adminUsers.loading')} />
+        )}
+      </section>
+    )
   }
 
   return (

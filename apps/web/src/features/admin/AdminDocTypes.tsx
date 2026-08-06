@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react'
 import { FLOW } from '@qlhs/contracts'
 import { getDocumentTypes, type DocTypeGroup } from '../tickets/api'
 import { addDocumentType } from './api'
+import { StateNotice } from '../../shared/StateNotice'
 import { toast } from '../../shared/toast'
 import { t } from '../../i18n'
 
@@ -12,15 +13,19 @@ const FLOWS: readonly string[] = Object.values(FLOW)
  *  sửa/xoá — hồ sơ cũ lưu text nên đổi/gỡ sẽ nguy hiểm; chỉ cho thêm. */
 export function AdminDocTypes() {
   const [groups, setGroups] = useState<DocTypeGroup[] | null>(null)
+  const [error, setError] = useState(false)
   const [value, setValue] = useState('')
   const [flow, setFlow] = useState<string>(FLOWS[0] ?? 'General')
   const [busy, setBusy] = useState(false)
 
   const load = useCallback(async () => {
+    setError(false)
     try {
       setGroups(await getDocumentTypes())
     } catch {
-      setGroups([])
+      // A failed load must not masquerade as "no document types" — that would hide
+      // an outage behind an empty list on an add-only catalog.
+      setError(true)
     }
   }, [])
   useEffect(() => {
@@ -48,6 +53,14 @@ export function AdminDocTypes() {
     <section className="doctypes card" aria-label={t('adminOptions.docTypes.title')}>
       <h2>{t('adminOptions.docTypes.title')}</h2>
       <p className="dt-hint">{t('adminOptions.docTypes.hint')}</p>
+
+      {error ? (
+        <StateNotice kind="error" text={t('adminOptions.loadError')} onRetry={load} />
+      ) : !groups ? (
+        <StateNotice kind="loading" text={t('adminOptions.loading')} />
+      ) : groups.length === 0 ? (
+        <p className="dt-empty">{t('adminOptions.docTypes.empty')}</p>
+      ) : null}
 
       {groups?.map((g) => (
         <div key={g.flow} className="dt-group">

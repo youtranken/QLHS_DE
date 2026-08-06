@@ -31,6 +31,7 @@ export const auth = {
     label: 'Nhắc sáng',
     onTitle: 'Đang nhận email nhắc việc lúc 7h30 (chỉ khi có hồ sơ cần chú ý). Bấm để tắt.',
     offTitle: 'Đang tắt email nhắc việc buổi sáng. Bấm để bật.',
+    saveErr: 'Không lưu được tuỳ chọn nhắc việc — thử lại.',
   },
   roleSwitcher: {
     aria: 'Chuyển vai',

@@ -31,6 +31,7 @@ export const auth = {
     label: 'Morning digest',
     onTitle: 'Receiving reminder emails at 7:30 (only when tickets need attention). Click to turn off.',
     offTitle: 'Morning reminder emails are off. Click to turn on.',
+    saveErr: 'Could not save your reminder preference — try again.',
   },
   roleSwitcher: {
     aria: 'Switch role',

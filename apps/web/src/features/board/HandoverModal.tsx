@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
 import { useFocusTrap } from '../../shared/useFocusTrap'
+import { useBackdropClose } from '../../shared/useBackdropClose'
 import { ConfirmModal } from '../../shared/ConfirmModal'
 import { DatePicker } from '../../shared/DatePicker'
 import { toast } from '../../shared/toast'
@@ -43,6 +44,11 @@ export function HandoverModal({
   const [receivedAt, setReceivedAt] = useState(today)
   const [busy, setBusy] = useState(false)
   const [confirmingMissing, setConfirmingMissing] = useState(false)
+  // Arm on backdrop mousedown so a drag that STARTS in the date field and ends on
+  // the overlay doesn't discard the receipt (useBackdropClose); guard on busy.
+  const backdrop = useBackdropClose(() => {
+    if (!busy) onClose()
+  })
 
   async function guard(fn: () => Promise<void>) {
     if (busy) return
@@ -59,14 +65,7 @@ export function HandoverModal({
   }
 
   return (
-    <div
-      role="presentation"
-      className="overlay"
-      onKeyDown={onKeyDown}
-      onClick={() => {
-        if (!busy) onClose()
-      }}
-    >
+    <div role="presentation" className="overlay" onKeyDown={onKeyDown} {...backdrop}>
       <div
         ref={ref}
         role="dialog"

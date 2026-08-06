@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Bell, BellOff } from 'lucide-react'
 import { apiGet, apiPost } from '../../shared/api-client'
+import { toast } from '../../shared/toast'
 import { t } from '../../i18n'
 
 /**
@@ -32,7 +33,8 @@ export function DigestToggle() {
     try {
       await apiPost<{ enabled: boolean }>('/me/digest', { enabled: next })
     } catch {
-      setEnabled(!next)
+      setEnabled(!next) // revert the optimistic flip…
+      toast.err(t('auth.digest.saveErr')) // …and say why it bounced back
     } finally {
       setBusy(false)
     }

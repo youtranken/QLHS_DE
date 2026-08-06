@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
 import { useFocusTrap } from '../../shared/useFocusTrap'
+import { useBackdropClose } from '../../shared/useBackdropClose'
 import { ConfirmModal } from '../../shared/ConfirmModal'
 import { t } from '../../i18n'
 
@@ -21,6 +22,10 @@ export function CompleteContractModal({ code, onSubmit, onClose }: CompleteContr
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [confirming, setConfirming] = useState(false)
+  // Don't discard the typed scan path on a drag-select that ends on the backdrop.
+  const backdrop = useBackdropClose(() => {
+    if (!busy) onClose()
+  })
 
   function submit() {
     if (busy) return
@@ -47,14 +52,7 @@ export function CompleteContractModal({ code, onSubmit, onClose }: CompleteContr
 
   const invalid = error !== null
   return (
-    <div
-      role="presentation"
-      className="overlay"
-      onKeyDown={onKeyDown}
-      onClick={() => {
-        if (!busy) onClose()
-      }}
-    >
+    <div role="presentation" className="overlay" onKeyDown={onKeyDown} {...backdrop}>
       <div
         ref={ref}
         role="dialog"

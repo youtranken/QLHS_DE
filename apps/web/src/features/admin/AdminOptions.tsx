@@ -69,9 +69,13 @@ export function AdminOptions() {
   }
 
   async function setActive(row: OptionView, active: boolean) {
-    await updateOption(row.id, { active })
-    await load()
-    toast.ok(t(active ? 'adminOptions.enabledToast' : 'adminOptions.disabledToast', { value: row.value }))
+    try {
+      await updateOption(row.id, { active })
+      await load()
+      toast.ok(t(active ? 'adminOptions.enabledToast' : 'adminOptions.disabledToast', { value: row.value }))
+    } catch {
+      toast.err(t('adminOptions.saveFail'))
+    }
   }
 
   return (

@@ -54,5 +54,6 @@ export const adminOptions = {
     addBtn: 'Thêm loại',
     added: 'Đã thêm loại hồ sơ.',
     addErr: 'Không thêm được loại hồ sơ.',
+    empty: 'Chưa có loại hồ sơ nào — thêm loại đầu tiên bên dưới.',
   },
 } as const

@@ -122,6 +122,7 @@
 .doctypes { margin-top: 22px; padding: 16px 18px 18px; }
 .doctypes h2 { font-size: 15px; margin: 0 0 4px; }
 .dt-hint { color: var(--ink-2); font-size: 12.5px; margin: 0 0 14px; }
+.dt-empty { color: var(--ink-3); font-size: 12.5px; margin: 4px 0 10px; }
 .dt-group { display: flex; align-items: baseline; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line-soft); }
 .dt-flow { flex: 0 0 84px; font-weight: 700; font-size: 12px; color: var(--ink-2); }
 .dt-vals { display: flex; flex-wrap: wrap; gap: 7px; }

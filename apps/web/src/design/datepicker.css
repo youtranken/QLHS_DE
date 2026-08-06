@@ -58,14 +58,26 @@
 .dp.open .dp-trigger .chev {
   transform: rotate(180deg);
 }
+/* A real sibling <button> (not nested inside the trigger button — invalid & AT-
+   unreliable), overlaid just left of the chevron; the trigger reserves room via
+   .has-clear so the value text never runs under it. */
+.dp.has-clear .dp-trigger {
+  padding-right: 50px;
+}
 .dp-clear {
-  flex: none;
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
   display: grid;
   place-items: center;
   width: 20px;
   height: 20px;
+  border: none;
   border-radius: 50%;
+  background: transparent;
   color: var(--ink-3);
+  font: inherit;
   font-size: 11px;
   cursor: pointer;
 }

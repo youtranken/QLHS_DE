@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import { ApiClientError } from '../../shared/api-client'
 import { ConfirmModal } from '../../shared/ConfirmModal'
 import { useFocusTrap } from '../../shared/useFocusTrap'
+import { useBackdropClose } from '../../shared/useBackdropClose'
 import { t } from '../../i18n'
 
 export interface SendAccountingModalProps {
@@ -27,6 +28,10 @@ export function SendAccountingModal({ code, onSubmit, onClose, note }: SendAccou
   // Payment closes the ticket for good at "Sent to Accounting" (note set) — gate it
   // behind an explicit danger confirm instead of a passive warning line (H5).
   const [confirming, setConfirming] = useState(false)
+  // A drag-select ending on the overlay must not throw away the typed Document No.
+  const backdrop = useBackdropClose(() => {
+    if (!busy) onClose()
+  })
 
   function submit() {
     if (busy) return
@@ -62,14 +67,7 @@ export function SendAccountingModal({ code, onSubmit, onClose, note }: SendAccou
 
   const invalid = error !== null
   return (
-    <div
-      role="presentation"
-      className="overlay"
-      onKeyDown={onKeyDown}
-      onClick={() => {
-        if (!busy) onClose()
-      }}
-    >
+    <div role="presentation" className="overlay" onKeyDown={onKeyDown} {...backdrop}>
       <div
         ref={ref}
         role="dialog"

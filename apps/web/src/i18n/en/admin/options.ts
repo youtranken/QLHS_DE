@@ -54,5 +54,6 @@ export const adminOptions = {
     addBtn: 'Add type',
     added: 'Document type added.',
     addErr: 'Could not add the document type.',
+    empty: 'No document types yet — add the first one below.',
   },
 } as const
