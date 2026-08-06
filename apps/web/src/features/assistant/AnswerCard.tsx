@@ -29,7 +29,8 @@ function rowPill(r: TicketRowVM) {
   if (typeof r.overdueDays === 'number' && r.overdueDays > 0) {
     return <span className="asst-pill late">{t('assistant.card.late', { n: r.overdueDays })}</span>
   }
-  if (r.priority && r.priority !== 'normal') return <span className="asst-pill rush">{r.priority}</span>
+  // Any elevated priority (rush, or legacy urgent) reads as "Gấp" — not the raw value.
+  if (r.priority && r.priority !== 'normal') return <span className="asst-pill rush">{t('board.card.prioRush')}</span>
   return null
 }
 

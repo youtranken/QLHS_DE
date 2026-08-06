@@ -36,7 +36,7 @@ export function CreateTicketForm({ onCreated }: { onCreated: () => void }) {
   // Built per render (not module-level) so a future locale switch re-evaluates.
   const PRIOS: Array<{ v: string; label: string }> = [
     { v: 'normal', label: t('tickets.createForm.prioNormal') },
-    { v: 'urgent', label: t('tickets.createForm.prioUrgent') },
+    { v: 'rush', label: t('tickets.createForm.prioRush') },
   ]
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<CreateTicketBody>(EMPTY)

@@ -24,9 +24,10 @@ const FLOW_CLS: Record<string, string> = { Contract: 'flc', Payment: 'flp', Gene
 // Flow letter mirrors the metro (General→A, Contract→B, Payment→C) so flow reads at
 // a glance without relying on the left-rule COLOUR alone (colour-blind safe).
 const FLOW_LETTER: Record<string, string> = { General: 'A', Contract: 'B', Payment: 'C' }
-const PRIO_CLASS: Record<string, string> = { urgent: 'pill-prio urgent', rush: 'pill-prio rush' }
-const prioLabel = (p: string): string =>
-  p === 'urgent' ? t('board.card.prioUrgent') : p === 'rush' ? t('board.card.prioRush') : p
+// Priority is "Gấp" (rush) or "Thường" (normal) only — "Khẩn" (urgent) retired.
+// Legacy urgent tickets still show, as Gấp, so nothing silently disappears.
+const isElevated = (p: string): boolean => p === 'rush' || p === 'urgent'
+const prioLabel = (p: string): string => (isElevated(p) ? t('board.card.prioRush') : p)
 
 /** One dense ticket card with its keyboard-accessible ⋯ action menu (AD-17).
  *  Left rule is flow-coloured; over-SLA repaints it red. A soft-lock shows Seize. */
@@ -114,8 +115,8 @@ export function BoardCardView({
             {t('board.card.pausedPill')}
           </span>
         )}
-        {PRIO_CLASS[c.priority] && (
-          <span className={PRIO_CLASS[c.priority]}>{prioLabel(c.priority)}</span>
+        {isElevated(c.priority) && (
+          <span className="pill-prio rush">{prioLabel(c.priority)}</span>
         )}
         <DupBadge hints={c.dupOf ?? []} />
         {hasMenu && (

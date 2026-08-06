@@ -66,9 +66,15 @@ describe('BoardCardView — F8 paused state', () => {
 
 describe('BoardCardView — priority is display-only (DCC cannot change it)', () => {
   it('shows the priority chip but offers no change control in the ⋯ menu', async () => {
-    render(<BoardCardView card={card({ priority: 'urgent' })} onAction={vi.fn()} onSeize={vi.fn()} />)
-    expect(screen.getByText(/^KHẨN$/)).toBeInTheDocument()
+    render(<BoardCardView card={card({ priority: 'rush' })} onAction={vi.fn()} onSeize={vi.fn()} />)
+    expect(screen.getByText(/^GẤP$/)).toBeInTheDocument()
     expect(screen.queryByText(/Đổi ưu tiên/i)).not.toBeInTheDocument()
+  })
+
+  it('shows a legacy "urgent" ticket as GẤP (Khẩn retired, nothing disappears)', async () => {
+    render(<BoardCardView card={card({ priority: 'urgent' })} onAction={vi.fn()} onSeize={vi.fn()} />)
+    expect(screen.getByText(/^GẤP$/)).toBeInTheDocument()
+    expect(screen.queryByText(/KHẨN/)).not.toBeInTheDocument()
   })
 })
 

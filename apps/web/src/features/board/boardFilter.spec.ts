@@ -36,9 +36,10 @@ describe('cardMatches', () => {
     expect(cardMatches(card({ flow: 'Payment' }), f({ flow: 'All' }))).toBe(true)
   })
 
-  it('priority facet is exact', () => {
-    expect(cardMatches(card({ priority: 'rush' }), f({ priority: 'urgent' }))).toBe(false)
+  it('priority facet: Gấp (rush) matches rush AND legacy urgent; normal is excluded', () => {
     expect(cardMatches(card({ priority: 'rush' }), f({ priority: 'rush' }))).toBe(true)
+    expect(cardMatches(card({ priority: 'urgent' }), f({ priority: 'rush' }))).toBe(true) // Khẩn folded into Gấp
+    expect(cardMatches(card({ priority: 'normal' }), f({ priority: 'rush' }))).toBe(false)
   })
 
   it('text query matches code or contractor, case-insensitive', () => {
@@ -48,8 +49,8 @@ describe('cardMatches', () => {
   })
 
   it('combines facets (AND)', () => {
-    const c = card({ flow: 'Contract', priority: 'urgent', overdueDays: 5, contractor: 'Xyz' })
-    expect(cardMatches(c, f({ flow: 'Contract', priority: 'urgent', overOnly: true, q: 'xyz' }))).toBe(true)
+    const c = card({ flow: 'Contract', priority: 'rush', overdueDays: 5, contractor: 'Xyz' })
+    expect(cardMatches(c, f({ flow: 'Contract', priority: 'rush', overOnly: true, q: 'xyz' }))).toBe(true)
     expect(cardMatches(c, f({ flow: 'Contract', priority: 'normal' }))).toBe(false)
   })
 })
