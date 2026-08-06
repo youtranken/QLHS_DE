@@ -2,8 +2,10 @@
 export const adminAnalytics = {
   ariaLabel: 'Analytics quản lý',
   title: 'Phân tích vận hành',
-  exportAria: 'Xuất toàn bộ nhật ký ra CSV',
+  exportAria: 'Xuất CSV theo khoảng ngày đã chọn',
   exportCsv: 'Xuất CSV',
+  exportFrom: 'Từ',
+  exportTo: 'Đến',
   loadError: 'Không tải được số liệu — thử lại sau.',
   loading: 'Đang tính số liệu…',
   /** VI display name per canonical flow (fallback: raw flow). */

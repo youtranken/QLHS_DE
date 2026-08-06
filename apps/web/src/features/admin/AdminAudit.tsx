@@ -84,6 +84,10 @@ export function AdminAudit() {
                   <label htmlFor="a-code">{t('adminAudit.filters.code')}</label>
                   <input id="a-code" className="txt-input mono" placeholder={t('adminAudit.filters.codePlaceholder')} value={form.code} onChange={(e) => set('code', e.target.value)} />
                 </div>
+                <div className="field field-actor">
+                  <label htmlFor="a-actor">{t('adminAudit.filters.actor')}</label>
+                  <input id="a-actor" className="txt-input" placeholder={t('adminAudit.filters.actorPlaceholder')} value={form.sub ?? ''} onChange={(e) => set('sub', e.target.value)} />
+                </div>
                 <div className="field field-event">
                   <label>{t('adminAudit.filters.event')}</label>
                   <AuditEventSelect

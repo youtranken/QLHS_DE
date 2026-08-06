@@ -33,6 +33,7 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
   const [sel, setSel] = useState<ReadonlySet<string>>(new Set())
   const [loaded, setLoaded] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [lastOk, setLastOk] = useState<number | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
 
   // Power-user shortcuts: "/" focuses the board search, "n" opens the ticket
@@ -57,12 +58,14 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
   }, [])
 
   // A failed refetch after the first successful load keeps the stale board (the
-  // error box only shows before anything loaded); live-refetch retries anyway.
+  // pre-load error box only shows before anything loaded); once loaded, a failed
+  // refetch surfaces as the "reconnecting" chip instead. Live-refetch retries anyway.
   const load = useCallback(async () => {
     try {
       setCols(await getStationBoard())
       setError(null)
       setLoaded(true)
+      setLastOk(Date.now())
     } catch {
       setError(t('board.loadErr'))
     }
@@ -79,6 +82,9 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
 
   const filter: BoardFilter = { q, overOnly, flow, priority }
   const match = (c: BoardCard) => cardMatches(c, filter)
+  const filterActive = q.trim() !== '' || overOnly || flow !== 'All' || priority !== 'All'
+  const noMatches = filterActive && loaded && cols.every((col) => !col.cards.some(match))
+  const hhmm = (ms: number) => new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
   const applyFilter = (f: BoardFilter) => {
     setQ(f.q)
     setOverOnly(f.overOnly)
@@ -101,6 +107,15 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
     <section>
       <div className="boardhead">
         <h2>{t('board.header.title')}</h2>
+        {loaded && (
+          <span className={`boardsync${error ? ' stale' : ''}`} role="status" aria-live="polite">
+            {error
+              ? t('board.sync.reconnecting')
+              : lastOk
+                ? t('board.sync.updated', { time: hhmm(lastOk) })
+                : ''}
+          </span>
+        )}
         <label className="srch">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />
@@ -161,10 +176,13 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
             </div>
           ))}
         </div>
+      ) : noMatches ? (
+        <StateNotice kind="empty" text={t('board.noMatchAll')} />
       ) : (
       <div className="cols">
         {cols.map((col) => {
           const cls = col.reconcile ? ' reccol' : col.overSla ? ' hotcol' : ''
+          const shown = col.cards.filter(match)
           return (
             <div key={col.reconcile ? 'reconcile' : col.status} className={`col${cls}`}>
               <div className="ch">
@@ -177,19 +195,27 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
                       <TriangleAlert size={13} aria-hidden />
                     </span>
                   )}
-                  <span className="n">{col.cards.length}</span>
+                  <span className="n" title={filterActive ? t('board.column.countFiltered', { shown: shown.length, total: col.cards.length }) : undefined}>
+                    {filterActive && shown.length !== col.cards.length
+                      ? `${shown.length}/${col.cards.length}`
+                      : col.cards.length}
+                  </span>
                 </div>
                 <div className="vi">
                   {col.reconcile ? t('board.column.reconcileHint') : statusVi(col.status)}
                 </div>
               </div>
               <div className="cb">
-                {col.cards.length === 0 && (
+                {shown.length === 0 && (
                   <div className="emptycol">
-                    {col.reconcile ? t('board.column.reconcileEmpty') : t('board.column.empty')}
+                    {filterActive
+                      ? t('board.column.noMatch')
+                      : col.reconcile
+                        ? t('board.column.reconcileEmpty')
+                        : t('board.column.empty')}
                   </div>
                 )}
-                {col.cards.filter(match).map((c) => (
+                {shown.map((c) => (
                   <BoardCardView
                     key={c.id}
                     card={c}

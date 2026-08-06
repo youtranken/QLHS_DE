@@ -20,6 +20,29 @@
   border-radius: 999px;
   background: var(--accent);
 }
+/* Flow letter badge on a board card (A/B/C) — carries flow as text+colour, not
+   colour alone (colour-blind safe), consistent with the metro badge. */
+.fltag {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--ink-3);
+}
+.fltag.flc {
+  background: var(--contract);
+}
+.fltag.flp {
+  background: var(--payment);
+}
+.fltag.flg {
+  background: var(--general);
+}
 .chip.fl-contract .dot {
   background: var(--contract);
 }

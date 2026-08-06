@@ -6,6 +6,11 @@ export const board = {
   },
   loadErr: 'Không tải được bảng trạm — kiểm tra kết nối rồi thử lại.',
   loadingAria: 'Đang tải bảng trạm',
+  noMatchAll: 'Không có hồ sơ nào khớp bộ lọc. Thử bỏ bớt điều kiện.',
+  sync: {
+    reconnecting: 'Đang kết nối lại…',
+    updated: 'Cập nhật {time}',
+  },
   search: {
     placeholder: 'Tìm mã, nhà thầu… (/)',
     aria: 'Tìm hồ sơ trong bảng',
@@ -30,9 +35,12 @@ export const board = {
     reconcileHint: 'DCC2/DCC3 báo thiếu giấy — cần đối chiếu & bàn giao lại',
     reconcileEmpty: 'Không có hồ sơ cần đối chiếu — bản cứng khớp hệ thống.',
     empty: 'Trống',
+    noMatch: 'Không có hồ sơ khớp bộ lọc',
+    countFiltered: '{shown}/{total} khớp bộ lọc',
   },
   card: {
     openDetail: 'Mở chi tiết hồ sơ',
+    flowAria: 'Luồng {flow}',
     draft: 'nháp',
     overdueBeforePause: 'Đã quá hạn {n} ngày trước khi dừng đồng hồ',
     overdue: 'Quá hạn {n} ngày',

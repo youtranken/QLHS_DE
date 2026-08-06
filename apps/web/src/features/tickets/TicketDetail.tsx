@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { TICKET_STATUS } from '@qlhs/contracts'
+import { useLiveRefetch } from '../../shared/useLiveRefetch'
 import { getTicketDetail, type TicketDetail as Detail, type TimelineEntry } from './api'
 import { statusVi } from './statusLabel'
 import { groupAmount, displaySub } from '../../shared/format'
@@ -64,6 +65,9 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
   const [d, setD] = useState<Detail | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [editing, setEditing] = useState(false)
+  // Don't let a live refetch yank the form out from under an in-progress edit.
+  const editingRef = useRef(false)
+  editingRef.current = editing
 
   const load = useCallback(async () => {
     // Clear a prior error first, or a successful Retry would keep rendering the
@@ -76,9 +80,11 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
     }
   }, [ticketId])
 
-  useEffect(() => {
-    void load()
-  }, [load])
+  // Live-refresh so an open detail reflects a Return/handover the moment it lands,
+  // instead of showing a stale snapshot until the user navigates away (UX M4).
+  useLiveRefetch(() => {
+    if (!editingRef.current) void load()
+  }, [ticketId])
 
   if (error) {
     return (

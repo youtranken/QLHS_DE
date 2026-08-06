@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode, useCallback, useState } from 'react'
+import { Fragment, type ReactNode, useCallback, useRef, useState } from 'react'
 import { useLiveRefetch } from '../../shared/useLiveRefetch'
 import {
   cancelTicket,
@@ -29,6 +29,10 @@ export function MyTickets({ reloadKey, action }: { reloadKey: number; action?: R
   const [flt, setFlt] = useState<Filter>('all')
   const [openId, setOpenId] = useState<string | null>(null)
   const [detail, setDetail] = useState<TicketDetail | null>(null)
+  // Mirror the open row into a ref so the live-refetch callback (captured once by
+  // the SSE subscription) can read the CURRENT expanded id without re-subscribing.
+  const openRef = useRef<string | null>(null)
+  openRef.current = openId
   const [error, setError] = useState<string | null>(null)
   const [cancelId, setCancelId] = useState<string | null>(null)
   const [detailId, setDetailId] = useState<string | null>(null)
@@ -47,8 +51,20 @@ export function MyTickets({ reloadKey, action }: { reloadKey: number; action?: R
 
   // Keep the expanded row open across refetches (AC5): only re-fetch, don't
   // collapse. Driven by the SSE stream now (2.1) so a Return lands in the
-  // applicant's list the moment DCC1 sends it back, not up to 4s later.
-  useLiveRefetch(() => void load(), [reloadKey])
+  // applicant's list the moment DCC1 sends it back, not up to 4s later. Also
+  // refresh the OPEN row's detail — otherwise the list flips to "Returned" while
+  // the expanded panel keeps the stale route and hides the ReturnPanel (UX H1).
+  const refetch = useCallback(async () => {
+    await load()
+    const id = openRef.current
+    if (!id) return
+    try {
+      setDetail(await getTicketDetail(id))
+    } catch {
+      /* keep last-known detail; the list already refreshed */
+    }
+  }, [load])
+  useLiveRefetch(() => void refetch(), [reloadKey])
 
   async function toggle(id: string) {
     if (openId === id) {
@@ -191,7 +207,13 @@ export function MyTickets({ reloadKey, action }: { reloadKey: number; action?: R
         </div>
       ) : total === 0 ? (
         <p className="empty-note">
-          {flt === 'returned' ? t('tickets.myList.emptyReturned') : t('tickets.myList.emptyAll')}
+          {flt === 'returned'
+            ? t('tickets.myList.emptyReturned')
+            : flt === 'running'
+              ? t('tickets.myList.emptyRunning')
+              : flt === 'closed'
+                ? t('tickets.myList.emptyClosed')
+                : t('tickets.myList.emptyAll')}
         </p>
       ) : (
         <div className="tblwrap">

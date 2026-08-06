@@ -2,6 +2,30 @@
    (.adminshell); chart + heatmap + delay-list là phần riêng của màn này. Token màu
    kế thừa từ .adminshell nên mọi var() dưới đây resolve trong subtree quản trị. */
 
+/* CSV export date-range controls in the page header. */
+.az-export {
+  gap: var(--sp-3);
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.az-daterange {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+}
+.az-daterange input {
+  padding: 7px 9px;
+  border: 1px solid var(--stroke);
+  background: var(--input-bg);
+  color: var(--ink);
+  border-radius: var(--r-sm, 8px);
+  font: inherit;
+  font-size: var(--fs-sm);
+  color-scheme: light dark;
+}
+
 .az-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -200,6 +224,11 @@
 .az-hcell.empty {
   color: var(--ink-faint);
   font-weight: var(--fw-normal);
+}
+/* Strong amber cells are light in BOTH themes — a fixed dark ink keeps the number
+   ≥AA instead of near-white --ink washing out in dark mode. */
+.az-hcell.hot {
+  color: #1c1503;
 }
 .az-heatlegend {
   display: flex;

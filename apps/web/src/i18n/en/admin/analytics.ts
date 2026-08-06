@@ -2,8 +2,10 @@
 export const adminAnalytics = {
   ariaLabel: 'Management analytics',
   title: 'Operational analytics',
-  exportAria: 'Export the entire audit log to CSV',
+  exportAria: 'Export CSV for the selected date range',
   exportCsv: 'Export CSV',
+  exportFrom: 'From',
+  exportTo: 'To',
   loadError: 'Could not load metrics — try again later.',
   loading: 'Computing metrics…',
   /** Display name per canonical flow (fallback: raw flow). */

@@ -338,6 +338,37 @@ describe('StationBoard — Payment send ACC closes at Sent to Accounting (Story 
   })
 })
 
+const twoCardBoard: BoardColumn[] = [
+  {
+    status: 'Submitted to VP Andy',
+    overSla: false,
+    cards: [
+      { id: 'a1', code: 'G-2026-0001', contractor: 'ACME', amount: '1', priority: 'normal', flow: 'General', status: 'Submitted to VP Andy', overdueDays: 0, lockedByMe: false, lockedBy: null, actions: [] },
+      { id: 'a2', code: 'G-2026-0002', contractor: 'ZENITH', amount: '1', priority: 'normal', flow: 'General', status: 'Submitted to VP Andy', overdueDays: 0, lockedByMe: false, lockedBy: null, actions: [] },
+    ],
+  },
+]
+
+describe('StationBoard — filter reflects the count & empty state (UX H1)', () => {
+  beforeEach(() => vi.mocked(getStationBoard).mockResolvedValue(twoCardBoard))
+  afterEach(() => vi.restoreAllMocks())
+
+  it('shows a matched/total count and hides non-matching cards when filtering', async () => {
+    render(<StationBoard />)
+    await screen.findByText('G-2026-0001')
+    fireEvent.change(screen.getByLabelText('Tìm hồ sơ trong bảng'), { target: { value: 'ACME' } })
+    expect(await screen.findByText('1/2')).toBeInTheDocument() // not the unfiltered "2"
+    expect(screen.queryByText('G-2026-0002')).not.toBeInTheDocument()
+  })
+
+  it('shows a board-level no-match notice when nothing matches (not a silent blank)', async () => {
+    render(<StationBoard />)
+    await screen.findByText('G-2026-0001')
+    fireEvent.change(screen.getByLabelText('Tìm hồ sơ trong bảng'), { target: { value: 'zzz-nope' } })
+    expect(await screen.findByText(/Không có hồ sơ nào khớp bộ lọc/)).toBeInTheDocument()
+  })
+})
+
 describe('StationBoard — Payment reconcile lane resend (Story 4.1)', () => {
   beforeEach(() => vi.mocked(getStationBoard).mockResolvedValue(reconcileDcc3Board))
   afterEach(() => vi.restoreAllMocks())

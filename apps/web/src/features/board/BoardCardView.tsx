@@ -21,6 +21,9 @@ export interface BoardCardViewProps {
 }
 
 const FLOW_CLS: Record<string, string> = { Contract: 'flc', Payment: 'flp', General: 'flg' }
+// Flow letter mirrors the metro (General→A, Contract→B, Payment→C) so flow reads at
+// a glance without relying on the left-rule COLOUR alone (colour-blind safe).
+const FLOW_LETTER: Record<string, string> = { General: 'A', Contract: 'B', Payment: 'C' }
 const PRIO_CLASS: Record<string, string> = { urgent: 'pill-prio urgent', rush: 'pill-prio rush' }
 const prioLabel = (p: string): string =>
   p === 'urgent' ? t('board.card.prioUrgent') : p === 'rush' ? t('board.card.prioRush') : p
@@ -55,8 +58,11 @@ export function BoardCardView({
       if (el.open && !el.contains(e.target as Node)) el.removeAttribute('open')
     }
     const onToggle = () => {
-      if (el.open) document.addEventListener('pointerdown', onOutside, true)
-      else document.removeEventListener('pointerdown', onOutside, true)
+      if (el.open) {
+        document.addEventListener('pointerdown', onOutside, true)
+        // Move focus into the menu on open so keyboard users don't have to Tab to it.
+        el.querySelector<HTMLElement>('.cardmenu button:not([disabled])')?.focus()
+      } else document.removeEventListener('pointerdown', onOutside, true)
     }
     el.addEventListener('toggle', onToggle)
     return () => {
@@ -77,6 +83,9 @@ export function BoardCardView({
             aria-label={t('board.card.selectAria', { code: c.code ?? t('board.card.draft') })}
           />
         )}
+        <span className={`fltag ${FLOW_CLS[c.flow] ?? ''}`} aria-label={t('board.card.flowAria', { flow: c.flow })} title={c.flow}>
+          {FLOW_LETTER[c.flow] ?? '?'}
+        </span>
         <button
           type="button"
           className="code"
@@ -110,8 +119,18 @@ export function BoardCardView({
         )}
         <DupBadge hints={c.dupOf ?? []} />
         {hasMenu && (
-        <details ref={detailsRef}>
-          <summary className="dots" aria-label={t('board.menu.aria')} aria-busy={busy}>
+        <details
+          ref={detailsRef}
+          onKeyDown={(e) => {
+            // Native <details> ignores Escape — close it and return focus to ⋯.
+            if (e.key === 'Escape' && detailsRef.current?.open) {
+              e.stopPropagation()
+              detailsRef.current.removeAttribute('open')
+              detailsRef.current.querySelector<HTMLElement>('.dots')?.focus()
+            }
+          }}
+        >
+          <summary className="dots" tabIndex={0} aria-label={t('board.menu.aria')} aria-busy={busy}>
             <MoreVertical size={16} aria-hidden />
           </summary>
           <div className="cardmenu">

@@ -20,6 +20,9 @@ export function AdminAnalytics() {
   const [d, setD] = useState<AnalyticsData | null>(null)
   const [error, setError] = useState(false)
   const [nonce, setNonce] = useState(0)
+  // CSV export range (the export endpoint accepts from/to). Empty = server default.
+  const [from, setFrom] = useState('')
+  const [to, setTo] = useState('')
 
   useEffect(() => {
     let alive = true
@@ -39,8 +42,21 @@ export function AdminAnalytics() {
   return (
     <section aria-label={t('adminAnalytics.ariaLabel')}>
       <h1 className="sr-only">{t('adminAnalytics.title')}</h1>
-      <div className="pagehead" style={{ marginTop: 0, justifyContent: 'flex-end' }}>
-        <a className="btn secondary" href={analyticsExportUrl()} download aria-label={t('adminAnalytics.exportAria')}>
+      <div className="pagehead az-export" style={{ marginTop: 0, justifyContent: 'flex-end' }}>
+        <label className="az-daterange">
+          <span>{t('adminAnalytics.exportFrom')}</span>
+          <input type="date" value={from} max={to || undefined} onChange={(e) => setFrom(e.target.value)} />
+        </label>
+        <label className="az-daterange">
+          <span>{t('adminAnalytics.exportTo')}</span>
+          <input type="date" value={to} min={from || undefined} onChange={(e) => setTo(e.target.value)} />
+        </label>
+        <a
+          className="btn secondary"
+          href={analyticsExportUrl(from || undefined, to || undefined)}
+          download
+          aria-label={t('adminAnalytics.exportAria')}
+        >
           <Download size={16} aria-hidden />
           {t('adminAnalytics.exportCsv')}
         </a>

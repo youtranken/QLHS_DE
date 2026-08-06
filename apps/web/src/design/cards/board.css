@@ -15,6 +15,34 @@
   letter-spacing: -0.01em;
   margin: 0;
 }
+/* Live-sync cue: quiet "Updated HH:MM" normally, amber "Reconnecting…" when a
+   refetch has failed since the last good load, so a stale board never looks live. */
+.boardsync {
+  flex: none;
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.boardsync.stale {
+  color: var(--sla);
+}
+.boardsync.stale::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: middle;
+  animation: boardsync-blink 1.4s ease-in-out infinite;
+}
+@keyframes boardsync-blink {
+  50% {
+    opacity: 0.3;
+  }
+}
 /* ô tìm trong-bảng: nằm kế tiêu đề, co giãn lấp khoảng giữa (scope trong .boardhead
    để không đụng phần tử .srch khác trong tương lai) */
 .boardhead .srch {

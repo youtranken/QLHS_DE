@@ -99,6 +99,16 @@ export function CreateTicketForm({ onCreated }: { onCreated: () => void }) {
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     if (busy) return
+    // The native-required inputs (Subject/Contractor/…) are already gated by the
+    // browser before onSubmit fires; the dropdown-rendered required fields are NOT
+    // (a custom Select can't carry `required`), so validate them here explicitly.
+    const missing: string[] = []
+    if (!form.projectTeam.trim()) missing.push('Project/Team')
+    if (!form.paymentTerm.trim()) missing.push('Payment Term')
+    if (missing.length > 0) {
+      setError(t('tickets.createForm.errRequiredFields', { fields: missing.join(', ') }))
+      return
+    }
     setBusy(true)
     setError(null)
     try {
@@ -108,7 +118,9 @@ export function CreateTicketForm({ onCreated }: { onCreated: () => void }) {
       toast.ok(t('tickets.createForm.createdToast'))
       onCreated()
     } catch {
-      setError(t('tickets.createForm.errCreate'))
+      // Required fields are validated above, so a failure here is a server/transport
+      // error — don't mislead the user into re-checking their inputs.
+      setError(t('tickets.createForm.errCreateServer'))
     } finally {
       setBusy(false)
     }

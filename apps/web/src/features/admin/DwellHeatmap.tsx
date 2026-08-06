@@ -28,16 +28,21 @@ export function DwellHeatmap({ rows, flows }: { rows: DwellRow[]; flows: string[
             {rows.map((r) => (
               <tr key={r.status}>
                 <th scope="row" className="az-hrow" lang="en" title={statusVi(r.status)}>{applyVp(r.status)}</th>
-                {r.cells.map((c) => (
-                  <td
-                    key={c.flow}
-                    className={c.count === 0 ? 'az-hcell empty' : 'az-hcell'}
-                    style={{ background: cellTint(c.avgDays, max) }}
-                    title={t('adminAnalytics.dwell.cellTitle', { status: statusVi(r.status), flow: flowVi(c.flow), days: c.avgDays, count: c.count })}
-                  >
-                    {c.count === 0 ? '·' : c.avgDays}
-                  </td>
-                ))}
+                {r.cells.map((c) => {
+                  const tint = c.count === 0 ? 0 : tintPct(c.avgDays, max)
+                  return (
+                    <td
+                      key={c.flow}
+                      // ≥42% amber is light enough that near-white --ink drops below
+                      // AA; `hot` pins a fixed dark ink so the number stays legible.
+                      className={`az-hcell${c.count === 0 ? ' empty' : ''}${tint >= 42 ? ' hot' : ''}`}
+                      style={tint > 0 ? { background: `color-mix(in srgb, var(--rush) ${tint}%, transparent)` } : undefined}
+                      title={t('adminAnalytics.dwell.cellTitle', { status: statusVi(r.status), flow: flowVi(c.flow), days: c.avgDays, count: c.count })}
+                    >
+                      {c.count === 0 ? '·' : c.avgDays}
+                    </td>
+                  )
+                })}
               </tr>
             ))}
           </tbody>
@@ -56,9 +61,8 @@ export function DwellHeatmap({ rows, flows }: { rows: DwellRow[]; flows: string[
   )
 }
 
-/** Transparent → --rush (amber) as dwell approaches the worst cell (12%–72% tint). */
-function cellTint(avgDays: number, max: number): string {
-  if (avgDays <= 0) return 'transparent'
-  const pct = Math.round((avgDays / max) * 60) + 12
-  return `color-mix(in srgb, var(--rush) ${pct}%, transparent)`
+/** Amber tint % as dwell approaches the worst cell (12%–72%); 0 = no tint. */
+function tintPct(avgDays: number, max: number): number {
+  if (avgDays <= 0) return 0
+  return Math.round((avgDays / max) * 60) + 12
 }

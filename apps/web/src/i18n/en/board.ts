@@ -6,6 +6,11 @@ export const board = {
   },
   loadErr: 'Could not load the station board — check your connection and try again.',
   loadingAria: 'Loading station board',
+  noMatchAll: 'No tickets match the filter. Try removing a condition.',
+  sync: {
+    reconnecting: 'Reconnecting…',
+    updated: 'Updated {time}',
+  },
   search: {
     placeholder: 'Search code, contractor… (/)',
     aria: 'Search tickets in the board',
@@ -30,9 +35,12 @@ export const board = {
     reconcileHint: 'DCC2/DCC3 reported missing paperwork — needs reconcile & re-handover',
     reconcileEmpty: 'No tickets to reconcile — hardcopy matches the system.',
     empty: 'Empty',
+    noMatch: 'No tickets match the filter',
+    countFiltered: '{shown}/{total} match the filter',
   },
   card: {
     openDetail: 'Open ticket detail',
+    flowAria: 'Flow {flow}',
     draft: 'draft',
     overdueBeforePause: 'Was {n} days overdue before the clock was paused',
     overdue: 'Overdue {n} days',

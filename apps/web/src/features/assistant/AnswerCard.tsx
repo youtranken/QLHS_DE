@@ -1,8 +1,15 @@
 import { t, statusVi, kindMessage, applyVp } from '../../i18n'
 import { type Block, type TicketRowVM } from './api'
 
-const FLOW_VN: Record<string, string> = { General: 'Tổng hợp', Contract: 'Hợp đồng', Payment: 'Thanh toán' }
 const FLOW_CLS: Record<string, string> = { General: 'general', Contract: 'contract', Payment: 'payment' }
+
+/** Canonical flow → localized name via the i18n catalog (mirrors admin flowVi) so
+ *  the assistant doesn't render Vietnamese flow names while the UI is in English. */
+function flowLabel(flow: string): string {
+  const key = `adminAnalytics.flows.${flow}` as const
+  const s = t(key)
+  return s === key ? flow : s
+}
 
 function Code({ code, onOpen }: { code: string | null; onOpen: (c: string) => void }) {
   if (!code) return <span className="asst-code muted">—</span>
@@ -14,7 +21,7 @@ function Code({ code, onOpen }: { code: string | null; onOpen: (c: string) => vo
 }
 
 function Flow({ flow }: { flow: string }) {
-  return <span className={`asst-flow ${FLOW_CLS[flow] ?? ''}`}>{FLOW_VN[flow] ?? flow}</span>
+  return <span className={`asst-flow ${FLOW_CLS[flow] ?? ''}`}>{flowLabel(flow)}</span>
 }
 
 /** Pill SLA cho một dòng danh sách: chỉ hiện khi có dữ liệu (không bịa "trong hạn"). */
