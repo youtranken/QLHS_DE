@@ -25,7 +25,7 @@ echo "==> [3/4] Build + recreate (prod overlay)"
 echo "==> [4/4] Chờ /api/health qua edge"
 ok=0
 for i in $(seq 1 30); do
-  code=$(curl -sk -o /dev/null -w '%{http_code}' -H 'Host: qlhs.pmh.com.vn' https://localhost:8443/api/health || true)
+  code=$(curl -sk -o /dev/null -w '%{http_code}' -H 'Host: de-qlhs.pmh.com.vn' https://localhost:8443/api/health || true)
   [[ "$code" == "200" ]] && { ok=1; echo "    health OK (200)"; break; }
   echo "    ...chờ (HTTP ${code:-x}) ${i}/30"; sleep 3
 done
