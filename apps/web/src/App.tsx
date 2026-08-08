@@ -9,6 +9,7 @@ import { LocaleToggle } from './shared/LocaleToggle'
 import { ToastHost } from './shared/ToastHost'
 import { Clock } from './shared/Clock'
 import { useRoute, goHome } from './shared/route'
+import { useIdleLogout } from './shared/useIdleLogout'
 import { useLocaleVersion } from './i18n/locale'
 import { useCurrentUser } from './features/auth/useCurrentUser'
 import { RoleSwitcher } from './features/auth/RoleSwitcher'
@@ -47,6 +48,9 @@ export function App() {
   // The metro map is signage; DCC can collapse it to bring the actionable board up.
   const [mapOpen, setMapOpen] = useState(true)
   const route = useRoute()
+  // Idle-logout 15' (khớp QLTS/PMH ID): poll ngầm giữ token sống nên phải đếm idle
+  // theo tương tác thật ở client rồi đóng phiên. Chỉ tính khi đã đăng nhập.
+  useIdleLogout(() => void apiPost('/auth/logout').then(reload), state.status === 'authed')
 
   if (state.status === 'loading') {
     return (
