@@ -80,6 +80,7 @@ export function AdminDocTypes() {
 
       <form className="dt-add" onSubmit={add}>
         <input
+          className="txt-input"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder={t('adminOptions.docTypes.namePlaceholder')}
