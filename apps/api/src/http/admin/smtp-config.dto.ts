@@ -32,7 +32,9 @@ export class SmtpConfigDto {
 
 /** Test-send: the same config plus the recipient to prove delivery works. */
 export class SmtpTestDto extends SmtpConfigDto {
-  @IsEmail()
+  // allow_display_name: chấp nhận cả dạng "Tên <email>" (hay gặp khi dán từ
+  // Outlook) — nodemailer tự tách; vẫn chặn chuỗi không có địa chỉ hợp lệ.
+  @IsEmail({ allow_display_name: true })
   @MaxLength(255)
   to!: string
 }
