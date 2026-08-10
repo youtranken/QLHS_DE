@@ -10,13 +10,14 @@ import { AdminDocTypes } from './AdminDocTypes'
 
 /** Hàm (không const) để nhãn t() đọc lại catalog mỗi render — sẵn cho đổi ngôn ngữ. */
 const kinds = () => [
+  { key: 'docType', label: t('adminOptions.kinds.docType') },
   { key: 'paymentTerm', label: t('adminOptions.kinds.paymentTerm') },
   { key: 'projectTeam', label: t('adminOptions.kinds.projectTeam') },
   { key: 'currency', label: t('adminOptions.kinds.currency') },
 ]
 
 export function AdminOptions() {
-  const [kind, setKind] = useState<string>('paymentTerm')
+  const [kind, setKind] = useState<string>('docType')
   const [rows, setRows] = useState<OptionView[] | null>(null)
   const [adding, setAdding] = useState(false)
   const [addValue, setAddValue] = useState('')
@@ -26,6 +27,12 @@ export function AdminOptions() {
   const [error, setError] = useState(false)
 
   const load = useCallback(async () => {
+    // Tab Document Type có dữ liệu riêng (AdminDocTypes tự tải) — không gọi listOptions.
+    if (kind === 'docType') {
+      setRows(null)
+      setError(false)
+      return
+    }
     setError(false)
     try {
       setRows(await listOptions(kind))
@@ -39,6 +46,7 @@ export function AdminOptions() {
   }, [load])
 
   const kindLabel = kinds().find((k) => k.key === kind)?.label ?? kind
+  const isDocType = kind === 'docType'
 
   async function submitAdd(e: React.FormEvent) {
     e.preventDefault()
@@ -81,12 +89,14 @@ export function AdminOptions() {
   return (
     <section aria-label={t('adminOptions.title')}>
       <h1 className="sr-only">{t('adminOptions.title')}</h1>
-      <div className="pagehead" style={{ marginTop: 0, justifyContent: 'flex-end' }}>
-        <button type="button" className="btn primary" onClick={() => setAdding(true)}>
-          <Plus size={16} aria-hidden />
-          {t('adminOptions.addBtn')}
-        </button>
-      </div>
+      {!isDocType && (
+        <div className="pagehead" style={{ marginTop: 0, justifyContent: 'flex-end' }}>
+          <button type="button" className="btn primary" onClick={() => setAdding(true)}>
+            <Plus size={16} aria-hidden />
+            {t('adminOptions.addBtn')}
+          </button>
+        </div>
+      )}
 
       <div className="cat-toolbar">
         <div className="segmented" role="tablist" aria-label={t('adminOptions.kindsAria')}>
@@ -108,6 +118,10 @@ export function AdminOptions() {
         </div>
       </div>
 
+      {isDocType ? (
+        <AdminDocTypes />
+      ) : (
+        <>
       <div className="note-bar">
         <Info size={18} aria-hidden />
         {t('adminOptions.note')}
@@ -219,6 +233,8 @@ export function AdminOptions() {
           </table>
         </div>
       )}
+        </>
+      )}
 
       <Dialog.Root
         open={adding}
@@ -288,8 +304,6 @@ export function AdminOptions() {
           onCancel={() => setConfirmOff(null)}
         />
       )}
-
-      <AdminDocTypes />
     </section>
   )
 }

@@ -3,6 +3,7 @@ export const adminOptions = {
   title: 'Catalog',
   kindsAria: 'Catalog type',
   kinds: {
+    docType: 'Document Type',
     paymentTerm: 'Payment Term',
     projectTeam: 'Project Team',
     currency: 'Currency',

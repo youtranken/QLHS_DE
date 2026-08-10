@@ -3,6 +3,7 @@ export const adminOptions = {
   title: 'Danh mục',
   kindsAria: 'Loại danh mục',
   kinds: {
+    docType: 'Document Type',
     paymentTerm: 'Payment Term',
     projectTeam: 'Project Team',
     currency: 'Currency',
@@ -47,7 +48,7 @@ export const adminOptions = {
   confirmOffMessage: 'Tắt sẽ ẩn giá trị khỏi form tạo mới. Hồ sơ cũ vẫn giữ nguyên. Tiếp tục?',
   confirmOffLabel: 'Tắt giá trị',
   docTypes: {
-    title: 'Loại hồ sơ (Document Type)',
+    title: 'Document Type',
     hint: 'Thêm loại mới kèm luồng xử lý (A/B/C). Chỉ thêm — không sửa/xoá để hồ sơ cũ an toàn.',
     namePlaceholder: 'Tên loại mới (vd: Phụ lục 2)',
     flowLabel: 'Luồng',

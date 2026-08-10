@@ -52,7 +52,6 @@ export function AdminDocTypes() {
 
   return (
     <section className="doctypes card" aria-label={t('adminOptions.docTypes.title')}>
-      <h2>{t('adminOptions.docTypes.title')}</h2>
       <p className="dt-hint">{t('adminOptions.docTypes.hint')}</p>
 
       {error ? (
