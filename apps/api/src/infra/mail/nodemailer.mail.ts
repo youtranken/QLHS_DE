@@ -19,7 +19,13 @@ export class NodemailerMailPort extends MailPort {
 
   async send(mail: Mail): Promise<void> {
     const tx = await this.transporter()
-    await tx.sendMail({ from: this.from, to: mail.to, subject: mail.subject, text: mail.body })
+    await tx.sendMail({
+      from: this.from,
+      to: mail.to,
+      subject: mail.subject,
+      text: mail.body,
+      ...(mail.html ? { html: mail.html } : {}),
+    })
   }
 
   private async transporter(): Promise<Transporter> {

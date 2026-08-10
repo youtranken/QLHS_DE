@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { SmtpConfigRepo } from '../../infra/prisma/config/smtp-config.repo'
 import { decryptSecret, hasEncKey } from '../../infra/crypto/crypto-secret'
 import { buildTransport } from '../../infra/mail/nodemailer.mail'
+import { renderMail } from '../../domain/notify/email-layout'
 import type { SmtpConfigInput } from './update-smtp-config.usecase'
 
 export interface SmtpTestInput extends SmtpConfigInput {
@@ -27,11 +28,18 @@ export class TestSmtpUseCase {
       from: input.from,
       source: 'db',
     })
+    const { html, text } = renderMail({
+      title: 'Email thử cấu hình SMTP',
+      preheader: 'Email thử từ QLHS — xác nhận cấu hình SMTP hoạt động.',
+      intro:
+        'Đây là email thử từ QLHS. Nếu bạn nhận được thư này, cấu hình SMTP đang hoạt động bình thường.',
+    })
     await transport.sendMail({
       from: input.from,
       to: input.to,
       subject: 'QLHS — email thử cấu hình SMTP',
-      text: 'Đây là email thử. Nếu bạn nhận được, cấu hình SMTP đang hoạt động.',
+      text,
+      html,
     })
   }
 

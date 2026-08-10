@@ -84,8 +84,8 @@ export class OutboxDispatcher {
           continue
         }
         try {
-          const { subject, body } = emailTemplate({ kind: r.kind, code: r.code })
-          await this.mail.send({ to: r.email, subject, body }) // OUTSIDE any tx
+          const { subject, body, html } = emailTemplate({ kind: r.kind, code: r.code })
+          await this.mail.send({ to: r.email, subject, body, html }) // OUTSIDE any tx
           await this.prisma
             .$executeRaw`UPDATE notification_outbox SET status='sent', sent_at=now() WHERE id=${r.id}`
           sent++
