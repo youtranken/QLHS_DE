@@ -4,6 +4,7 @@ import { FLOW } from '@qlhs/contracts'
 import { getDocumentTypes, type DocTypeGroup } from '../tickets/api'
 import { addDocumentType } from './api'
 import { StateNotice } from '../../shared/StateNotice'
+import { Select } from '../../shared/Select'
 import { toast } from '../../shared/toast'
 import { t } from '../../i18n'
 
@@ -85,13 +86,12 @@ export function AdminDocTypes() {
           maxLength={60}
           aria-label={t('adminOptions.docTypes.namePlaceholder')}
         />
-        <select value={flow} onChange={(e) => setFlow(e.target.value)} aria-label={t('adminOptions.docTypes.flowLabel')}>
-          {FLOWS.map((f) => (
-            <option key={f} value={f}>
-              {f}
-            </option>
-          ))}
-        </select>
+        <Select
+          value={flow}
+          onChange={setFlow}
+          options={FLOWS.map((f) => ({ value: f, label: f }))}
+          ariaLabel={t('adminOptions.docTypes.flowLabel')}
+        />
         <button type="submit" className="btn primary" disabled={busy || !value.trim()}>
           <Plus size={16} aria-hidden />
           {t('adminOptions.docTypes.addBtn')}
