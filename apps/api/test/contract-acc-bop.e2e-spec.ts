@@ -112,9 +112,16 @@ describe('DCC1 receive-from-ACC & submit BOP (e2e)', () => {
   it('ACC approved → DCC1 submits BOP → Submitted to BOP', async () => {
     const { id } = await seed('Received from ACC')
     const dcc1 = await login('dcc1-e2e', ['DCC1'])
-    const res = await dcc1.post(`/dcc1/tickets/${id}/action`).send({ event: 'submitToBop' })
+    const res = await dcc1.post(`/dcc1/tickets/${id}/action`).send({ event: 'submitToBop', reason: 'Trình BOP duyệt' })
     expect(res.status).toBe(201)
     expect(res.body.status).toBe('Submitted to BOP')
+  })
+
+  it('submitToBop without a reason is rejected (BE-enforced note, 400)', async () => {
+    const { id } = await seed('Received from ACC')
+    const dcc1 = await login('dcc1-e2e', ['DCC1'])
+    const res = await dcc1.post(`/dcc1/tickets/${id}/action`).send({ event: 'submitToBop' })
+    expect(res.status).toBe(400)
   })
 
   it('ACC return (sendBack) → Returned and counts a new round (heavy)', async () => {

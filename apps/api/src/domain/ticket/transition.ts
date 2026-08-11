@@ -42,7 +42,9 @@ export class ReasonRequiredError extends DomainError {
   readonly code = 'ReasonRequired'
 }
 
-const REASON_REQUIRED: ReadonlySet<TicketEvent> = new Set<TicketEvent>(['sendBack'])
+// sendBack always needs a reason; submitToBop carries DCC1's mandatory note to BOP
+// (enforced server-side, not just in the UI, so the handover log always has it).
+const REASON_REQUIRED: ReadonlySet<TicketEvent> = new Set<TicketEvent>(['sendBack', 'submitToBop'])
 
 /**
  * The ONLY place ticket.status changes (AD-2). Pure: validates the edge against
