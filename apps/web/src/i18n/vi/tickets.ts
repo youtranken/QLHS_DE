@@ -110,6 +110,10 @@ export const tickets = {
     fieldDocumentType: 'Document Type',
     fieldContractor: 'Contractor',
     fieldContractNo: 'Contract No.',
+    // Contract-flow "Contract No" = documentNo do DCC2 gán (fallback contractNo của
+    // Applicant khi DCC chưa nhập). Payment thì documentNo là "Payment No".
+    fieldContractNoAcc: 'Contract No',
+    fieldPaymentNo: 'Payment No',
     fieldProjectTeam: 'Project/Team',
     fieldPaymentTerm: 'Payment Term',
     fieldBudgetCode: 'Budget code',

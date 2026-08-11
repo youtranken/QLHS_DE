@@ -27,5 +27,3 @@ export function searchClosed(f: ClosedFilters, cursor?: string): Promise<ClosedP
 
 export const reopenClosed = (id: string, reason: string) =>
   apiPost<{ status: string }>(`/dcc1/tickets/${id}/reopen`, { reason })
-export const requestReopen = (id: string) =>
-  apiPost<{ ok: true }>(`/dcc/tickets/${id}/request-reopen`)

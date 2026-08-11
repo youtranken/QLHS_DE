@@ -21,6 +21,7 @@ function detailAt(status: string): TicketDetail {
     description: 'Duyệt chi phí',
     paymentTerm: 'N/A',
     contractNo: 'N/A',
+    documentNo: null,
     projectTeam: 'Team A',
     budgetCode: 'BUD',
     contractor: 'ACME',

@@ -109,6 +109,8 @@ export const tickets = {
     fieldDocumentType: 'Document type',
     fieldContractor: 'Contractor',
     fieldContractNo: 'Contract no.',
+    fieldContractNoAcc: 'Contract No',
+    fieldPaymentNo: 'Payment No',
     fieldProjectTeam: 'Project / Team',
     fieldPaymentTerm: 'Payment term',
     fieldBudgetCode: 'Budget code',

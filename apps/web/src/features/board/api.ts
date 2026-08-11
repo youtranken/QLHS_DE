@@ -95,8 +95,6 @@ export const completeContract = (id: string, scanPath: string) =>
   apiPost<{ status: string }>(`/dcc2/tickets/${id}/complete`, { scanPath })
 export const requestReturn = (id: string, reason?: string) =>
   apiPost<{ ok: true }>(`/dcc2/tickets/${id}/request-return`, reason ? { reason } : {})
-export const requestReturnDcc3 = (id: string, reason?: string) =>
-  apiPost<{ ok: true }>(`/dcc3/tickets/${id}/request-return`, reason ? { reason } : {})
 export const returnPushback = (id: string, reason: string) =>
   apiPost<{ status: string }>(`/dcc1/tickets/${id}/return-pushback`, { reason })
 

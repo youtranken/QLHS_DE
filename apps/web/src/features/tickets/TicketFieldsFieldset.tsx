@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { DOCUMENT_TYPE_GROUPS } from '@qlhs/contracts'
 import { groupAmount } from '../../shared/format'
 import { getDocumentTypes, getOptions, type CreateTicketBody, type DocTypeGroup } from './api'
@@ -81,6 +81,22 @@ export function TicketFieldsFieldset({
     ...g.types.map((d) => ({ value: d, label: d, indent: true })),
   ])
 
+  // Contract flow: the real Contract No is assigned by DCC2 at send-to-Accounting,
+  // so the Applicant must NOT fill it — lock the field to "N/A" (backend requires
+  // non-empty). Payment/General keep it editable + required.
+  const selectedFlow = docSource.find((g) => g.types.includes(form.documentType))?.flow
+  const contractLocked = selectedFlow === 'Contract'
+  const wasLocked = useRef(contractLocked)
+  useEffect(() => {
+    if (contractLocked) {
+      if (form.contractNo !== 'N/A') set('contractNo', 'N/A')
+    } else if (wasLocked.current) {
+      set('contractNo', '') // leaving Contract → clear the auto N/A for fresh entry
+    }
+    wasLocked.current = contractLocked
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contractLocked])
+
   return (
     <>
       <div className="field full">
@@ -108,9 +124,20 @@ export function TicketFieldsFieldset({
       </div>
       <div className="field">
         <label htmlFor={id('contractNo')} lang="en">
-          Contract No. (If not-Pls, write N/A) <span className="req">*</span>
+          Contract No.{contractLocked ? '' : ' (If not-Pls, write N/A)'}{' '}
+          {!contractLocked && <span className="req">*</span>}
         </label>
-        <input id={id('contractNo')} className="mono" required value={form.contractNo} onChange={(e) => set('contractNo', e.target.value)} />
+        <input
+          id={id('contractNo')}
+          className="mono"
+          required={!contractLocked}
+          disabled={contractLocked}
+          value={contractLocked ? 'N/A' : form.contractNo}
+          onChange={(e) => set('contractNo', e.target.value)}
+        />
+        {contractLocked && (
+          <span className="hint">DCC2 sẽ gán số hợp đồng khi gửi Kế toán — bạn không cần nhập.</span>
+        )}
       </div>
       <div className="field">
         <label htmlFor={id('projectTeam')} lang="en">

@@ -83,7 +83,7 @@
   background: var(--sla-bg);
   font-size: 11px;
   line-height: 1.35;
-  color: var(--ink-1);
+  color: var(--ink);
 }
 /* hàng đáy thẻ: số tiền (trái) + nút hành-động-chính (phải). Cho wrap để nhãn
    nút dài (label server chưa rút gọn) rớt xuống dòng thay vì tràn cột hẹp. */
