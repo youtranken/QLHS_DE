@@ -3,7 +3,6 @@ import {
   confirmCard,
   pauseSla,
   pickCard,
-  requestReturn,
   resendDcc2,
   resendDcc3,
   resumeSla,
@@ -69,21 +68,6 @@ export function makeCardAction({
         return
       } else if (action.event === 'completeContract') {
         setComplete(card) // open the scan-path form
-        return
-      } else if (action.event === '__pushback') {
-        setAsk({
-          title: t('board.ask.pushbackTitle'),
-          message: t('board.ask.pushbackMessage'),
-          code,
-          reason: true,
-          danger: true,
-          confirmLabel: t('board.ask.pushbackConfirm'),
-          onOk: async (reason) => {
-            await requestReturn(card.id, reason ?? '')
-            toast.ok(t('board.toasts.pushbackDone'))
-            await load()
-          },
-        })
         return
       } else if (action.event === '__return') {
         setAsk({

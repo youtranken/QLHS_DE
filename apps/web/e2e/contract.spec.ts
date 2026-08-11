@@ -42,7 +42,7 @@ test('Contract: full line through every station to Completed', async ({ page }) 
   await expectStatus(code!, 'Submitted to DCC2')
 
   await switchTo(page, 'dcc2-hoa', ['DCC2'])
-  await cardAction(page, 'Đã nhận bản cứng')
+  await cardAction(page, 'Kiểm tra bản cứng')
   await confirmHandover(page)
   await expectStatus(code!, 'Received by DCC2')
 
@@ -64,7 +64,7 @@ test('Contract: full line through every station to Completed', async ({ page }) 
   await expectStatus(code!, 'Submitted to DCC2 (Hardcopy)')
 
   await switchTo(page, 'dcc2-hoa', ['DCC2'])
-  await cardAction(page, 'Đã nhận bản cứng')
+  await cardAction(page, 'Kiểm tra bản cứng')
   await confirmHandover(page)
   await expectStatus(code!, 'Hardcopy')
 

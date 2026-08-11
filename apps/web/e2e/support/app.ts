@@ -88,7 +88,7 @@ export async function switchTo(page: Page, sub: string, roles: string[]): Promis
 }
 
 /** HandoverModal: the date defaults to today, so just confirm. */
-export async function confirmHandover(page: Page, confirmLabel = 'Đã nhận bản cứng'): Promise<void> {
+export async function confirmHandover(page: Page, confirmLabel = 'Đủ & đúng — Xác nhận nhận'): Promise<void> {
   const dialog = page.getByRole('dialog')
   await expect(dialog).toBeVisible()
   await dialog.getByRole('button', { name: confirmLabel }).click()

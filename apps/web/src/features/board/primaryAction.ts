@@ -3,10 +3,10 @@ import { t } from '../../i18n'
 import { PAUSE_EVENT, RESUME_EVENT } from './slaPauseActions'
 import type { LegalAction } from './api'
 
-// Ở ⋯ (không lên nút chính): mọi hành động LÙI / cần lý do (Trả lại, Mở lại,
-// đẩy ngược) và điều khiển đồng hồ SLA. reasonRequired đã phủ SendBack/Reopen/
-// __return/pause; chỉ còn các pseudo đẩy-ngược + resume phải liệt kê tay.
-const MENU_ONLY = new Set<string>(['__pushback', PAUSE_EVENT, RESUME_EVENT])
+// Ở ⋯ (không lên nút chính): mọi hành động LÙI / cần lý do (Trả lại, Mở lại) và
+// điều khiển đồng hồ SLA. reasonRequired đã phủ SendBack/Reopen/__return/pause;
+// chỉ còn resume phải liệt kê tay.
+const MENU_ONLY = new Set<string>([PAUSE_EVENT, RESUME_EVENT])
 // Phòng thủ (allowlist theo đích): mọi hành động dẫn tới trạng thái LÙI/HỦY luôn
 // ở ⋯ — chặn một event tương lai reasonRequired:false-nhưng-phá-huỷ (vd Cancel)
 // tự leo lên nút chính chỉ vì lọt denylist sự-kiện.

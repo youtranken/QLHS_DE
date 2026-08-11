@@ -124,23 +124,19 @@ describe('Contract BOP → Hardcopy → Completed (e2e)', () => {
     expect(row.status).toBe('Hardcopy')
   })
 
-  it('AC4: DCC2 push-back flags the ticket, locks completion; DCC1 return-pushback resolves it', async () => {
-    const { id } = await seed('Hardcopy', { currentHolderSub: 'dcc2-e2e' })
+  it('missing-paper at the hardcopy handover → DCC1 Returns it from the reconcile lane (heavy)', async () => {
+    // The new model: DCC2 reports a wrong/incomplete hardcopy AT RECEIPT (Submitted
+    // to DCC2 (Hardcopy)), which flags the ticket; DCC1 then chooses to Return.
+    const { id } = await seed('Submitted to DCC2 (Hardcopy)')
     const dcc2 = await login('dcc2-e2e', ['DCC2'])
-    const note = await dcc2.post(`/dcc2/tickets/${id}/request-return`).send({})
+    const note = await dcc2.post(`/dcc2/tickets/${id}/missing-paper`).send({ reason: 'Bản cứng sai' })
     expect(note.status).toBe(201)
 
     const flagged = await admin.ticket.findUniqueOrThrow({ where: { id } })
     expect(flagged.reconcileFlag).toBe(true)
-    expect(flagged.reconcileReason).toBe('return_requested')
-    const noteRow = await admin.ticketEvent.findFirstOrThrow({
-      where: { ticketId: id, action: 'return_requested' },
-    })
-    expect(noteRow.fromStatus).toBe(noteRow.toStatus) // status-preserving note
+    expect(flagged.reconcileReason).toBe('missing_paper')
 
-    // Completion is locked out while the return is pending (code-review #1).
-    expect((await dcc2.post(`/dcc2/tickets/${id}/complete`).send({ scanPath: '\\\\s\\a.pdf' })).status).toBe(409)
-    // DCC2 cannot Return itself, nor use DCC1's endpoint.
+    // DCC2 cannot use DCC1's Return endpoint (AD-11 — DCC1 is the sole Return actor).
     expect((await dcc2.post(`/dcc1/tickets/${id}/return-pushback`).send({ reason: 'x' })).status).toBe(403)
 
     const dcc1 = await login('dcc1-e2e', ['DCC1'])
@@ -149,13 +145,13 @@ describe('Contract BOP → Hardcopy → Completed (e2e)', () => {
       .send({ reason: 'Bản cứng sai' })
     expect(ret.body.status).toBe('Returned')
     const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
-    expect(row.roundNo).toBe(1) // heavy — already past external processing
+    expect(row.roundNo).toBe(1) // heavy — new round for the Applicant to fix
     expect(row.reconcileFlag).toBe(false) // cleared atomically with the sendBack
     expect(row.reconcileReason).toBeNull()
   })
 
   it('return-pushback requires a reason (400) and refuses an un-flagged ticket (409)', async () => {
-    const { id } = await seed('Hardcopy', { currentHolderSub: 'dcc2-e2e' })
+    const { id } = await seed('Submitted to DCC2 (Hardcopy)')
     const dcc1 = await login('dcc1-e2e', ['DCC1'])
     expect((await dcc1.post(`/dcc1/tickets/${id}/return-pushback`).send({ reason: ' ' })).status).toBe(400)
     expect((await dcc1.post(`/dcc1/tickets/${id}/return-pushback`).send({ reason: 'x' })).status).toBe(409)

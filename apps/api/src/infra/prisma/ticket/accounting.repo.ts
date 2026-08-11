@@ -41,10 +41,10 @@ export class AccountingRepo {
           FROM ticket WHERE id = ${ticketId} FOR UPDATE`
         const row = rows[0]
         if (!row) throw new TicketNotFoundError(ticketId)
-        // A pending push-back (return_requested) must block closure — DCC1 has to
-        // resolve the Return first, same as `complete` is locked (AC4/H2).
+        // A pending reconcile flag (DCC reported a missing/wrong hardcopy) must
+        // block closure — DCC1 has to re-hand over or Return it first.
         if (row.reconcile_flag) {
-          throw new ReconcileStateError('Đang chờ đối chiếu — DCC1 cần xử lý trước')
+          throw new ReconcileStateError('Đang chờ kiểm tra lại — DCC1 cần xử lý trước')
         }
 
         const state: TicketState = {

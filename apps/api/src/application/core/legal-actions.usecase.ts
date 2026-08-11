@@ -18,9 +18,11 @@ const LABEL: Partial<Record<TicketEvent, string>> = {
   [TICKET_EVENT.Resubmit]: 'Nộp lại',
   [TICKET_EVENT.Reopen]: 'Mở lại (Reopen)',
   [TICKET_EVENT.HandoverToDcc2]: 'Chuyển cho DCC2 →',
-  [TICKET_EVENT.ConfirmReceivedByDcc2]: 'Đã nhận bản cứng',
+  // Neutral label: the click opens a check modal where DCC2/DCC3 either confirms
+  // receipt OR reports a missing/wrong hardcopy — not a blind "received".
+  [TICKET_EVENT.ConfirmReceivedByDcc2]: 'Kiểm tra bản cứng',
   [TICKET_EVENT.HandoverToDcc3]: 'Chuyển cho DCC3 →',
-  [TICKET_EVENT.ConfirmReceivedByDcc3]: 'Đã nhận bản cứng',
+  [TICKET_EVENT.ConfirmReceivedByDcc3]: 'Kiểm tra bản cứng',
   // Flow-aware in labelFor() — this fallback is the Contract wording.
   [TICKET_EVENT.SendToAccounting]: 'Nhập Contract No & gửi Accounting',
   [TICKET_EVENT.ReceiveFromAcc]: 'Nhận về từ ACC',

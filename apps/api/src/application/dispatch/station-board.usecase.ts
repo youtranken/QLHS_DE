@@ -3,7 +3,6 @@ import {
   FLOW, ROLE, TICKET_EVENT, TICKET_STATUS,
   type Flow, type Priority, type Role, type TicketStatus,
 } from '@qlhs/contracts'
-import { RECONCILE_REASON } from '../../domain/ticket/reconcile'
 import { TicketQueryRepo } from '../../infra/prisma/ticket/ticket-query.repo'
 import { SlaRepo } from '../../infra/prisma/sla/sla.repo'
 import { LockRepo } from '../../infra/prisma/ticket/lock.repo'
@@ -79,17 +78,8 @@ const RESEND_DCC3: LegalAction = {
   reversible: false,
   reasonRequired: false,
 }
-// DCC2 "đẩy ngược DCC1" (AC4) — a note, not an edge; DCC1 performs the Return.
-// Requires a reason (why the hardcopy is wrong) so DCC1 sees it in the log.
-const PUSHBACK: LegalAction = {
-  event: '__pushback' as never,
-  label: 'Đẩy ngược DCC1 (bản cứng sai)',
-  toStatus: TICKET_STATUS.ReceivedByDcc2,
-  reversible: false,
-  reasonRequired: true,
-}
-// DCC1 clears a pushed-back ticket by Returning it (reason required) — routed to
-// the dedicated return-pushback endpoint (clears flag + sendBack atomically).
+// DCC1 Returns a reconcile-flagged ticket (reason required) — routed to the
+// dedicated return-pushback endpoint (clears flag + heavy sendBack atomically).
 const RETURN: LegalAction = {
   event: '__return' as never,
   label: 'Trả lại Applicant (Return)',
@@ -158,9 +148,10 @@ export class StationBoardUseCase {
     for (const card of pool.cards) card.dupOf = hints.get(card.id) ?? []
   }
 
-  /** DCC1's flag-driven "chờ kiểm tra lại" lane: tickets DCC2/DCC3 bounced back.
-   *  The per-card action depends on WHY — re-hand over (missing paper) or Return
-   *  (pushed back). Absent for other roles or when nothing is flagged. */
+  /** DCC1's flag-driven "chờ kiểm tra lại" lane: tickets DCC2/DCC3 bounced back
+   *  at receipt (missing/wrong hardcopy). Each card offers BOTH ways out — re-hand
+   *  over (supplement & resend) as the primary button, and Return to the Applicant
+   *  in the ⋯ menu. Absent for other roles or when nothing is flagged. */
   private async reconcileLane(
     role: Role | null,
     all: Awaited<ReturnType<TicketQueryRepo['listByFlows']>>,
@@ -177,8 +168,8 @@ export class StationBoardUseCase {
     const comments = await this.tickets.reconcileComments(flagged.map((r) => r.id))
     const cards = await Promise.all(
       flagged.map(async (r) => {
-        const action = reconcileAction(r.reconcileReason, r.flow as Flow)
-        const card = await this.toCard(r, r.status as TicketStatus, viewerSub, now, clock, thresholdOf, () => [action])
+        const actions = reconcileActions(r.flow as Flow)
+        const card = await this.toCard(r, r.status as TicketStatus, viewerSub, now, clock, thresholdOf, () => actions)
         return { ...card, reconcileComment: comments.get(r.id) ?? null }
       }),
     )
@@ -222,11 +213,12 @@ export class StationBoardUseCase {
   }
 }
 
-/** The single reconcile-lane action for a flagged ticket, by why + flow: Return
- *  (pushed back), or re-hand over to DCC2 (Contract) / DCC3 (Payment). */
-function reconcileAction(reason: string | null, flow: Flow): LegalAction {
-  if (reason === RECONCILE_REASON.ReturnRequested) return RETURN
-  return flow === FLOW.Payment ? RESEND_DCC3 : RESEND
+/** Both ways out of the reconcile lane, DCC1's call: re-hand over (supplement &
+ *  resend to DCC2/DCC3, primary) OR Return the ticket to the Applicant (⋯ menu).
+ *  splitActions promotes the safe resend to the button and keeps Return in ⋯. */
+function reconcileActions(flow: Flow): LegalAction[] {
+  const resend = flow === FLOW.Payment ? RESEND_DCC3 : RESEND
+  return [resend, RETURN]
 }
 
 function actionsFor(
@@ -243,15 +235,11 @@ function actionsFor(
     return [RECEIVE, ...back]
   }
   if (!role) return []
-  const actions = legalActionsFor(status, role, flow)
-  // AC4: give DCC2 a push-back option wherever it physically holds the hardcopy.
-  if (role === ROLE.Dcc2 && (status === TICKET_STATUS.ReceivedByDcc2 || status === TICKET_STATUS.Hardcopy)) {
-    return [...actions, PUSHBACK]
-  }
-  // DCC3 has NO push-back after receiving (H2 dropped): a wrong hardcopy caught at
-  // `Received by DCC3` is handled out-of-band (pause SLA). Missing/wrong paper is
-  // reported at the receive step (`Submitted to DCC3`) instead, with a reason.
-  return actions
+  // No after-receipt push-back: a wrong/incomplete hardcopy is caught by DCC2/DCC3
+  // AT RECEIPT (the "missing paper" report on the handover modal), which flags the
+  // ticket into DCC1's reconcile lane. Once a DCC confirms receipt it has accepted
+  // the paper — nothing bounces back from Received-by-DCC2/DCC3 or Hardcopy.
+  return legalActionsFor(status, role, flow)
 }
 
 /** Per-role column header override (AD-16 — one status, differently-named tabs).

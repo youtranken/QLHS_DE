@@ -26,15 +26,14 @@ const HANDOVER_STATES: readonly string[] = [
 ]
 /** The single DCC3 receipt-waiting state (Payment has one handover, Story 4.1). */
 const HANDOVER_STATES_DCC3: readonly string[] = [TICKET_STATUS.SubmittedToDcc3]
-/** The DCC2-held states from which DCC2 may push a wrong hardcopy back to DCC1. */
-const PUSHBACK_STATES: readonly string[] = [TICKET_STATUS.ReceivedByDcc2, TICKET_STATUS.Hardcopy]
 
 /**
- * DCC2 handover exceptions (AD-10/AD-11, Stories 3.1/3.4). "Missing paper" and
- * "request return" both flag the ticket (reconcile_flag + reason) so it bounces
- * off DCC2's board into DCC1's reconcile lane — but only "missing paper" keeps
- * the status; "return" hands off to DCC1 who runs the sendBack. All flag toggles
- * lock the row (FOR UPDATE) so a concurrent action can't strand the flag.
+ * DCC2/DCC3 handover exceptions (AD-10/AD-11, Stories 3.1/3.4). A wrong/incomplete
+ * hardcopy is reported AT RECEIPT ("missing paper"): the ticket is flagged
+ * (reconcile_flag, status-preserving) so it bounces off the DCC board into DCC1's
+ * reconcile lane. DCC1 then decides there — re-hand over (clear the flag) OR Return
+ * (clear + heavy sendBack). All flag toggles lock the row (FOR UPDATE) so a
+ * concurrent action can't strand the flag.
  */
 @Injectable()
 export class HandoverRepo {
@@ -59,13 +58,6 @@ export class HandoverRepo {
   /** DCC1 re-hands over a reconciled Payment ticket → clears the flag. */
   clearMissingPaperDcc3(id: string, actorSub: string): Promise<void> {
     return this.setReconcile(id, actorSub, HANDOVER_STATES_DCC3, null, false)
-  }
-
-  /** DCC2 "đẩy ngược DCC1" (AC4, AD-11): flag with a return reason so DCC1 sees it
-   *  in the reconcile lane and completion is locked out; DCC1 runs the Return. The
-   *  `comment` (why the hardcopy is wrong) is recorded on the audit event. */
-  requestReturn(id: string, actorSub: string, comment?: string): Promise<void> {
-    return this.setReconcile(id, actorSub, PUSHBACK_STATES, RECONCILE_REASON.ReturnRequested, true, comment)
   }
 
   /**
@@ -132,8 +124,11 @@ export class HandoverRepo {
   }
 
   /**
-   * DCC1 resolves a push-back: clears the flag AND runs the heavy `sendBack` in
-   * one locked transaction (no stranded flag). Guarded to return_requested only.
+   * DCC1 Returns a reconcile-flagged ticket from its lane: clears the flag AND
+   * runs the heavy `sendBack` in one locked transaction (no stranded flag). The
+   * receipt-waiting state it sits in has a DCC1-owned sendBack edge (contract.ts /
+   * payment.ts); any reconcile-flagged ticket qualifies (the DCC reported a
+   * wrong/incomplete hardcopy) — DCC1 chooses Return over re-hand-over.
    */
   async returnFromPushback(id: string, actor: Actor, reason: string, now: Date): Promise<{ status: string }> {
     return this.prisma.$transaction(async (tx) => {
@@ -143,8 +138,8 @@ export class HandoverRepo {
         FROM ticket WHERE id = ${id} FOR UPDATE`
       const row = rows[0]
       if (!row) throw new TicketNotFoundError(id)
-      if (!row.reconcile_flag || row.reconcile_reason !== RECONCILE_REASON.ReturnRequested) {
-        throw new ReconcileStateError('Hồ sơ không ở trạng thái chờ DCC1 trả lại')
+      if (!row.reconcile_flag) {
+        throw new ReconcileStateError('Hồ sơ không ở trạng thái chờ kiểm tra lại')
       }
       const state: TicketState = {
         id: row.id,
@@ -221,12 +216,7 @@ export class HandoverRepo {
         data: {
           ticketId: id,
           actorSub,
-          action:
-            next && reason === RECONCILE_REASON.ReturnRequested
-              ? TICKET_EVENT.ReturnRequested
-              : next
-                ? TICKET_EVENT.MissingPaperFlagged
-                : TICKET_EVENT.MissingPaperCleared,
+          action: next ? TICKET_EVENT.MissingPaperFlagged : TICKET_EVENT.MissingPaperCleared,
           fromStatus: t.status,
           toStatus: t.status,
           reason: next && comment?.trim() ? comment.trim() : null,

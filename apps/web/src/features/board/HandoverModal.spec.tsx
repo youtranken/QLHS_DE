@@ -28,21 +28,21 @@ describe('HandoverModal — 2-phase confirmation (UX-DR8, AC2/AC3)', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
-  it('"Đã nhận bản cứng" confirms with the default (today) date', async () => {
+  it('"Đủ & đúng — Xác nhận nhận" confirms with the default (today) date', async () => {
     const { onConfirm } = setup()
-    fireEvent.click(screen.getByRole('button', { name: 'Đã nhận bản cứng' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Đủ & đúng — Xác nhận nhận' }))
     await waitFor(() => expect(onConfirm).toHaveBeenCalledTimes(1))
     expect(onConfirm.mock.calls[0]?.[0]).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
 
-  it('"Thiếu giấy" is irreversible — asks for confirmation before bouncing', async () => {
+  it('"Thiếu / Sai" is irreversible — asks for confirmation before bouncing', async () => {
     const { onMissing } = setup()
     // Opens the danger ConfirmModal; cancelling it must not bounce.
-    fireEvent.click(screen.getByRole('button', { name: 'Thiếu giấy, trả về DCC1' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Thiếu / Sai — Trả về DCC1' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Hủy' }))
     expect(onMissing).not.toHaveBeenCalled()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Thiếu giấy, trả về DCC1' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Thiếu / Sai — Trả về DCC1' }))
     // A reason is now required before the bounce is enabled. The confirm dialog is
     // nested inside the handover dialog, so target the last one.
     await screen.findByRole('button', { name: 'Trả về DCC1' })

@@ -75,7 +75,7 @@ describe('DCC station board (e2e — AD-17 actions + scope)', () => {
     expect(after?.code).toBe(res.body.code)
   })
 
-  it('reconcile bounce: flagged Submitted-to-DCC2 leaves DCC2, appears on DCC1 with __resend', async () => {
+  it('reconcile bounce (Contract): flagged Submitted-to-DCC2 leaves DCC2, DCC1 gets BOTH resend + return', async () => {
     await admin.ticket.create({
       data: {
         status: TICKET_STATUS.SubmittedToDcc2,
@@ -84,6 +84,7 @@ describe('DCC station board (e2e — AD-17 actions + scope)', () => {
         priority: 'normal',
         code: 'CT-2026-0001',
         reconcileFlag: true,
+        reconcileReason: 'missing_paper',
       },
     })
     const dcc2 = await login('d2', ['DCC2'])
@@ -97,33 +98,40 @@ describe('DCC station board (e2e — AD-17 actions + scope)', () => {
     const dcc1Board = (await dcc1.get('/station-board')).body
     const reconcile = dcc1Board.find((c: { reconcile?: boolean }) => c.reconcile === true)
     expect(reconcile.cards).toHaveLength(1)
-    expect(reconcile.cards[0].actions.map((a: { event: string }) => a.event)).toEqual(['__resend'])
+    // DCC1 decides: re-hand over (primary) OR Return to Applicant (⋯) — both offered.
+    expect(reconcile.cards[0].actions.map((a: { event: string }) => a.event)).toEqual([
+      '__resend',
+      '__return',
+    ])
   })
 
-  it('push-back (return_requested) leaves DCC2 Hardcopy lane, shows on DCC1 with __return', async () => {
+  it('reconcile bounce (Payment): flagged Submitted-to-DCC3 leaves DCC3, DCC1 gets resend-dcc3 + return', async () => {
     await admin.ticket.create({
       data: {
-        status: TICKET_STATUS.Hardcopy,
-        flow: FLOW.Contract,
+        status: TICKET_STATUS.SubmittedToDcc3,
+        flow: FLOW.Payment,
         applicantSub: 'a',
         priority: 'normal',
         code: 'CT-2026-0100',
         reconcileFlag: true,
-        reconcileReason: 'return_requested',
+        reconcileReason: 'missing_paper',
       },
     })
-    const dcc2 = await login('d2', ['DCC2'])
-    const hardcopy = (await dcc2.get('/station-board')).body.find(
-      (c: { status: string }) => c.status === TICKET_STATUS.Hardcopy,
+    const dcc3 = await login('d3', ['DCC3'])
+    const dcc3Sub = (await dcc3.get('/station-board')).body.find(
+      (c: { status: string }) => c.status === TICKET_STATUS.SubmittedToDcc3,
     )
-    expect(hardcopy.cards).toHaveLength(0) // pushed back — off DCC2's lane
+    expect(dcc3Sub.cards).toHaveLength(0) // bounced off DCC3's lane
 
     const dcc1 = await login('d1', ['DCC1'])
     const reconcile = (await dcc1.get('/station-board')).body.find(
       (c: { reconcile?: boolean }) => c.reconcile === true,
     )
     expect(reconcile.cards).toHaveLength(1)
-    expect(reconcile.cards[0].actions.map((a: { event: string }) => a.event)).toEqual(['__return'])
+    expect(reconcile.cards[0].actions.map((a: { event: string }) => a.event)).toEqual([
+      '__resend-dcc3',
+      '__return',
+    ])
   })
 
   it('an UN-flagged Submitted-to-DCC2 stays on DCC2 and is absent from DCC1', async () => {

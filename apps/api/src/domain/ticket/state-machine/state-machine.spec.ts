@@ -193,14 +193,23 @@ describe('Contract handover DCC1→DCC2 (Story 3.1, FR-10)', () => {
     )
   })
 
-  it('AC4: DCC1 is the sole Return actor from DCC2-held states — heavy (counts a round)', () => {
-    for (const from of [TICKET_STATUS.ReceivedByDcc2, TICKET_STATUS.Hardcopy]) {
+  it('DCC1 Returns from a DCC2 receipt-waiting state (reconcile lane) — heavy (counts a round)', () => {
+    // A wrong/incomplete hardcopy is reported by DCC2 AT RECEIPT (reconcile flag,
+    // status-preserving); DCC1 Returns from that same state via the reconcile lane.
+    for (const from of [TICKET_STATUS.SubmittedToDcc2, TICKET_STATUS.SubmittedToDcc2Hardcopy]) {
       const edge = findEdge(from, TICKET_EVENT.SendBack, FLOW.Contract)
       expect(edge?.to).toBe(TICKET_STATUS.Returned)
       expect(edge?.ownerRole).toBe(ROLE.Dcc1)
       expect(edge?.enteredFlow).toBe(true)
-      // DCC2 cannot fire sendBack from these states.
+      // DCC2 never fires sendBack (AD-11) — only DCC1 does, from the reconcile lane.
       expect(legalActions(from, ROLE.Dcc2, FLOW.Contract)).not.toContain(TICKET_EVENT.SendBack)
+    }
+  })
+
+  it('no after-receipt push-back: Received-by-DCC2 / Hardcopy have no sendBack edge', () => {
+    // The check happens at receipt; once DCC2 confirms, it has accepted the paper.
+    for (const from of [TICKET_STATUS.ReceivedByDcc2, TICKET_STATUS.Hardcopy]) {
+      expect(findEdge(from, TICKET_EVENT.SendBack, FLOW.Contract)).toBeUndefined()
     }
   })
 })
@@ -294,21 +303,25 @@ describe('Payment close DCC3 → Sent to Accounting (Story 4.2, FR-13/H5)', () =
   })
 })
 
-describe('Payment pre-close Return at Received by DCC3 (H2 — symmetric to Contract AC4)', () => {
-  it('DCC1 Returns a wrong hardcopy from Received by DCC3 — heavy (counts a round)', () => {
-    // Walkthrough §C:83 / PRD §4.2: DCC3 spots a wrong hardcopy → đẩy ngược DCC1 →
-    // DCC1 Returns. Past external processing, so it counts a round (enteredFlow).
-    const edge = findEdge(TICKET_STATUS.ReceivedByDcc3, TICKET_EVENT.SendBack, FLOW.Payment)
+describe('Payment Return from the DCC3 receipt-waiting state (symmetric to Contract)', () => {
+  it('DCC1 Returns a wrong hardcopy from Submitted to DCC3 — heavy (counts a round)', () => {
+    // DCC3 reports a missing/wrong hardcopy AT RECEIPT (reconcile flag); DCC1 then
+    // Returns from that same state via the reconcile lane. Heavy → counts a round.
+    const edge = findEdge(TICKET_STATUS.SubmittedToDcc3, TICKET_EVENT.SendBack, FLOW.Payment)
     expect(edge?.to).toBe(TICKET_STATUS.Returned)
     expect(edge?.ownerRole).toBe(ROLE.Dcc1)
     expect(edge?.enteredFlow).toBe(true)
   })
 
-  it('DCC3 still never Returns itself — only DCC1 fires it (AD-11)', () => {
-    expect(legalActions(TICKET_STATUS.ReceivedByDcc3, ROLE.Dcc3, FLOW.Payment)).not.toContain(
+  it('no after-receipt push-back: Received by DCC3 has no sendBack edge', () => {
+    expect(findEdge(TICKET_STATUS.ReceivedByDcc3, TICKET_EVENT.SendBack, FLOW.Payment)).toBeUndefined()
+  })
+
+  it('DCC3 never Returns itself — only DCC1 fires it (AD-11)', () => {
+    expect(legalActions(TICKET_STATUS.SubmittedToDcc3, ROLE.Dcc3, FLOW.Payment)).not.toContain(
       TICKET_EVENT.SendBack,
     )
-    expect(legalActions(TICKET_STATUS.ReceivedByDcc3, ROLE.Dcc1, FLOW.Payment)).toContain(
+    expect(legalActions(TICKET_STATUS.SubmittedToDcc3, ROLE.Dcc1, FLOW.Payment)).toContain(
       TICKET_EVENT.SendBack,
     )
   })

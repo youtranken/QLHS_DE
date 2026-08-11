@@ -95,9 +95,6 @@ export const board = {
     irreversible: 'Hành động này không thể hoàn tác. Tiếp tục?',
   },
   ask: {
-    pushbackTitle: 'Đẩy ngược bản cứng',
-    pushbackMessage: 'Đẩy ngược sẽ báo DCC1 trả hồ sơ về Applicant. Không thể hoàn tác.',
-    pushbackConfirm: 'Đẩy ngược',
     returnTitle: 'Trả lại Applicant',
     returnMessage: 'Trả hồ sơ về Applicant đi vòng mới. Nêu lý do:',
     returnConfirm: 'Trả lại',
@@ -123,7 +120,6 @@ export const board = {
     codeGenerated: 'Đã sinh mã {code}.',
     resentDcc2: 'Đã bàn giao lại cho DCC2.',
     resentDcc3: 'Đã bàn giao lại cho DCC3.',
-    pushbackDone: 'Đã báo DCC1 (đẩy ngược bản cứng sai).',
     returnedToApplicant: 'Đã trả lại Applicant.',
     slaPaused: 'Đã dừng đồng hồ SLA — hồ sơ vẫn ở ga cũ.',
     slaResumed: 'Đã chạy lại đồng hồ SLA.',
@@ -137,11 +133,11 @@ export const board = {
     close: 'Đóng',
     cancel: 'Hủy',
     handover: {
-      title: 'Bàn giao bản cứng',
-      confirm: 'Đã nhận bản cứng',
+      title: 'Kiểm tra bản cứng',
+      confirm: 'Đủ & đúng — Xác nhận nhận',
       dateLabel: 'Ngày nhận từ DCC1',
-      missingConfirm: 'Báo thiếu giấy sẽ trả hồ sơ về DCC1 đối chiếu (không hoàn tác). Tiếp tục?',
-      missingButton: 'Thiếu giấy, trả về DCC1',
+      missingConfirm: 'Báo thiếu/sai sẽ trả hồ sơ về DCC1 kiểm tra lại (không hoàn tác). Tiếp tục?',
+      missingButton: 'Thiếu / Sai — Trả về DCC1',
       missingConfirmBtn: 'Trả về DCC1',
     },
     receiveAcc: {

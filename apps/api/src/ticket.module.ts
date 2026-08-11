@@ -31,7 +31,6 @@ import { SendAccountingDcc3UseCase } from './application/accounting/send-account
 import { SubmitToAccountingUseCase } from './application/accounting/submit-to-accounting.usecase'
 import { ReceiveFromAccUseCase } from './application/accounting/receive-from-acc.usecase'
 import { CompleteContractUseCase } from './application/accounting/complete-contract.usecase'
-import { RequestReturnUseCase } from './application/returns/request-return.usecase'
 import { ReturnFromPushbackUseCase } from './application/returns/return-from-pushback.usecase'
 import { UndoActionUseCase } from './application/board/undo-action.usecase'
 import { BatchActionUseCase } from './application/board/batch-action.usecase'
@@ -120,7 +119,6 @@ import { DispatchController } from './http/dispatch/dispatch.controller'
     SubmitToAccountingUseCase,
     ReceiveFromAccUseCase,
     CompleteContractUseCase,
-    RequestReturnUseCase,
     ReturnFromPushbackUseCase,
     UndoActionUseCase,
     BatchActionUseCase,

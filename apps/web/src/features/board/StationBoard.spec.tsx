@@ -18,7 +18,6 @@ vi.mock('./api', () => ({
   sendAccounting: vi.fn(),
   sendAccountingDcc3: vi.fn(),
   completeContract: vi.fn(),
-  requestReturn: vi.fn(),
   returnPushback: vi.fn(),
 }))
 import {
@@ -102,7 +101,7 @@ const dcc2Board: BoardColumn[] = [
         actions: [
           {
             event: 'confirmReceivedByDcc2',
-            label: 'Đã nhận bản cứng',
+            label: 'Kiểm tra bản cứng',
             toStatus: 'Received by DCC2',
             reversible: false,
             reasonRequired: false,
@@ -117,9 +116,9 @@ describe('StationBoard — 2-phase handover (Story 3.1)', () => {
   beforeEach(() => vi.mocked(getStationBoard).mockResolvedValue(dcc2Board))
   afterEach(() => vi.restoreAllMocks())
 
-  it('DCC2 "Đã nhận bản cứng" opens the 2-phase modal (not a blind transition)', async () => {
+  it('DCC2 "Kiểm tra bản cứng" opens the check modal (not a blind transition)', async () => {
     render(<StationBoard />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Đã nhận bản cứng' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Kiểm tra bản cứng' }))
     expect(await screen.findByRole('dialog')).toBeInTheDocument()
     expect(actionCard).not.toHaveBeenCalled()
   })
@@ -232,7 +231,7 @@ const dcc3Board: BoardColumn[] = [
         actions: [
           {
             event: 'confirmReceivedByDcc3',
-            label: 'Đã nhận bản cứng',
+            label: 'Kiểm tra bản cứng',
             toStatus: 'Received by DCC3',
             reversible: false,
             reasonRequired: false,
@@ -247,13 +246,13 @@ describe('StationBoard — Payment 2-phase handover DCC3 (Story 4.1)', () => {
   beforeEach(() => vi.mocked(getStationBoard).mockResolvedValue(dcc3Board))
   afterEach(() => vi.restoreAllMocks())
 
-  it('DCC3 "Đã nhận bản cứng" opens the modal, and confirm hits the DCC3 endpoint', async () => {
+  it('DCC3 "Kiểm tra bản cứng" opens the modal, and confirm hits the DCC3 endpoint', async () => {
     vi.mocked(receiveDcc3).mockResolvedValue({ status: 'Received by DCC3' })
     render(<StationBoard />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Đã nhận bản cứng' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Kiểm tra bản cứng' }))
     const dialog = await screen.findByRole('dialog')
     expect(actionCard).not.toHaveBeenCalled()
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Đã nhận bản cứng' }))
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Đủ & đúng — Xác nhận nhận' }))
     await waitFor(() => expect(receiveDcc3).toHaveBeenCalledWith('p1', expect.any(String)))
   })
 })

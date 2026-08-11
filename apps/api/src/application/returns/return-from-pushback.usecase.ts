@@ -4,8 +4,9 @@ import { HandoverRepo } from '../../infra/prisma/ticket/handover.repo'
 import { SystemClock } from '../../infra/clock/system-clock'
 import { ReasonRequiredError } from '../../domain/ticket/transition'
 
-/** DCC1 resolves a DCC2 push-back (AC4): clears the reconcile flag and runs the
- *  heavy Return in one transaction. DCC1 is the sole Return actor (AD-11). */
+/** DCC1 Returns a reconcile-flagged ticket from its lane (DCC2/DCC3 reported a
+ *  wrong/incomplete hardcopy at receipt): clears the flag and runs the heavy
+ *  Return in one transaction. DCC1 is the sole Return actor (AD-11). */
 @Injectable()
 export class ReturnFromPushbackUseCase {
   constructor(

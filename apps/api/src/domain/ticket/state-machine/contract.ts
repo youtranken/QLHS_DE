@@ -105,9 +105,13 @@ export const CONTRACT_EDGES: readonly Edge[] = [
     reversible: false,
   },
   {
-    // AC4: DCC2 pushes a wrong hardcopy back — DCC1 is the sole Return actor
-    // (AD-11). Heavy (past external processing) from either DCC2-held state.
-    from: TICKET_STATUS.ReceivedByDcc2,
+    // DCC1's Return channel while a Contract sits in DCC2's inbox (either
+    // handover). A wrong/incomplete hardcopy is reported by DCC2 AT RECEIPT
+    // (reconcile flag, status-preserving); DCC1 then decides in the reconcile
+    // lane to re-hand over OR Return here. The receipt-waiting states hold no
+    // single holder and belong to DCC2's tab, so a DCC1-owned edge never leaks
+    // as a stray DCC2 button. Heavy → new round (the Applicant's paper was wrong).
+    from: TICKET_STATUS.SubmittedToDcc2,
     event: TICKET_EVENT.SendBack,
     to: TICKET_STATUS.Returned,
     ownerRole: ROLE.Dcc1,
@@ -116,7 +120,7 @@ export const CONTRACT_EDGES: readonly Edge[] = [
     enteredFlow: true,
   },
   {
-    from: TICKET_STATUS.Hardcopy,
+    from: TICKET_STATUS.SubmittedToDcc2Hardcopy,
     event: TICKET_EVENT.SendBack,
     to: TICKET_STATUS.Returned,
     ownerRole: ROLE.Dcc1,

@@ -7,7 +7,6 @@ import { ConfirmReceivedByDcc2UseCase } from '../../application/handover/confirm
 import { ReportMissingPaperUseCase } from '../../application/handover/report-missing-paper.usecase'
 import { SubmitToAccountingUseCase } from '../../application/accounting/submit-to-accounting.usecase'
 import { CompleteContractUseCase } from '../../application/accounting/complete-contract.usecase'
-import { RequestReturnUseCase } from '../../application/returns/request-return.usecase'
 import { CompleteContractDto, Dcc2ReceiveDto, SendAccountingDto } from '../dcc-shared/dcc2-receive.dto'
 import { ReasonDto } from '../dcc-shared/ticket-action.dto'
 
@@ -22,7 +21,6 @@ export class Dcc2Controller {
     private readonly reportMissing: ReportMissingPaperUseCase,
     private readonly submitAccounting: SubmitToAccountingUseCase,
     private readonly completeContract: CompleteContractUseCase,
-    private readonly requestReturn: RequestReturnUseCase,
   ) {}
 
   @Post('tickets/:id/receive')
@@ -69,16 +67,5 @@ export class Dcc2Controller {
     @Body() dto: CompleteContractDto,
   ): Promise<{ status: string }> {
     return this.completeContract.execute({ ticketId: id, actorSub: user.sub, scanPath: dto.scanPath })
-  }
-
-  /** DCC2 "đẩy ngược DCC1" — a push-back note; DCC1 performs the Return (AD-11). */
-  @Post('tickets/:id/request-return')
-  async pushBack(
-    @GetCurrentUser() user: CurrentUser,
-    @Param('id') id: string,
-    @Body() dto: ReasonDto,
-  ): Promise<{ ok: true }> {
-    await this.requestReturn.execute({ ticketId: id, actorSub: user.sub, reason: dto.reason })
-    return { ok: true }
   }
 }

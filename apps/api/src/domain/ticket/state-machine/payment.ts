@@ -40,12 +40,13 @@ export const PAYMENT_EDGES: readonly Edge[] = [
     reversible: false,
   },
   {
-    // Pre-close Return (H2, walkthrough §C:83 / PRD §4.2): DCC3 spots a wrong
-    // hardcopy at `Received by DCC3` → đẩy ngược DCC1 → DCC1 Returns. Symmetric to
-    // Contract's `ReceivedByDcc2 --sendBack--> Returned`. Heavy (past external
-    // processing) → counts a round. DCC1 is the sole Return actor (AD-11); DCC3
-    // only flags the push-back (reconcile_flag), it never fires sendBack itself.
-    from: TICKET_STATUS.ReceivedByDcc3,
+    // DCC1's Return channel while a Payment sits in DCC3's inbox. DCC3 reports a
+    // wrong/incomplete hardcopy AT RECEIPT (`Submitted to DCC3`, reconcile flag,
+    // status-preserving); DCC1 then decides in the reconcile lane to re-hand over
+    // OR Return here. Symmetric to Contract's `SubmittedToDcc2 --sendBack-->`.
+    // DCC1 is the sole Return actor (AD-11); DCC3 only flags, never fires sendBack.
+    // Heavy → counts a round. No after-receipt push-back (checked at receipt).
+    from: TICKET_STATUS.SubmittedToDcc3,
     event: TICKET_EVENT.SendBack,
     to: TICKET_STATUS.Returned,
     ownerRole: ROLE.Dcc1,

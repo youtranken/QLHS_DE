@@ -95,9 +95,6 @@ export const board = {
     irreversible: 'This action cannot be undone. Continue?',
   },
   ask: {
-    pushbackTitle: 'Push back hardcopy',
-    pushbackMessage: 'Pushing back will tell DCC1 to return the ticket to the Applicant. This cannot be undone.',
-    pushbackConfirm: 'Push back',
     returnTitle: 'Return to Applicant',
     returnMessage: 'Return the ticket to the Applicant for a new round. State the reason:',
     returnConfirm: 'Return',
@@ -123,7 +120,6 @@ export const board = {
     codeGenerated: 'Code {code} generated.',
     resentDcc2: 'Re-handed over to DCC2.',
     resentDcc3: 'Re-handed over to DCC3.',
-    pushbackDone: 'Notified DCC1 (wrong hardcopy pushed back).',
     returnedToApplicant: 'Returned to Applicant.',
     slaPaused: 'SLA clock paused — ticket stays at the same station.',
     slaResumed: 'SLA clock resumed.',
@@ -137,11 +133,11 @@ export const board = {
     close: 'Close',
     cancel: 'Cancel',
     handover: {
-      title: 'Hardcopy handover',
-      confirm: 'Hardcopy received',
+      title: 'Check hardcopy',
+      confirm: 'Complete & correct — Confirm receipt',
       dateLabel: 'Date received from DCC1',
-      missingConfirm: 'Reporting missing paperwork will return the ticket to DCC1 to reconcile (cannot be undone). Continue?',
-      missingButton: 'Missing paperwork, return to DCC1',
+      missingConfirm: 'Reporting a missing/wrong hardcopy returns the ticket to DCC1 to re-check (cannot be undone). Continue?',
+      missingButton: 'Missing / Wrong — Return to DCC1',
       missingConfirmBtn: 'Return to DCC1',
     },
     receiveAcc: {
