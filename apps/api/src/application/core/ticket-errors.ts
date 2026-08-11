@@ -38,11 +38,6 @@ export class DocumentNoDuplicateError extends DomainError {
   readonly code = 'DocumentNoDuplicate'
 }
 
-/** Completing a Contract Hardcopy requires a non-empty scan path (FR-12). */
-export class ScanPathRequiredError extends DomainError {
-  readonly code = 'ScanPathRequired'
-}
-
 /** An SLA threshold must be a positive whole number of days (Story 5.1, AC3). */
 export class SlaDaysInvalidError extends DomainError {
   readonly code = 'SlaDaysInvalid'

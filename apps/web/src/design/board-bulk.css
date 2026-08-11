@@ -223,7 +223,9 @@
 }
 .batchrow {
   display: grid;
-  grid-template-columns: 116px 1fr 110px 200px;
+  /* minmax(0,1fr) lets the contractor cell shrink (ellipsis) instead of pushing
+     the input past the modal edge on a narrow viewport. */
+  grid-template-columns: 108px minmax(0, 1fr) 96px minmax(120px, 190px);
   align-items: center;
   gap: 10px;
 }

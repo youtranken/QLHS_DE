@@ -168,13 +168,5 @@ export const board = {
       confirmSubmit: 'Send to ACC & close ticket',
       confirmMessage: 'Sending to ACC closes the Payment ticket at "Sent to Accounting".',
     },
-    complete: {
-      title: 'Complete ticket',
-      pathLabel: 'Scan file path',
-      pathRequired: 'Scan file path is required.',
-      failError: 'Completion failed — try again.',
-      submit: 'Complete',
-      confirmBtn: 'Complete & close ticket',
-    },
   },
 } as const

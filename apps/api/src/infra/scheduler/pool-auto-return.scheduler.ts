@@ -69,14 +69,16 @@ export class PoolAutoReturnScheduler {
       }
       returned++
       // Landing at Return-fixing fires no email of its own, so tell the Applicant
-      // NOW with the same "returned" notice a manual Return sends. Uses the
-      // `Returned` kind (NOT `return_reminder`) so it keeps a distinct outbox key
-      // and leaves the day-3 return-reminder backstop free to fire. Best-effort +
-      // idempotent via UNIQUE(ticket, round, kind).
+      // NOW. Uses the dedicated `auto_returned` kind — NOT `Returned` — so its
+      // UNIQUE(ticket, round, kind) dedup can't collide with a manual `Returned`
+      // already written this round (which would swallow the email); the day-3
+      // return-reminder backstop stays independent too. First auto-return of a
+      // round emails; a later auto-return in the SAME round dedups (design: "email
+      // once"). Best-effort (post-commit); the reminder backstops a lost insert.
       try {
         await this.prisma.$executeRaw`
           INSERT INTO notification_outbox (ticket_id, round_no, kind, recipient_sub, status)
-          VALUES (${t.id}, ${state.roundNo}, ${NOTIFICATION_KIND.Returned}, ${state.applicantSub}, 'pending')
+          VALUES (${t.id}, ${state.roundNo}, ${NOTIFICATION_KIND.AutoReturned}, ${state.applicantSub}, 'pending')
           ON CONFLICT (ticket_id, round_no, kind) DO NOTHING`
       } catch (e) {
         this.log.warn(`auto-return ${t.id}: notice enqueue failed (backstop covers): ${String(e)}`)

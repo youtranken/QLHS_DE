@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common'
 import {
-  isTerminal,
   TICKET_EVENT,
   TICKET_STATUS,
   type Flow,
@@ -11,7 +10,6 @@ import { PrismaService } from '../prisma.service'
 import {
   FieldsLockedError,
   PriorityLockedError,
-  TicketNotClosedError,
 } from '../../../application/core/ticket-errors'
 import { TicketNotFoundError } from '../../../domain/errors'
 import { diffFields, type ApplicantFields } from '../../../domain/ticket/applicant-fields'

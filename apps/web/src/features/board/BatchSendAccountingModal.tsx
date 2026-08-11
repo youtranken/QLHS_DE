@@ -24,7 +24,6 @@ export interface BatchSendAccountingModalProps {
  * it can be fixed and re-sent. Uses the existing per-ticket endpoints (no new BE).
  */
 export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAccountingModalProps) {
-  const { ref, onKeyDown } = useFocusTrap<HTMLDivElement>(onClose)
   const isPayment = cards[0]?.flow === 'Payment'
   const docLabel = isPayment
     ? t('board.modals.sendAccounting.payNoLabel')
@@ -35,9 +34,12 @@ export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAc
   const [errs, setErrs] = useState<Record<string, string>>({})
   const [done, setDone] = useState<Record<string, boolean>>({})
   const [busy, setBusy] = useState(false)
-  const backdrop = useBackdropClose(() => {
+  // A send loop in flight must not be torn down by ESC or a backdrop click.
+  const close = () => {
     if (!busy) onClose()
-  })
+  }
+  const { ref, onKeyDown } = useFocusTrap<HTMLDivElement>(close)
+  const backdrop = useBackdropClose(close)
 
   // Succeeded rows drop off the list; blanks remain for later.
   const rows = cards.filter((c) => !done[c.id])

@@ -168,13 +168,5 @@ export const board = {
       confirmSubmit: 'Gửi ACC & đóng hồ sơ',
       confirmMessage: 'Gửi ACC sẽ đóng hồ sơ Payment ở "Sent to Accounting".',
     },
-    complete: {
-      title: 'Hoàn tất hồ sơ',
-      pathLabel: 'Đường dẫn file scan',
-      pathRequired: 'Cần nhập đường dẫn file scan.',
-      failError: 'Hoàn tất thất bại — thử lại.',
-      submit: 'Hoàn tất',
-      confirmBtn: 'Hoàn tất & đóng hồ sơ',
-    },
   },
 } as const

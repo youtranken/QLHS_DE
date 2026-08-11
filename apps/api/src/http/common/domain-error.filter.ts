@@ -15,7 +15,6 @@ const STATUS_BY_CODE: ReadonlyMap<string, number> = new Map([
   ['ReconcileState', HttpStatus.CONFLICT],
   ['DocumentNoInvalid', HttpStatus.BAD_REQUEST],
   ['DocumentNoDuplicate', HttpStatus.CONFLICT],
-  ['ScanPathRequired', HttpStatus.BAD_REQUEST],
   ['SlaDaysInvalid', HttpStatus.BAD_REQUEST],
   ['SlaConfigKeyInvalid', HttpStatus.BAD_REQUEST],
   ['SelfLockout', HttpStatus.CONFLICT],

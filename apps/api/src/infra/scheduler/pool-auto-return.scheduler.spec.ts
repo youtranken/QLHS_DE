@@ -35,7 +35,7 @@ function make(tickets: Array<{ id: string; statusEnteredAt: Date }>) {
   return { sched, prisma, transitions, applied }
 }
 
-const RETURNED_KIND = 'Returned'
+const AUTO_RETURNED_KIND = 'auto_returned'
 
 describe('PoolAutoReturnScheduler (4 business-day Pool grace)', () => {
   it('auto-returns only tickets over the grace window, via the system auto_return edge', async () => {
@@ -53,13 +53,14 @@ describe('PoolAutoReturnScheduler (4 business-day Pool grace)', () => {
     expect(applied[0]?.out.event.action).toBe(TICKET_EVENT.AutoReturn)
     expect(applied[0]?.out.ticket.status).toBe(TICKET_STATUS.ReturnFixing)
     expect(applied[0]?.out.event.actorSub).toBe('system')
-    // The Applicant is notified immediately with the "Returned" notice (distinct
-    // outbox key from the day-3 return-reminder backstop).
+    // The Applicant is notified immediately with the dedicated `auto_returned`
+    // notice — a distinct outbox key so it can't collide with a manual `Returned`
+    // in the same round (nor the day-3 return-reminder backstop).
     // Tagged-template call: [strings, ticketId, roundNo, kind, recipientSub]
     // ('pending' is a SQL literal in the template, not an interpolated value).
     expect(prisma.$executeRaw).toHaveBeenCalledTimes(1)
     expect(prisma.$executeRaw.mock.calls[0]).toEqual(
-      expect.arrayContaining(['old', RETURNED_KIND, 'app-a']),
+      expect.arrayContaining(['old', AUTO_RETURNED_KIND, 'app-a']),
     )
   })
 
