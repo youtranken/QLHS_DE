@@ -148,4 +148,26 @@ describe('Payment handover DCC1→DCC3 (e2e)', () => {
     const ok = await dcc3.post(`/dcc3/tickets/${id}/receive`).send({})
     expect(ok.body.status).toBe('Received by DCC3')
   })
+
+  it('DCC1 Returns instead: missing-paper flag → return-pushback → Returned, new round (heavy)', async () => {
+    // Item-1: the reconcile lane now gives Payment a Return path too. DCC3 flags a
+    // missing/wrong hardcopy at receipt; DCC1 chooses Return over re-hand-over.
+    const dcc = await login('dcc1-e2e', ['DCC1'])
+    const id = await handedToDcc3(dcc)
+    const dcc3 = await login('dcc3-e2e', ['DCC3'])
+    await dcc3.post(`/dcc3/tickets/${id}/missing-paper`).send({ reason: 'Bản cứng sai — thiếu trang 3' })
+
+    // DCC3 is never the Return actor (AD-11) — DCC1's endpoint refuses it (403).
+    expect((await dcc3.post(`/dcc1/tickets/${id}/return-pushback`).send({ reason: 'x' })).status).toBe(403)
+
+    const ret = await dcc.post(`/dcc1/tickets/${id}/return-pushback`).send({ reason: 'Bản cứng sai' })
+    expect(ret.status).toBe(201)
+    expect(ret.body.status).toBe('Returned')
+
+    const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
+    expect(row.roundNo).toBe(1) // heavy — new round for the Applicant to fix
+    expect(row.reconcileFlag).toBe(false) // cleared atomically with the sendBack
+    expect(row.reconcileReason).toBeNull()
+    expect(row.currentHolderSub).toBe('app-e2e') // back with the Applicant
+  })
 })

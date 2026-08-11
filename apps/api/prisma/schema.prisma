@@ -101,11 +101,11 @@ model Ticket {
   statusEnteredAt  DateTime      @default(now()) @map("status_entered_at")
   createdAt        DateTime      @default(now()) @map("created_at")
 
-  // 2-phase handover (AD-10/AD-11): DCC2 flags "missing paper" OR "đẩy ngược
-  // DCC1" → the ticket keeps its status but bounces off DCC2's board into DCC1's
-  // reconcile lane. `reconcileReason` distinguishes what DCC1 must do:
-  // 'missing_paper' → re-hand over; 'return_requested' → Return. Both clear when
-  // resolved. Minimal flag, not a duplicate status column.
+  // 2-phase handover (AD-10/AD-11): DCC2/DCC3 reports a missing/wrong hardcopy AT
+  // RECEIPT ('missing_paper') → the ticket keeps its status but bounces off the
+  // DCC board into DCC1's reconcile lane, where DCC1 chooses to re-hand over OR
+  // Return. Cleared when resolved. ('return_requested' is a retired reason kept
+  // only for reading historical rows.) Minimal flag, not a duplicate status column.
   reconcileFlag    Boolean       @default(false) @map("reconcile_flag")
   reconcileReason  String?       @map("reconcile_reason")
 

@@ -48,8 +48,9 @@ test('Payment: DCC3 missing-paper at receipt → DCC1 supplements and re-hands o
   await confirm.getByRole('button', { name: 'Trả về DCC1' }).click()
   await expectStatus(code!, 'Submitted to DCC3') // status unchanged (reconcile-flagged)
 
-  // DCC1 sees it in the "Chờ kiểm tra lại" lane (with DCC3's reason), supplements the
-  // paperwork and re-hands over — the ticket returns to DCC3 to receive again.
+  // DCC1 sees it in the "Chờ kiểm tra lại" lane (with DCC3's reason). Here DCC1
+  // supplements and re-hands over; DCC1 could also Return to the Applicant instead
+  // (the ⋯ "Trả lại Applicant" action — exercised in payment-handover.e2e-spec.ts).
   await switchTo(page, 'dcc1-nam', ['DCC1'])
   await cardAction(page, 'Đã bổ sung, gửi lại →')
   await expectStatus(code!, 'Submitted to DCC3') // reconcile cleared, back to DCC3
