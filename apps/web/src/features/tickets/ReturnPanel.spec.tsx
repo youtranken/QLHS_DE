@@ -17,6 +17,7 @@ function detailAt(status: string): TicketDetail {
     id: 't1',
     code: 'G-2026-0001',
     status,
+    flow: 'General',
     documentType: 'General',
     description: 'Duyệt chi phí',
     paymentTerm: 'N/A',

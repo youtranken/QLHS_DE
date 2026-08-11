@@ -54,7 +54,7 @@ export const tickets = {
     cancelBtn: 'Thu hồi',
     cloneBtn: 'Nhân bản',
     cloneAria: 'Tạo hồ sơ mới từ {code}',
-    cloneToast: 'Đã đổ sẵn form từ hồ sơ cũ — kiểm tra rồi nộp.',
+    cloneToast: 'Đã lấy dữ liệu từ form hồ sơ cũ, cần thay đổi trước khi Gửi.',
   },
   routeRail: {
     aria: 'Tuyến xử lý hồ sơ',

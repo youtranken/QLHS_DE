@@ -7,7 +7,7 @@ import { getTicketDetail, type TicketDetail as Detail } from './api'
 import { TicketDetail } from './TicketDetail'
 
 const fixture: Detail = {
-  id: 't1', code: 'CT-2026-0042', status: 'Received from ACC', documentType: 'Contract',
+  id: 't1', code: 'CT-2026-0042', status: 'Received from ACC', flow: 'Contract', documentType: 'Contract',
   description: 'Thanh toán đợt 4/8', paymentTerm: 'Net 30', contractNo: 'HD-118', documentNo: null,
   projectTeam: 'Landmark 81', budgetCode: 'B-04', contractor: 'Coteccons',
   amount: '3480500000', currency: 'VND', roundNo: 0, overdueDays: 4, dwellDays: 4,
@@ -88,7 +88,7 @@ describe('TicketDetail — read-only deep-link page', () => {
   })
 
   it('Payment flow: Applicant contractNo = "Contract No", DCC3 documentNo = "Payment No"', async () => {
-    vi.mocked(getTicketDetail).mockResolvedValue({ ...fixture, documentType: 'Payment', contractNo: 'HD-777', documentNo: 'PN-2026-9' })
+    vi.mocked(getTicketDetail).mockResolvedValue({ ...fixture, flow: 'Payment', documentType: 'Payment', contractNo: 'HD-777', documentNo: 'PN-2026-9' })
     render(<TicketDetail ticketId="t1" />)
     await waitFor(() => expect(screen.getByText('PN-2026-9')).toBeInTheDocument())
     expect(screen.getByText('Payment No')).toBeInTheDocument()
@@ -97,7 +97,7 @@ describe('TicketDetail — read-only deep-link page', () => {
   })
 
   it('Payment flow: no "Payment No" field until DCC3 enters it (documentNo null)', async () => {
-    vi.mocked(getTicketDetail).mockResolvedValue({ ...fixture, documentType: 'Payment', documentNo: null })
+    vi.mocked(getTicketDetail).mockResolvedValue({ ...fixture, flow: 'Payment', documentType: 'Payment', documentNo: null })
     render(<TicketDetail ticketId="t1" />)
     await waitFor(() => expect(screen.getByText('CT-2026-0042')).toBeInTheDocument())
     expect(screen.queryByText('Payment No')).not.toBeInTheDocument()

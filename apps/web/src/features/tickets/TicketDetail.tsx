@@ -12,10 +12,6 @@ import { RETURN_STATES } from './ticketStates'
 import { StateNotice } from '../../shared/StateNotice'
 import { applyVp, t } from '../../i18n'
 
-const FLOW_OF: Record<string, string> = {
-  General: 'General', Contract: 'Contract', VO: 'Contract', Annex: 'Contract',
-  Budget: 'Contract', Payment: 'Payment',
-}
 
 /** Human verb for an immutable-log line; falls back to the raw event name.
  *  A function (not a module const) so a future locale switch re-evaluates. */
@@ -118,7 +114,10 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
   }
   if (!d) return <StateNotice kind="loading" text={t('tickets.detail.loading')} />
 
-  const flow = FLOW_OF[d.documentType ?? 'General'] ?? 'General'
+  // Use the server-resolved flow (authoritative, incl. admin-added document types),
+  // not a hardcoded doc-type map — else new types fall through to General and the
+  // Contract No / Payment No fields would be mislabeled/hidden.
+  const flow = d.flow
   const code = d.code ?? d.id.slice(0, 8)
   const log = mergeLog(d.timeline, d.pauses)
   const ACTION_VI = actionVi()

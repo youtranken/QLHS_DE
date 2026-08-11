@@ -63,6 +63,9 @@ export interface TicketDetail {
   id: string
   code: string | null
   status: string
+  /** Server-resolved flow (General/Contract/Payment) — authoritative, drives the
+   *  Contract No vs Payment No labelling regardless of document type. */
+  flow: string
   documentType: string | null
   description: string | null
   paymentTerm: string | null

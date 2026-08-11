@@ -30,12 +30,11 @@ describe('splitActions — nút chính vs ⋯', () => {
   it('keeps push-backs and SLA clock controls in the ⋯ menu', () => {
     const { primary, menu } = splitActions([
       act({ event: '__pushback' }),
-      act({ event: '__pushback-dcc3' }),
       act({ event: PAUSE_EVENT, reasonRequired: true }),
       act({ event: RESUME_EVENT }),
     ])
     expect(primary).toHaveLength(0)
-    expect(menu).toHaveLength(4)
+    expect(menu).toHaveLength(3)
   })
 
   it('keeps a destructive backward action (toStatus Returned/Cancelled) in ⋯ even if not reasonRequired', () => {

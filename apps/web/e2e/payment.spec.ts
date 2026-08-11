@@ -5,7 +5,6 @@ import {
   switchTo,
   createTicket,
   cardAction,
-  confirmModal,
   expectStatus,
 } from './support/app'
 
@@ -48,9 +47,9 @@ test('Payment: DCC3 missing-paper at receipt → DCC1 returns to the Applicant',
   await confirm.getByRole('button', { name: 'Trả về DCC1' }).click()
   await expectStatus(code!, 'Submitted to DCC3') // status unchanged (reconcile-flagged)
 
-  // DCC1 clears the reconcile lane by Returning the ticket to the Applicant.
+  // DCC1 sees it in the "Chờ kiểm tra lại" lane (with DCC3's reason), supplements the
+  // paperwork and re-hands over — the ticket returns to DCC3 to receive again.
   await switchTo(page, 'dcc1-nam', ['DCC1'])
-  await cardAction(page, 'Trả lại Applicant (Return)')
-  await confirmModal(page, 'Trả lại', 'Bản cứng sai — trả lại để bổ sung')
-  await expectStatus(code!, 'Returned')
+  await cardAction(page, 'Đã bổ sung, gửi lại →')
+  await expectStatus(code!, 'Submitted to DCC3') // reconcile cleared, back to DCC3
 })

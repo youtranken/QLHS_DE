@@ -99,35 +99,19 @@ describe('Reopen / request-reopen / undo (e2e)', () => {
     expect(actions).toContain('sendBack')
   })
 
-  it('DCC2 may only REQUEST a reopen on an in-scope closed ticket (status unchanged)', async () => {
-    // Contract ticket is in DCC2's flow scope.
+  it('DCC2 cannot reopen and the request-reopen endpoint is gone (reopening is DCC1 only)', async () => {
     const t = await admin.ticket.create({
       data: { status: 'Completed', flow: 'Contract', applicantSub: 'app-e2e', priority: 'normal', code: 'CT-2026-0001' },
     })
     const dcc2 = await login('dcc2-e2e', ['DCC2'])
 
+    // Direct reopen is DCC1-only → 403.
     expect((await dcc2.post(`/dcc1/tickets/${t.id}/reopen`).send({ reason: 'x' })).status).toBe(403)
-    expect((await dcc2.post(`/dcc/tickets/${t.id}/request-reopen`)).status).toBe(201)
+    // The old DCC2/DCC3 "request reopen" endpoint was retired → 404, no audit note.
+    expect((await dcc2.post(`/dcc/tickets/${t.id}/request-reopen`)).status).toBe(404)
 
     const row = await admin.ticket.findUniqueOrThrow({ where: { id: t.id } })
-    expect(row.status).toBe('Completed') // request does NOT change status
-    const req = await admin.ticketEvent.findFirst({ where: { ticketId: t.id, action: 'reopen_requested' } })
-    expect(req?.actorSub).toBe('dcc2-e2e')
-  })
-
-  it('request-reopen enforces flow scope (AD-16) and closed-only (FR-17)', async () => {
-    const dcc1 = await login('dcc1-e2e', ['DCC1'])
-    const generalCompleted = await completedTicket(dcc1)
-    const contractActive = await admin.ticket.create({
-      data: { status: 'Received by DCC2', flow: 'Contract', applicantSub: 'app-e2e', priority: 'normal', code: 'CT-2026-0002' },
-    })
-    // DCC3 (Payment scope) cannot touch a General ticket → 404, no cross-scope note.
-    const dcc3 = await login('dcc3-e2e', ['DCC3'])
-    expect((await dcc3.post(`/dcc/tickets/${generalCompleted}/request-reopen`)).status).toBe(404)
-    // DCC2 in-scope but ticket not closed → 409.
-    const dcc2 = await login('dcc2-e2e', ['DCC2'])
-    expect((await dcc2.post(`/dcc/tickets/${contractActive.id}/request-reopen`)).status).toBe(409)
-    // No audit note was written in either case.
+    expect(row.status).toBe('Completed') // unchanged
     expect(await admin.ticketEvent.count({ where: { action: 'reopen_requested' } })).toBe(0)
   })
 

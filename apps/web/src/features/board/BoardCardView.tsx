@@ -46,6 +46,12 @@ export function BoardCardView({
   // behind the modal/confirm the action pops.
   const detailsRef = useRef<HTMLDetailsElement>(null)
   const closeMenu = () => detailsRef.current?.removeAttribute('open')
+  // Click anywhere on the card opens the detail — except on an interactive control
+  // (the ⋯ menu, an action button, the bulk checkbox), which handle their own click.
+  const onCardClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button, a, input, details, label')) return
+    openTicketDetail(c.id)
+  }
   // Ga ⋯ chỉ render khi có menu/khoá; keyed vào effect bên dưới để listener gắn
   // lại đúng lúc <details> xuất hiện (thẻ được refetch tại chỗ, không remount).
   const hasMenu = menu.length > 0 || !!c.lockedBy
@@ -72,7 +78,9 @@ export function BoardCardView({
     }
   }, [hasMenu])
   return (
-    <article className={`${cls}${selected ? ' picked' : ''}`}>
+    // Whole-card click opens detail (mouse convenience); the .code button remains the
+    // keyboard/AT path, and interactive children are excluded in onCardClick.
+    <article className={`${cls}${selected ? ' picked' : ''}`} onClick={onCardClick}>
       <div className="r1">
         {selectable && (
           <input

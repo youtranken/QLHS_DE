@@ -54,7 +54,7 @@ export const tickets = {
     cancelBtn: 'Withdraw',
     cloneBtn: 'Duplicate',
     cloneAria: 'Create a new ticket from {code}',
-    cloneToast: 'Form pre-filled from the old ticket — review then submit.',
+    cloneToast: 'Data copied from the old ticket — edit it before submitting.',
   },
   routeRail: {
     aria: 'Ticket processing route',

@@ -112,6 +112,13 @@
 .field input.mono {
   font-family: var(--mono);
 }
+/* Locked field (e.g. Contract No on the Contract flow — DCC2 assigns it): muted so
+   it reads as read-only, matching the disabled look of Select/DatePicker. */
+.field input:disabled {
+  background: var(--panel-3);
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
 /* Themed dropdown: hide the native arrow, draw our own chevron (the option
    panel itself stays browser-native). */
 .field select {

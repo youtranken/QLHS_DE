@@ -65,6 +65,10 @@
   border-radius: 5px;
   padding: 1px 6px;
 }
+/* The whole card opens the detail (except its buttons/menu) — hint it as clickable. */
+.tcard {
+  cursor: pointer;
+}
 .tcard .who {
   font-size: 11.5px;
   color: var(--ink-2);
