@@ -37,6 +37,7 @@ export const board = {
     empty: 'Empty',
     noMatch: 'No tickets match the filter',
     countFiltered: '{shown}/{total} match the filter',
+    batchSendBtn: 'Enter numbers & send in bulk',
   },
   card: {
     openDetail: 'Open ticket detail',
@@ -144,6 +145,16 @@ export const board = {
       title: 'Receive back from ACC',
       confirm: 'Received back from ACC',
       dateLabel: 'Date received from ACC',
+    },
+    batchAcc: {
+      title: 'Send in bulk — enter {field}',
+      hint: 'Enter {field} for the tickets you want to send; leave a row blank to skip it (kept for later). A duplicate number is flagged inline on that row.',
+      count: '{n}/{total} filled',
+      submit: 'Send {n} tickets',
+      inputAria: 'Enter {field} for {code}',
+      sentToast: 'Sent {n} tickets.',
+      partialToast: '{ok} sent · {failed} failed (fix and resend).',
+      failToast: 'Could not send any ticket — check again.',
     },
     sendAccounting: {
       title: 'Send to Accounting',

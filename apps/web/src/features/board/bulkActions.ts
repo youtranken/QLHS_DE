@@ -6,8 +6,14 @@ import type { BoardCard, LegalAction } from './api'
  * gated (SendBack) and pseudo/client-only (`__pick`, SLA pause) actions never
  * go bulk, so a batch can't silently skip the reason a single-card path demands.
  */
-function isBulkable(a: LegalAction): boolean {
+export function isBulkable(a: LegalAction): boolean {
   return !a.reasonRequired && !a.event.startsWith('__')
+}
+
+/** A column earns a bulk-select checkbox only if some card there has a bulk-apply
+ *  action — else the checkbox is dead weight (Pool "Nhận", Received-from-ACC). */
+export function columnHasBulkAction(cards: BoardCard[]): boolean {
+  return cards.some((c) => c.actions.some(isBulkable))
 }
 
 export function commonBulkActions(cards: BoardCard[]): LegalAction[] {

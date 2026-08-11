@@ -37,6 +37,7 @@ export const board = {
     empty: 'Trống',
     noMatch: 'Không có hồ sơ khớp bộ lọc',
     countFiltered: '{shown}/{total} khớp bộ lọc',
+    batchSendBtn: 'Nhập số & gửi hàng loạt',
   },
   card: {
     openDetail: 'Mở chi tiết hồ sơ',
@@ -144,6 +145,16 @@ export const board = {
       title: 'Nhận về từ ACC',
       confirm: 'Đã nhận về từ ACC',
       dateLabel: 'Ngày nhận từ ACC',
+    },
+    batchAcc: {
+      title: 'Gửi hàng loạt — nhập {field}',
+      hint: 'Điền {field} cho những hồ sơ cần gửi; để trống là bỏ qua (giữ lại xử lý sau). Trùng số sẽ báo lỗi ngay dòng đó.',
+      count: 'Đã điền {n}/{total}',
+      submit: 'Gửi {n} hồ sơ',
+      inputAria: 'Nhập {field} cho {code}',
+      sentToast: 'Đã gửi {n} hồ sơ.',
+      partialToast: '{ok} đã gửi · {failed} lỗi (sửa rồi gửi lại).',
+      failToast: 'Chưa gửi được hồ sơ nào — kiểm tra lại.',
     },
     sendAccounting: {
       title: 'Gửi Accounting',

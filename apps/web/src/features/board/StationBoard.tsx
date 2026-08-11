@@ -3,12 +3,13 @@ import { useLiveRefetch } from '../../shared/useLiveRefetch'
 import { getStationBoard, type BoardCard, type BoardColumn } from './api'
 import { HandoverModal } from './HandoverModal'
 import { SendAccountingModal } from './SendAccountingModal'
+import { BatchSendAccountingModal } from './BatchSendAccountingModal'
 import { ConfirmModal } from '../../shared/ConfirmModal'
 import { StateNotice } from '../../shared/StateNotice'
 import { toast } from '../../shared/toast'
 import { BoardCardView } from './BoardCardView'
 import { BulkActionBar } from './BulkActionBar'
-import { commonBulkActions } from './bulkActions'
+import { commonBulkActions, columnHasBulkAction } from './bulkActions'
 import { cardMatches, type BoardFilter } from './boardFilter'
 import { BoardFilterBar } from './BoardFilterBar'
 import { useBoardActions } from './useBoardActions'
@@ -29,6 +30,9 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
   const [flow, setFlow] = useState<string>('All')
   const [priority, setPriority] = useState<string>('All')
   const [sel, setSel] = useState<ReadonlySet<string>>(new Set())
+  // "Enter Contract No / Payment No for many" — the cards of a Received-by-DCC2/DCC3
+  // column, opened in one batch-entry sheet. Null when closed.
+  const [batchSend, setBatchSend] = useState<BoardCard[] | null>(null)
   const [loaded, setLoaded] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastOk, setLastOk] = useState<number | null>(null)
@@ -182,6 +186,9 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
         {cols.map((col) => {
           const cls = col.reconcile ? ' reccol' : col.overSla ? ' hotcol' : ''
           const shown = col.cards.filter(match)
+          // Received-by-DCC2/DCC3 columns: each card needs its own Contract No /
+          // Payment No, so offer a batch-entry sheet instead of a one-action bulk.
+          const batchCards = shown.filter((c) => c.actions.some((a) => a.event === 'sendToAccounting'))
           return (
             <div key={col.reconcile ? 'reconcile' : col.status} className={`col${cls}`}>
               <div className="ch">
@@ -203,6 +210,11 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
                 {/* Reconcile lane: its label already carries the full message, so no
                     second sub-line — normal columns keep the VN status caption. */}
                 {!col.reconcile && <div className="vi">{statusVi(col.status)}</div>}
+                {batchCards.length > 0 && (
+                  <button type="button" className="colbatch" onClick={() => setBatchSend(batchCards)}>
+                    {t('board.column.batchSendBtn')}
+                  </button>
+                )}
               </div>
               <div className="cb">
                 {shown.length === 0 && (
@@ -221,7 +233,7 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
                     busy={inFlight.has(c.id)}
                     onAction={(card, action) => void run(card, action)}
                     onSeize={(id) => void doSeize(id)}
-                    selectable={canManage && !col.reconcile}
+                    selectable={canManage && !col.reconcile && columnHasBulkAction(shown)}
                     selected={sel.has(c.id)}
                     onToggleSelect={toggleSel}
                   />
@@ -261,6 +273,13 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
           code={receiveAcc.code ?? receiveAcc.id.slice(0, 8)}
           onConfirm={(d) => doReceiveAcc(receiveAcc, d)}
           onClose={() => setReceiveAcc(null)}
+        />
+      )}
+      {batchSend && (
+        <BatchSendAccountingModal
+          cards={batchSend}
+          onClose={() => setBatchSend(null)}
+          onDone={load}
         />
       )}
       {ask && (

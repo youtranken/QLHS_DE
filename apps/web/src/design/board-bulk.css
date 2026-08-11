@@ -196,6 +196,82 @@
   border-color: color-mix(in srgb, var(--sla) 45%, transparent);
 }
 
+/* "Nhập số & gửi hàng loạt" — chip nhỏ ở đầu cột Received-by-DCC2/DCC3. */
+.col .ch .colbatch {
+  margin-top: 7px;
+  align-self: flex-start;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 7px;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+  color: var(--accent);
+  cursor: pointer;
+}
+.col .ch .colbatch:hover {
+  background: color-mix(in srgb, var(--accent) 20%, var(--panel));
+}
+
+/* Bảng nhập số hàng loạt (BatchSendAccountingModal). */
+.batchtbl {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 56vh;
+  overflow-y: auto;
+}
+.batchrow {
+  display: grid;
+  grid-template-columns: 116px 1fr 110px 200px;
+  align-items: center;
+  gap: 10px;
+}
+.batchrow .bc {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.batchrow .bw {
+  font-size: 12px;
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.batchrow .ba {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  text-align: right;
+}
+.batchrow input {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink);
+}
+.batchrow.bad input {
+  border-color: var(--sla);
+}
+.batchrow input:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.batchrow .batcherr {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 11px;
+}
+.batchcount {
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-right: 4px;
+}
+
 /* Ô chọn trên thẻ + trạng thái đã-chọn */
 .tcard .bulksel {
   width: 15px;
