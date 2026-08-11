@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react'
 import {
   batchAction,
-  completeContract,
   missingPaperDcc2,
   missingPaperDcc3,
   receiveDcc2,
@@ -30,7 +29,6 @@ export function useBoardActions(load: () => Promise<void>) {
   const [handover, setHandover] = useState<BoardCard | null>(null)
   const [sendAcc, setSendAcc] = useState<BoardCard | null>(null)
   const [receiveAcc, setReceiveAcc] = useState<BoardCard | null>(null)
-  const [complete, setComplete] = useState<BoardCard | null>(null)
   const [ask, setAsk] = useState<Ask | null>(null)
   // Cards with a POST in flight — the ⋯ launcher disables them so a double-click
   // can't double-pick or mint two codes (the direct-transition path has no modal
@@ -63,7 +61,7 @@ export function useBoardActions(load: () => Promise<void>) {
   }
 
   const run = makeCardAction({
-    setAsk, setHandover, setSendAcc, setReceiveAcc, setComplete, onUndo: doUndo, load,
+    setAsk, setHandover, setSendAcc, setReceiveAcc, onUndo: doUndo, load,
   })
 
   // Serialise per-card: ignore a click while that card already has work in flight.
@@ -134,14 +132,6 @@ export function useBoardActions(load: () => Promise<void>) {
     await load()
   }
 
-  async function doComplete(card: BoardCard, scanPath: string) {
-    // Let errors propagate so the modal can show its own failure alert.
-    await completeContract(card.id, scanPath)
-    setComplete(null)
-    toast.ok(t('board.toasts.completed', { code: card.code ?? card.id.slice(0, 8) }))
-    await load()
-  }
-
   // FR-8 — one Andy decision applied to many tickets. Gated behind a confirm
   // (Approve→Complete is irreversible); each ticket's result is independent.
   function doBatch(ids: string[], action: LegalAction, onDone: () => void) {
@@ -163,9 +153,9 @@ export function useBoardActions(load: () => Promise<void>) {
   }
 
   return {
-    handover, sendAcc, receiveAcc, complete, ask, inFlight,
-    setHandover, setSendAcc, setReceiveAcc, setComplete, setAsk,
-    run: guardedRun, doSeize, doReceive, doMissing, doSendAcc, doReceiveAcc, doComplete,
+    handover, sendAcc, receiveAcc, ask, inFlight,
+    setHandover, setSendAcc, setReceiveAcc, setAsk,
+    run: guardedRun, doSeize, doReceive, doMissing, doSendAcc, doReceiveAcc,
     doBatch,
   }
 }

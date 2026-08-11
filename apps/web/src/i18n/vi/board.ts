@@ -134,7 +134,7 @@ export const board = {
     cancel: 'Hủy',
     handover: {
       title: 'Kiểm tra bản cứng',
-      confirm: 'Đủ & đúng — Xác nhận nhận',
+      confirm: 'Xác nhận',
       dateLabel: 'Ngày nhận từ DCC1',
       missingConfirm: 'Báo thiếu/sai sẽ trả hồ sơ về DCC1 kiểm tra lại (không hoàn tác). Tiếp tục?',
       missingButton: 'Thiếu / Sai — Trả về DCC1',
@@ -159,7 +159,7 @@ export const board = {
     },
     complete: {
       title: 'Hoàn tất hồ sơ',
-      pathLabel: 'Đường dẫn file scan (ổ chung)',
+      pathLabel: 'Đường dẫn file scan',
       pathRequired: 'Cần nhập đường dẫn file scan.',
       failError: 'Hoàn tất thất bại — thử lại.',
       submit: 'Hoàn tất',

@@ -31,7 +31,6 @@ export class CompleteContractRepo {
   async complete(
     ticketId: string,
     actor: Actor,
-    scanPath: string,
     now: Date,
   ): Promise<{ status: string }> {
     return this.prisma.$transaction(async (tx) => {
@@ -59,7 +58,6 @@ export class CompleteContractRepo {
       await tx.ticket.update({
         where: { id: ticketId },
         data: {
-          scanPath,
           status: out.ticket.status,
           currentHolderSub: out.ticket.currentHolderSub,
           roundNo: out.ticket.roundNo,

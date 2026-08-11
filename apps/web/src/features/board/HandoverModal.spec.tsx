@@ -28,9 +28,9 @@ describe('HandoverModal — 2-phase confirmation (UX-DR8, AC2/AC3)', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
-  it('"Đủ & đúng — Xác nhận nhận" confirms with the default (today) date', async () => {
+  it('"Xác nhận" confirms with the default (today) date', async () => {
     const { onConfirm } = setup()
-    fireEvent.click(screen.getByRole('button', { name: 'Đủ & đúng — Xác nhận nhận' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Xác nhận' }))
     await waitFor(() => expect(onConfirm).toHaveBeenCalledTimes(1))
     expect(onConfirm.mock.calls[0]?.[0]).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })

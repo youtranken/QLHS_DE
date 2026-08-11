@@ -176,7 +176,7 @@ export class StationBoardUseCase {
     return {
       status: TICKET_STATUS.SubmittedToDcc2,
       reconcile: true,
-      label: 'Chờ kiểm tra lại (DCC2/DCC3 báo thiếu giấy)',
+      label: 'DCC2/DCC3 báo thiếu giấy – cần kiểm tra lại',
       overSla: cards.some((c) => c.overdueDays > 0),
       cards,
     }

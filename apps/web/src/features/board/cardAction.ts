@@ -1,5 +1,6 @@
 import {
   actionCard,
+  completeContract,
   confirmCard,
   pauseSla,
   pickCard,
@@ -21,7 +22,6 @@ export interface CardActionDeps {
   setHandover: (c: BoardCard | null) => void
   setSendAcc: (c: BoardCard | null) => void
   setReceiveAcc: (c: BoardCard | null) => void
-  setComplete: (c: BoardCard | null) => void
   /** Reversible actions offer a 5s Undo via an action toast (backend enforces 5s). */
   onUndo: (id: string) => void | Promise<void>
   load: () => Promise<void>
@@ -41,7 +41,7 @@ function consequence(action: LegalAction): string {
  * layout — this is the whole decision table in one place.
  */
 export function makeCardAction({
-  setAsk, setHandover, setSendAcc, setReceiveAcc, setComplete, onUndo, load,
+  setAsk, setHandover, setSendAcc, setReceiveAcc, onUndo, load,
 }: CardActionDeps) {
   return async function run(card: BoardCard, action: LegalAction): Promise<void> {
     const code = card.code ?? card.id.slice(0, 8)
@@ -67,7 +67,20 @@ export function makeCardAction({
         setReceiveAcc(card) // open the dated receipt modal
         return
       } else if (action.event === 'completeContract') {
-        setComplete(card) // open the scan-path form
+        // No scan path anymore — DCC2 just confirms; completing closes the file and
+        // emails the Applicant (irreversible), so gate it behind a consequence confirm.
+        setAsk({
+          title: t('board.ask.confirmTitle'),
+          message: t('board.consequence.completed'),
+          code,
+          danger: true,
+          confirmLabel: action.label,
+          onOk: async () => {
+            await completeContract(card.id)
+            toast.ok(t('board.toasts.completed', { code }))
+            await load()
+          },
+        })
         return
       } else if (action.event === '__return') {
         setAsk({

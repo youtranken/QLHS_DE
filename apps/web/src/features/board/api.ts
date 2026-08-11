@@ -91,8 +91,8 @@ export const receiveFromAcc = (id: string, receivedAt?: string) =>
     `/dcc1/tickets/${id}/receive-from-acc`,
     receivedAt ? { receivedAt } : {},
   )
-export const completeContract = (id: string, scanPath: string) =>
-  apiPost<{ status: string }>(`/dcc2/tickets/${id}/complete`, { scanPath })
+export const completeContract = (id: string) =>
+  apiPost<{ status: string }>(`/dcc2/tickets/${id}/complete`)
 export const returnPushback = (id: string, reason: string) =>
   apiPost<{ status: string }>(`/dcc1/tickets/${id}/return-pushback`, { reason })
 

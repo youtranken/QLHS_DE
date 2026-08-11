@@ -141,11 +141,16 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
         ? [[d.documentNo ? 'documentNo' : 'contractNo', t('tickets.detail.fieldContractNoAcc'), true]]
         : [['contractNo', t('tickets.detail.fieldContractNo'), true]]
 
-  const FIELDS: Array<[keyof Detail, string, boolean]> = [
+  // Same order as the create form (Subject → Document Type → Contractor → Contract
+  // No → Project/Team → Amount → Payment Term → Budget code) so the detail reads
+  // like what the Applicant filled in. Split around the special Amount block.
+  const FIELDS_BEFORE_AMOUNT: Array<[keyof Detail, string, boolean]> = [
     ['documentType', t('tickets.detail.fieldDocumentType'), false],
     ['contractor', t('tickets.detail.fieldContractor'), false],
     ...numberFields,
     ['projectTeam', t('tickets.detail.fieldProjectTeam'), false],
+  ]
+  const FIELDS_AFTER_AMOUNT: Array<[keyof Detail, string, boolean]> = [
     ['paymentTerm', t('tickets.detail.fieldPaymentTerm'), false],
     ['budgetCode', t('tickets.detail.fieldBudgetCode'), true],
   ]
@@ -226,7 +231,11 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
             <div className="blk">
               <h3>{t('tickets.detail.sectionData')}</h3>
               <div className="fgrid">
-                {FIELDS.map(([k, label, mono]) => (
+                <div className="f wide">
+                  <div className="k">{t('tickets.detail.fieldDescription')}</div>
+                  <div className="v full">{d.description || '—'}</div>
+                </div>
+                {FIELDS_BEFORE_AMOUNT.map(([k, label, mono]) => (
                   <div className="f" key={k}>
                     <div className="k">{label}</div>
                     <div className={`v${mono ? ' mono' : ''}`}>{(d[k] as string) || '—'}</div>
@@ -238,13 +247,15 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
                     {groupAmount(d.amount, d.currency ?? 'VND')} {d.currency}
                   </div>
                 </div>
+                {FIELDS_AFTER_AMOUNT.map(([k, label, mono]) => (
+                  <div className="f" key={k}>
+                    <div className="k">{label}</div>
+                    <div className={`v${mono ? ' mono' : ''}`}>{(d[k] as string) || '—'}</div>
+                  </div>
+                ))}
                 <div className="f">
                   <div className="k">{t('tickets.detail.fieldRound')}</div>
                   <div className="v mono">{d.roundNo}</div>
-                </div>
-                <div className="f wide">
-                  <div className="k">{t('tickets.detail.fieldDescription')}</div>
-                  <div className="v full">{d.description || '—'}</div>
                 </div>
               </div>
             </div>
@@ -325,7 +336,12 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
                               {row.entry.reason}
                             </span>
                           ) : (
-                            t('tickets.detail.logReason', { reason: row.entry.reason })
+                            // Any other typed note (DCC "missing paper" report, the DCC1
+                            // note to BOP, …) is highlighted too so it doesn't get lost.
+                            <span className="logcomment">
+                              <b>{t('tickets.detail.logCommentLabel')}</b>{' '}
+                              {row.entry.reason}
+                            </span>
                           ))}
                       </>
                     ) : row.kind === 'pause' ? (

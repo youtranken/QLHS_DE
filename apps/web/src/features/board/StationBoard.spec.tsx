@@ -252,7 +252,7 @@ describe('StationBoard — Payment 2-phase handover DCC3 (Story 4.1)', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Kiểm tra bản cứng' }))
     const dialog = await screen.findByRole('dialog')
     expect(actionCard).not.toHaveBeenCalled()
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Đủ & đúng — Xác nhận nhận' }))
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Xác nhận' }))
     await waitFor(() => expect(receiveDcc3).toHaveBeenCalledWith('p1', expect.any(String)))
   })
 })

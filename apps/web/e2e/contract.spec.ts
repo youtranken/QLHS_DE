@@ -68,6 +68,6 @@ test('Contract: full line through every station to Completed', async ({ page }) 
   await expectStatus(code!, 'Hardcopy')
 
   await cardAction(page, 'Hoàn tất HĐ…') // primary button uses the short label
-  await completeContract(page, '\\\\share\\scans\\CT-e2e.pdf')
+  await completeContract(page)
   await expectStatus(code!, 'Completed')
 })

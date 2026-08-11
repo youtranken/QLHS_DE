@@ -135,9 +135,6 @@ export function TicketFieldsFieldset({
           value={contractLocked ? 'N/A' : form.contractNo}
           onChange={(e) => set('contractNo', e.target.value)}
         />
-        {contractLocked && (
-          <span className="hint">DCC2 sẽ gán số hợp đồng khi gửi Kế toán — bạn không cần nhập.</span>
-        )}
       </div>
       <div className="field">
         <label htmlFor={id('projectTeam')} lang="en">

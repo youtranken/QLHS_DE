@@ -109,10 +109,6 @@ model Ticket {
   reconcileFlag    Boolean       @default(false) @map("reconcile_flag")
   reconcileReason  String?       @map("reconcile_reason")
 
-  // Path to the scanned hardcopy on the shared drive (Contract Hardcopy step,
-  // FR-12/M10). A path string only — NEVER a file attachment (AD-7).
-  scanPath         String?       @map("scan_path")
-
   // 9 Applicant fields (PRD §3.1). Nullable at the DB; presence is enforced by
   // the create DTO. Amount is an integer in the currency's smallest unit.
   // Document No (contract number) entered by DCC2/DCC3 (FR-11/FR-13). Distinct

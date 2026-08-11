@@ -6,12 +6,15 @@
   position: sticky;
   top: 0;
   z-index: 5;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin: 0 0 12px;
-  padding: 9px 14px;
+  gap: 10px;
+  /* Compact chip that hugs its content — not a full-width row. Sits to the right
+     so it stays out of the way until a selection is active. */
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 12px auto;
+  padding: 7px 12px;
   background: color-mix(in srgb, var(--accent) 14%, var(--panel));
   border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
   border-radius: 10px;

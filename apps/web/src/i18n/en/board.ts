@@ -134,7 +134,7 @@ export const board = {
     cancel: 'Cancel',
     handover: {
       title: 'Check hardcopy',
-      confirm: 'Complete & correct — Confirm receipt',
+      confirm: 'Confirm',
       dateLabel: 'Date received from DCC1',
       missingConfirm: 'Reporting a missing/wrong hardcopy returns the ticket to DCC1 to re-check (cannot be undone). Continue?',
       missingButton: 'Missing / Wrong — Return to DCC1',
@@ -159,7 +159,7 @@ export const board = {
     },
     complete: {
       title: 'Complete ticket',
-      pathLabel: 'Scan file path (shared drive)',
+      pathLabel: 'Scan file path',
       pathRequired: 'Scan file path is required.',
       failError: 'Completion failed — try again.',
       submit: 'Complete',

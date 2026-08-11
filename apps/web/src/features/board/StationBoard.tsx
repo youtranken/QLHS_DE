@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { TICKET_STATUS } from '@qlhs/contracts'
 import { useLiveRefetch } from '../../shared/useLiveRefetch'
 import { getStationBoard, type BoardCard, type BoardColumn } from './api'
 import { HandoverModal } from './HandoverModal'
 import { SendAccountingModal } from './SendAccountingModal'
-import { CompleteContractModal } from './CompleteContractModal'
 import { ConfirmModal } from '../../shared/ConfirmModal'
 import { StateNotice } from '../../shared/StateNotice'
 import { toast } from '../../shared/toast'
@@ -74,9 +72,9 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
   useLiveRefetch(() => void load())
 
   const {
-    handover, sendAcc, receiveAcc, complete, ask, inFlight,
-    setHandover, setSendAcc, setReceiveAcc, setComplete, setAsk,
-    run, doSeize, doReceive, doMissing, doSendAcc, doReceiveAcc, doComplete,
+    handover, sendAcc, receiveAcc, ask, inFlight,
+    setHandover, setSendAcc, setReceiveAcc, setAsk,
+    run, doSeize, doReceive, doMissing, doSendAcc, doReceiveAcc,
     doBatch,
   } = useBoardActions(load)
 
@@ -92,8 +90,9 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
     setPriority(f.priority)
   }
 
-  // FR-8 bulk-select lives on the "Submitted to VP Andy" column and is DCC1-only.
-  const isAndyCol = (col: BoardColumn) => !col.reconcile && col.status === TICKET_STATUS.SubmittedToVpAndy
+  // Bulk-select is DCC1-only and offered on every real station column (not the
+  // reconcile lane). The bulk bar only shows actions legal for the WHOLE selection
+  // (commonBulkActions), so selecting a mix of statuses simply yields no bulk action.
   const toggleSel = (id: string) =>
     setSel((prev) => {
       const n = new Set(prev)
@@ -201,9 +200,9 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
                       : col.cards.length}
                   </span>
                 </div>
-                <div className="vi">
-                  {col.reconcile ? t('board.column.reconcileHint') : statusVi(col.status)}
-                </div>
+                {/* Reconcile lane: its label already carries the full message, so no
+                    second sub-line — normal columns keep the VN status caption. */}
+                {!col.reconcile && <div className="vi">{statusVi(col.status)}</div>}
               </div>
               <div className="cb">
                 {shown.length === 0 && (
@@ -222,7 +221,7 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
                     busy={inFlight.has(c.id)}
                     onAction={(card, action) => void run(card, action)}
                     onSeize={(id) => void doSeize(id)}
-                    selectable={canManage && isAndyCol(col)}
+                    selectable={canManage && !col.reconcile}
                     selected={sel.has(c.id)}
                     onToggleSelect={toggleSel}
                   />
@@ -262,13 +261,6 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
           code={receiveAcc.code ?? receiveAcc.id.slice(0, 8)}
           onConfirm={(d) => doReceiveAcc(receiveAcc, d)}
           onClose={() => setReceiveAcc(null)}
-        />
-      )}
-      {complete && (
-        <CompleteContractModal
-          code={complete.code ?? complete.id.slice(0, 8)}
-          onSubmit={(p) => doComplete(complete, p)}
-          onClose={() => setComplete(null)}
         />
       )}
       {ask && (

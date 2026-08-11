@@ -83,15 +83,22 @@ export async function cardAction(page: Page, label: string): Promise<void> {
   }).toPass({ timeout: 15_000 })
 }
 
-/** Switch identity mid-journey: drop the old session, mint the new one, reload. */
+/** Switch identity mid-journey: drop the old session, mint the new one, reload.
+ *  Guards the post-switch board-fetch race — a stray 401 (board fetched a beat
+ *  before the new cookie settles) can leave the board stuck empty, so wait for the
+ *  columns to render and reload once if the first paint came up without them. */
 export async function switchTo(page: Page, sub: string, roles: string[]): Promise<void> {
   await logout(page)
   await loginAs(page, { sub, roles })
   await page.goto('/')
+  await expect(async () => {
+    if ((await page.locator('.col').count()) === 0) await page.reload()
+    await expect(page.locator('.col').first()).toBeVisible({ timeout: 2000 })
+  }).toPass({ timeout: 15_000 })
 }
 
 /** HandoverModal: the date defaults to today, so just confirm. */
-export async function confirmHandover(page: Page, confirmLabel = 'Đủ & đúng — Xác nhận nhận'): Promise<void> {
+export async function confirmHandover(page: Page, confirmLabel = 'Xác nhận'): Promise<void> {
   const dialog = page.getByRole('dialog')
   await expect(dialog).toBeVisible()
   await dialog.getByRole('button', { name: confirmLabel }).click()
@@ -107,14 +114,12 @@ export async function sendToAccounting(page: Page, documentNo: string): Promise<
   await expect(dialog).toBeHidden()
 }
 
-/** CompleteContractModal: enter the scan path, then approve the danger confirm gate. */
-export async function completeContract(page: Page, scanPath: string): Promise<void> {
-  const dialog = page.getByRole('dialog').first()
+/** Complete a Contract: no scan path anymore — just approve the danger confirm gate
+ *  (DCC2 scans out-of-band; completing closes the file + emails the Applicant). */
+export async function completeContract(page: Page): Promise<void> {
+  const dialog = page.getByRole('dialog')
   await expect(dialog).toBeVisible()
-  await dialog.locator('input').first().fill(scanPath)
-  await dialog.getByRole('button', { name: 'Hoàn tất' }).click()
-  // Irreversible (AD-19) → a ConfirmModal now gates the actual completion.
-  await page.getByRole('button', { name: 'Hoàn tất & đóng hồ sơ' }).click()
+  await dialog.getByRole('button', { name: 'Hoàn tất & đóng hồ sơ' }).click()
   await expect(page.getByRole('dialog')).toHaveCount(0)
 }
 

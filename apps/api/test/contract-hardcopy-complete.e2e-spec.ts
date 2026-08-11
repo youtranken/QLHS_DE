@@ -98,30 +98,18 @@ describe('Contract BOP → Hardcopy → Completed (e2e)', () => {
     expect(row.status).toBe('Submitted to DCC2 (Hardcopy)')
   })
 
-  it('DCC2 enters the scan path and completes → Completed + outbox intent', async () => {
+  it('DCC2 confirms → Completed + outbox intent (no scan path collected)', async () => {
     const { id } = await seed('Hardcopy', { currentHolderSub: 'dcc2-e2e' })
     const dcc2 = await login('dcc2-e2e', ['DCC2'])
-    const res = await dcc2
-      .post(`/dcc2/tickets/${id}/complete`)
-      .send({ scanPath: '\\\\share\\scans\\CT-2026-0001.pdf' })
+    // No body — DCC2 just confirms; scanning is done out-of-band.
+    const res = await dcc2.post(`/dcc2/tickets/${id}/complete`).send({})
     expect(res.status).toBe(201)
     expect(res.body.status).toBe('Completed')
 
-    const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
-    expect(row.scanPath).toContain('CT-2026')
     // AD-15: a Completed (Contract) email intent is written in the same tx.
     const outbox = await admin.notificationOutbox.findMany({ where: { ticketId: id } })
     expect(outbox).toHaveLength(1)
     expect(outbox[0]?.kind).toBe('Completed')
-  })
-
-  it('completing without a scan path is rejected (400)', async () => {
-    const { id } = await seed('Hardcopy', { currentHolderSub: 'dcc2-e2e' })
-    const dcc2 = await login('dcc2-e2e', ['DCC2'])
-    const res = await dcc2.post(`/dcc2/tickets/${id}/complete`).send({ scanPath: '   ' })
-    expect(res.status).toBe(400)
-    const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
-    expect(row.status).toBe('Hardcopy')
   })
 
   it('missing-paper at the hardcopy handover → DCC1 Returns it from the reconcile lane (heavy)', async () => {

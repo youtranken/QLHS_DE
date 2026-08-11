@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common'
 import { ROLE } from '@qlhs/contracts'
 import { CompleteContractRepo } from '../../infra/prisma/ticket/complete-contract.repo'
 import { SystemClock } from '../../infra/clock/system-clock'
-import { ScanPathRequiredError } from '../core/ticket-errors'
 
-/** DCC2 closes a Contract at Hardcopy: records the scan path and completes (FR-12).
- *  The Applicant email intent is written transactionally (AD-15); irreversible. */
+/** DCC2 closes a Contract at Hardcopy: confirming completes it and writes the
+ *  Applicant email intent transactionally (AD-15); irreversible. DCC2 does its own
+ *  scanning out-of-band — no scan path is collected here anymore. */
 @Injectable()
 export class CompleteContractUseCase {
   constructor(
@@ -13,13 +13,10 @@ export class CompleteContractUseCase {
     private readonly clock: SystemClock,
   ) {}
 
-  execute(req: { ticketId: string; actorSub: string; scanPath: string }): Promise<{ status: string }> {
-    const scanPath = req.scanPath.trim()
-    if (!scanPath) throw new ScanPathRequiredError('Cần nhập đường dẫn file scan trước khi hoàn tất')
+  execute(req: { ticketId: string; actorSub: string }): Promise<{ status: string }> {
     return this.repo.complete(
       req.ticketId,
       { sub: req.actorSub, activeRole: ROLE.Dcc2 },
-      scanPath,
       this.clock.now(),
     )
   }

@@ -18,9 +18,6 @@ export class SendAccountingDto {
   documentNo!: string
 }
 
-/** DCC2 complete: the scan-path string (non-empty enforced in the use-case after
- *  trim, since @IsNotEmpty accepts whitespace). Never a file attachment (AD-7). */
-export class CompleteContractDto {
-  @IsString()
-  scanPath!: string
-}
+/** DCC2 complete: confirming closes the Contract + emails the Applicant. No file
+ *  and no scan path — DCC2 scans on their own; the app only records completion. */
+export class CompleteContractDto {}

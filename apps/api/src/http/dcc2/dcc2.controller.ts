@@ -7,7 +7,7 @@ import { ConfirmReceivedByDcc2UseCase } from '../../application/handover/confirm
 import { ReportMissingPaperUseCase } from '../../application/handover/report-missing-paper.usecase'
 import { SubmitToAccountingUseCase } from '../../application/accounting/submit-to-accounting.usecase'
 import { CompleteContractUseCase } from '../../application/accounting/complete-contract.usecase'
-import { CompleteContractDto, Dcc2ReceiveDto, SendAccountingDto } from '../dcc-shared/dcc2-receive.dto'
+import { Dcc2ReceiveDto, SendAccountingDto } from '../dcc-shared/dcc2-receive.dto'
 import { ReasonDto } from '../dcc-shared/ticket-action.dto'
 
 /** DCC2 hardcopy handover actions (Story 3.1, AD-10): confirm receipt (phase 2)
@@ -64,8 +64,7 @@ export class Dcc2Controller {
   complete(
     @GetCurrentUser() user: CurrentUser,
     @Param('id') id: string,
-    @Body() dto: CompleteContractDto,
   ): Promise<{ status: string }> {
-    return this.completeContract.execute({ ticketId: id, actorSub: user.sub, scanPath: dto.scanPath })
+    return this.completeContract.execute({ ticketId: id, actorSub: user.sub })
   }
 }

@@ -27,7 +27,7 @@ const LABEL: Partial<Record<TicketEvent, string>> = {
   [TICKET_EVENT.SendToAccounting]: 'Nhập Contract No & gửi Accounting',
   [TICKET_EVENT.ReceiveFromAcc]: 'Nhận về từ ACC',
   [TICKET_EVENT.SubmitToBop]: 'Trình BOP →',
-  [TICKET_EVENT.CompleteContract]: 'Nhập đường dẫn scan & hoàn tất',
+  [TICKET_EVENT.CompleteContract]: 'Hoàn tất & đóng hồ sơ',
 }
 
 export interface LegalAction {

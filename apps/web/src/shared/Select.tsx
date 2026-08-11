@@ -45,7 +45,10 @@ export function Select({
   const selected = options.find((o) => o.value === value && !o.header)
   const label = selected ? selected.label : (placeholder ?? '—')
 
-  const { refs, floatingStyles } = useAnchoredMenu(open, { matchWidth: true, maxHeight: 288 })
+  // Taller menu so grouped catalogs (e.g. Document Type: 3 flow headers + their
+  // types) show without an internal scroll; Floating UI still caps it to the space
+  // available and flips up near the viewport edge.
+  const { refs, floatingStyles } = useAnchoredMenu(open, { matchWidth: true, maxHeight: 440 })
 
   // Open → active = the currently-selected option (index within `options`).
   useEffect(() => {
