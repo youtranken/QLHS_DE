@@ -11,5 +11,9 @@ import { config } from 'dotenv'
  *
  * Prod (NODE_ENV=production, Docker) never overrides: Compose `environment:` is
  * authoritative and any `.env` baked into the image must not win over it.
+ *
+ * E2E (E2E=1, Playwright harness) never overrides either: the harness injects the
+ * throwaway DATABASE_URL + isolated PORT, and `.env` must not shadow them (else the
+ * server binds the dev port / dev DB and Playwright's health-check never resolves).
  */
-config({ override: process.env.NODE_ENV !== 'production' })
+config({ override: process.env.NODE_ENV !== 'production' && process.env.E2E !== '1' })

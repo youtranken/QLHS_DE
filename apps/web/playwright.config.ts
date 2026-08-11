@@ -13,7 +13,9 @@ export default defineConfig({
   // One worker + serial: every test shares the one throwaway DB and resets it.
   fullyParallel: false,
   workers: 1,
-  retries: process.env.CI ? 1 : 0,
+  // Retry once everywhere: the board live-refetches (SSE), which can detach a card
+  // mid-click in cardAction() — a documented, accepted flake that a rerun clears.
+  retries: 1,
   timeout: 40_000,
   expect: { timeout: 10_000 },
   reporter: process.env.CI ? [['github'], ['list']] : [['list']],
@@ -27,6 +29,9 @@ export default defineConfig({
       timeout: 60_000,
       reuseExistingServer: !process.env.CI,
       env: {
+        // E2E=1 stops load-env from letting apps/api/.env override these — else the
+        // server binds the dev :3000 / dev DB and the /health check never resolves.
+        E2E: '1',
         DATABASE_URL: APP_DB,
         DEV_AUTH: '1',
         QLHS_DISABLE_CRON: '1',

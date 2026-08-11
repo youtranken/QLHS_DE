@@ -31,8 +31,7 @@ test('Contract: full line through every station to Completed', async ({ page }) 
   })
 
   await switchTo(page, 'dcc1-nam', ['DCC1'])
-  await cardAction(page, 'Bốc & xử lý')
-  await cardAction(page, 'Trình Sếp')
+  await cardAction(page, 'Nhận') // pick + confirm merged: mints code → Submitted to VP Andy
   await expect(page.getByRole('status').filter({ hasText: 'Đã sinh mã' })).toBeVisible() // mint committed
   const code = await soleTicketCode()
   expect(code).toBeTruthy()
@@ -46,7 +45,7 @@ test('Contract: full line through every station to Completed', async ({ page }) 
   await confirmHandover(page)
   await expectStatus(code!, 'Received by DCC2')
 
-  await cardAction(page, 'Nhập Contract No & gửi Accounting')
+  await cardAction(page, 'Gửi Kế toán…') // primary button uses the short label
   await sendToAccounting(page, '26-CC-1-CT')
   await expectStatus(code!, 'Submitted to Accounting')
 
@@ -68,7 +67,7 @@ test('Contract: full line through every station to Completed', async ({ page }) 
   await confirmHandover(page)
   await expectStatus(code!, 'Hardcopy')
 
-  await cardAction(page, 'Nhập đường dẫn scan & hoàn tất')
+  await cardAction(page, 'Hoàn tất HĐ…') // primary button uses the short label
   await completeContract(page, '\\\\share\\scans\\CT-e2e.pdf')
   await expectStatus(code!, 'Completed')
 })

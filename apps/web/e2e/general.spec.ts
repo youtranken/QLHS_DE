@@ -21,12 +21,12 @@ test('General: create → pool pick → confirm → Andy complete', async ({ pag
   })
   expect(await ticketCount()).toBe(1)
 
-  // DCC1 seizes it from the Pool, then confirms the flow → a code is minted.
+  // DCC1 takes it from the Pool — "Nhận" mints the code AND advances to Submitted
+  // to VP Andy in one step (pick + confirm merged).
   await logout(page)
   await loginAs(page, { sub: 'dcc1-nam', roles: ['DCC1'] })
   await page.goto('/')
-  await cardAction(page, 'Bốc & xử lý')
-  await cardAction(page, 'Trình Sếp')
+  await cardAction(page, 'Nhận')
   await expect(page.getByRole('status').filter({ hasText: 'Đã sinh mã' })).toBeVisible()
 
   const code = await soleTicketCode()

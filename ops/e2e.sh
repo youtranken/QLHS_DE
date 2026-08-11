@@ -58,7 +58,10 @@ echo "▶ migrating qlhs + qlhs_e2e …"
 # 3. Run the requested suites.
 if [ "$TARGET" = "api" ] || [ "$TARGET" = "all" ]; then
   echo "▶ API integration e2e (vitest, DB-backed) …"
-  pnpm --filter @qlhs/api test
+  # Run from the repo root: vitest.config.ts lives here and its include globs are
+  # root-relative, so `vitest` must resolve `root` to the repo (running it from
+  # apps/api makes `root` default to apps/api → the apps/api/** globs match nothing).
+  pnpm exec vitest run apps/api
 fi
 if [ "$TARGET" = "pw" ] || [ "$TARGET" = "all" ]; then
   echo "▶ building API (Playwright runs apps/api/dist/main.js) …"

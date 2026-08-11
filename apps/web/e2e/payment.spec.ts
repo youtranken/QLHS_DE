@@ -29,8 +29,7 @@ test('Payment: DCC3 missing-paper at receipt → DCC1 supplements and re-hands o
   })
 
   await switchTo(page, 'dcc1-nam', ['DCC1'])
-  await cardAction(page, 'Bốc & xử lý')
-  await cardAction(page, 'Trình Sếp')
+  await cardAction(page, 'Nhận') // pick + confirm merged: mints code → Submitted to VP Andy
   await expect(page.getByRole('status').filter({ hasText: 'Đã sinh mã' })).toBeVisible() // mint committed
   const code = await soleTicketCode()
   expect(code).toBeTruthy()

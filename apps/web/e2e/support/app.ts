@@ -36,37 +36,40 @@ export interface TicketFields {
   description: string
 }
 
-/** Drive the Applicant create-ticket modal end to end. Project Team / Payment Term
- *  are Admin-managed dropdowns (seeded) — pick the first real option; if a fresh
- *  install left them as free text, type instead. */
+/** Drive the Applicant create-ticket modal end to end. Document Type / Project Team
+ *  / Payment Term are the shared custom Select (a button that opens a portaled
+ *  role=listbox) — Document Type is picked by value; the Admin-seeded lists take
+ *  their first real option. */
 export async function createTicket(page: Page, f: TicketFields): Promise<void> {
   await page.getByRole('button', { name: 'Tạo hồ sơ mới' }).click()
   const modal = page.locator('form.modal')
   await expect(modal).toBeVisible()
 
-  await fieldOf(modal, 'Document Type').locator('select').selectOption(f.documentType)
+  await selectOption(page, fieldOf(modal, 'Document Type'), f.documentType)
   await fieldOf(modal, 'Contractor').locator('input').fill(f.contractor)
-  await fieldOf(modal, 'Contract No').locator('input').fill(f.contractNo)
+  // Contract-flow types lock the Applicant's Contract No to N/A (DCC2 assigns it
+  // later) — the input is disabled, so only fill it for the editable flows.
+  const contractFlow = ['Contract', 'VO', 'Annex', 'Budget'].includes(f.documentType)
+  if (!contractFlow) await fieldOf(modal, 'Contract No').locator('input').fill(f.contractNo)
   await modal.locator('.amtrow input').fill(f.amount)
   await fieldOf(modal, 'Budget code').locator('input').fill(f.budgetCode)
-  await fieldOf(modal, 'Description').locator('textarea').fill(f.description)
-  await pickListField(fieldOf(modal, 'Project/Team'), 'Team A')
-  await pickListField(fieldOf(modal, 'Payment Term'), 'Net 30')
+  await fieldOf(modal, 'Subject').getByRole('textbox').fill(f.description)
+  await pickFirstOption(page, fieldOf(modal, 'Project/Team'))
+  await pickFirstOption(page, fieldOf(modal, 'Payment Term'))
 
   await modal.getByRole('button', { name: 'Nộp hồ sơ' }).click()
   await expect(modal).toBeHidden()
 }
 
 /** Open a board card's ⋯ menu and click one legal action by its label. The board
- *  live-refetches after every action, which collapses the <details> menu mid-flight
- *  — so re-open and retry until the click lands.
- *
- *  Known limitation (accepted): the retry re-clicks, so a click that throws *after*
- *  its event already dispatched could, very rarely, double-fire a non-idempotent
- *  transition or hang on a stale menu. A generic guard can't distinguish "action
- *  fired" from "button momentarily re-rendering" without knowing the expected next
- *  status; the correct fix is to thread that status into this helper and poll for it
- *  (tracked as follow-up). The journeys have run green repeatedly; a flake reruns. */
+ *  live-refetches after every action (SSE), which both collapses the <details> menu
+ *  and briefly re-renders each action button as `disabled={busy}`. A force-click
+ *  ignores that and silently no-ops on the busy button (or lands on a detaching
+ *  node), so the transition never fires yet the click doesn't throw. Instead we
+ *  gate on the button being visible AND enabled, then dispatch the click event
+ *  directly to the current node (bypasses the sibling-pill hit-test, still fires
+ *  the React onClick). Re-queried every toPass iteration, so a mid-flight re-render
+ *  just retries. */
 export async function cardAction(page: Page, label: string): Promise<void> {
   const card = page.locator('.tcard').first()
   const button = card.getByRole('button', { name: label })
@@ -74,9 +77,9 @@ export async function cardAction(page: Page, label: string): Promise<void> {
     if (!(await button.isVisible())) {
       await card.locator('summary.dots').click()
     }
-    // force: the dropdown items sit under sibling pills in the card header layout;
-    // we only need the button's onClick, not a hit-test.
-    await button.click({ timeout: 2000, force: true })
+    await expect(button).toBeVisible()
+    await expect(button).toBeEnabled()
+    await button.dispatchEvent('click')
   }).toPass({ timeout: 15_000 })
 }
 
@@ -119,7 +122,8 @@ export async function completeContract(page: Page, scanPath: string): Promise<vo
 export async function confirmModal(page: Page, confirmLabel: string, reason?: string): Promise<void> {
   const dialog = page.getByRole('dialog')
   await expect(dialog).toBeVisible()
-  if (reason !== undefined) await dialog.locator('#confirm-reason').fill(reason)
+  // The reason field is a textarea with a dynamic useId() — target it by role, not id.
+  if (reason !== undefined) await dialog.getByRole('textbox').fill(reason)
   await dialog.getByRole('button', { name: confirmLabel }).click()
   await expect(dialog).toBeHidden()
 }
@@ -128,12 +132,17 @@ function fieldOf(modal: Locator, label: string): Locator {
   return modal.locator('.field', { hasText: label })
 }
 
-async function pickListField(field: Locator, freeText: string): Promise<void> {
-  const select = field.locator('select')
-  if (await select.count()) {
-    // Skip the disabled "— chọn —" placeholder at index 0.
-    await select.selectOption({ index: 1 })
-  } else {
-    await field.locator('input').fill(freeText)
-  }
+/** Open a custom Select (button + portaled role=listbox) and click one option by
+ *  its exact accessible name. The listbox is portaled to <body>, so the option is
+ *  matched at page scope, not inside the field. */
+async function selectOption(page: Page, field: Locator, name: string): Promise<void> {
+  await field.getByRole('button').first().click()
+  await page.getByRole('option', { name, exact: true }).click()
+}
+
+/** Open a custom Select and pick its first real option (Admin-seeded list — the
+ *  placeholder is button-only text, never a listbox option). */
+async function pickFirstOption(page: Page, field: Locator): Promise<void> {
+  await field.getByRole('button').first().click()
+  await page.getByRole('option').first().click()
 }
