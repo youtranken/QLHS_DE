@@ -32,7 +32,7 @@ export const board = {
   },
   column: {
     overSla: 'have overdue tickets',
-    reconcileHint: 'DCC2/DCC3 reported missing paperwork — needs reconcile & re-handover',
+    reconcileHint: 'DCC2/DCC3 reported missing paperwork – needs re-check',
     reconcileEmpty: 'No tickets to reconcile — hardcopy matches the system.',
     empty: 'Empty',
     noMatch: 'No tickets match the filter',
@@ -151,15 +151,15 @@ export const board = {
     },
     sendAccounting: {
       title: 'Send to Accounting',
-      docNoLabel: 'Document No (contract code)',
-      emptyError: 'Please enter a Document No.',
-      duplicateError: 'Document No "{value}" already exists — enter a different code.',
+      docNoLabel: 'Contract No',
+      payNoLabel: 'Payment number',
+      emptyError: 'Please enter {field}.',
+      duplicateError: '{field} "{value}" already exists — enter a different code.',
       failError: 'Failed to send to ACC — try again.',
       submit: 'Send to ACC',
       confirmTitle: 'Close Payment ticket?',
       confirmSubmit: 'Send to ACC & close ticket',
-      paymentNote:
-        'Sending to ACC will close the ticket right at "Sent to Accounting" (no BOP, no email to Applicant) and cannot be undone.',
+      confirmMessage: 'Sending to ACC closes the Payment ticket at "Sent to Accounting".',
     },
     complete: {
       title: 'Complete ticket',

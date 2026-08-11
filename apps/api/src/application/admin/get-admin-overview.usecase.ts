@@ -6,6 +6,7 @@ import { AuditRepo } from '../../infra/prisma/admin/audit.repo'
 import { OutboxRepo } from '../../infra/prisma/notify/outbox.repo'
 import { SlaPauseRepo } from '../../infra/prisma/sla/sla-pause.repo'
 import { SlaClock, startOf } from '../sla/sla-clock'
+import { actorDisplayName } from '../../domain/audit/actor-name'
 import { SystemClock } from '../../infra/clock/system-clock'
 import { ListUsersUseCase } from './list-users.usecase'
 import { makeThresholdOf, summarizeLines, type LineSummary } from '../../domain/admin/overview'
@@ -89,7 +90,7 @@ export class GetAdminOverviewUseCase {
     const recent: RecentActivity[] = recentRows.map((e) => ({
       occurredAt: e.occurredAt.toISOString(),
       actorSub: e.actorSub,
-      actorName: nameOf.get(e.actorSub) ?? e.actorSub,
+      actorName: actorDisplayName(e.actorSub, nameOf.get(e.actorSub)),
       action: e.action,
       code: e.code,
       ticketId: e.ticketId,

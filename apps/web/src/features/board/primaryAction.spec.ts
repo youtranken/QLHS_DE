@@ -62,7 +62,7 @@ describe('primaryLabel — nhãn nút ngắn', () => {
     expect(primaryLabel(act({ event: '__pick', label: 'Bốc & xử lý' }))).toBe('Nhận')
     expect(primaryLabel(act({ event: 'andyApproveComplete', label: 'Sếp duyệt → hoàn tất' }))).toBe('Sếp duyệt → hoàn tất')
     expect(primaryLabel(act({ event: 'andyRequireBop', label: 'Sếp đã duyệt → trình BOP' }))).toBe('Trình BOP')
-    expect(primaryLabel(act({ event: 'sendToAccounting', label: 'Nhập Document No & gửi Accounting' }))).toBe('Gửi Kế toán…')
+    expect(primaryLabel(act({ event: 'sendToAccounting', label: 'Nhập Contract No & gửi Accounting' }))).toBe('Gửi Kế toán…')
     expect(primaryLabel(act({ event: 'completeContract', label: 'Nhập đường dẫn scan & hoàn tất' }))).toBe('Hoàn tất HĐ…')
   })
 

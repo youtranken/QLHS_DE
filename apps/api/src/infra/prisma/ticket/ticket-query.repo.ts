@@ -165,6 +165,27 @@ export class TicketQueryRepo {
   }
 
   /**
+   * Latest reconcile comment per ticket — the free-text reason DCC2/DCC3 typed
+   * when reporting missing paper or pushing a wrong hardcopy back. Shown on the
+   * DCC1 reconcile-lane card so DCC1 sees WHY without opening each ticket.
+   */
+  async reconcileComments(ticketIds: string[]): Promise<Map<string, string>> {
+    if (ticketIds.length === 0) return new Map()
+    const rows = await this.prisma.ticketEvent.findMany({
+      where: {
+        ticketId: { in: ticketIds },
+        action: { in: [TICKET_EVENT.MissingPaperFlagged, TICKET_EVENT.ReturnRequested] },
+        reason: { not: null },
+      },
+      orderBy: { occurredAt: 'desc' },
+      select: { ticketId: true, reason: true },
+    })
+    const latest = new Map<string, string>()
+    for (const r of rows) if (r.reason && !latest.has(r.ticketId)) latest.set(r.ticketId, r.reason)
+    return latest
+  }
+
+  /**
    * Most recent STATUS-changing transition — the Undo candidate (AD-19). Skips
    * audit-only notes (created / priority_changed / field_changed / reopen_requested
    * / pool_picked / lock_seized) so an interleaved note can't shadow the reversible

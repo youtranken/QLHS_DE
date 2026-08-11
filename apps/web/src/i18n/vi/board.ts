@@ -32,7 +32,7 @@ export const board = {
   },
   column: {
     overSla: 'có hồ sơ quá hạn',
-    reconcileHint: 'DCC2/DCC3 báo thiếu giấy — cần đối chiếu & bàn giao lại',
+    reconcileHint: 'DCC2/DCC3 báo thiếu giấy – cần kiểm tra lại',
     reconcileEmpty: 'Không có hồ sơ cần đối chiếu — bản cứng khớp hệ thống.',
     empty: 'Trống',
     noMatch: 'Không có hồ sơ khớp bộ lọc',
@@ -151,15 +151,15 @@ export const board = {
     },
     sendAccounting: {
       title: 'Gửi Accounting',
-      docNoLabel: 'Document No (mã hợp đồng)',
-      emptyError: 'Vui lòng nhập Document No.',
-      duplicateError: 'Document No "{value}" đã tồn tại — nhập mã khác.',
+      docNoLabel: 'Contract No',
+      payNoLabel: 'Payment number',
+      emptyError: 'Vui lòng nhập {field}.',
+      duplicateError: '{field} "{value}" đã tồn tại — nhập mã khác.',
       failError: 'Gửi ACC thất bại — thử lại.',
       submit: 'Gửi ACC',
       confirmTitle: 'Đóng hồ sơ Payment?',
       confirmSubmit: 'Gửi ACC & đóng hồ sơ',
-      paymentNote:
-        'Gửi ACC sẽ đóng hồ sơ ngay ở "Sent to Accounting" (không qua BOP, không email Applicant) và không thể hoàn tác.',
+      confirmMessage: 'Gửi ACC sẽ đóng hồ sơ Payment ở "Sent to Accounting".',
     },
     complete: {
       title: 'Hoàn tất hồ sơ',

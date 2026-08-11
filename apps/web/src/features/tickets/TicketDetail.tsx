@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
-import { TICKET_STATUS } from '@qlhs/contracts'
+import { SYSTEM_SUB, TICKET_STATUS } from '@qlhs/contracts'
 import { useLiveRefetch } from '../../shared/useLiveRefetch'
 import { getTicketDetail, type TicketDetail as Detail, type TimelineEntry } from './api'
 import { statusVi } from './statusLabel'
@@ -24,6 +24,8 @@ function actionVi(): Record<string, string> {
     created: t('tickets.log.created'), submit: t('tickets.log.submit'),
     pool_picked: t('tickets.log.poolPicked'), pick: t('tickets.log.pick'), confirm: t('tickets.log.confirm'),
     submitToAndy: t('tickets.log.submitToAndy'), sendToVpAndy: t('tickets.log.sendToVpAndy'),
+    andyApproveComplete: t('tickets.log.andyApproveComplete'),
+    andyRequireBop: t('tickets.log.andyRequireBop'),
     handoverToDcc2: t('tickets.log.handoverToDcc2'), handoverToDcc3: t('tickets.log.handoverToDcc3'),
     sendToDcc2: t('tickets.log.sendToDcc2'), sendToDcc3: t('tickets.log.sendToDcc3'),
     confirmReceivedByDcc2: t('tickets.log.confirmReceivedByDcc2'),
@@ -32,10 +34,22 @@ function actionVi(): Record<string, string> {
     submitToBop: t('tickets.log.submitToBop'), sendToBop: t('tickets.log.sendToBop'),
     bopApprove: t('tickets.log.bopApprove'),
     completeContract: t('tickets.log.completeContract'), complete: t('tickets.log.complete'),
-    sendBack: t('tickets.log.sendBack'), resubmit: t('tickets.log.resubmit'),
-    reopen: t('tickets.log.reopen'), cancel: t('tickets.log.cancel'),
+    sendBack: t('tickets.log.sendBack'), auto_return: t('tickets.log.autoReturn'),
+    confirmReturnReceipt: t('tickets.log.confirmReturnReceipt'),
+    resubmit: t('tickets.log.resubmit'),
+    reopen: t('tickets.log.reopen'), reopen_requested: t('tickets.log.reopenRequested'),
+    return_requested: t('tickets.log.returnRequested'),
+    missing_paper_flagged: t('tickets.log.missingPaperFlagged'),
+    missing_paper_cleared: t('tickets.log.missingPaperCleared'),
+    priority_changed: t('tickets.log.priorityChanged'),
+    field_changed: t('tickets.log.fieldChanged'),
+    lock_seized: t('tickets.log.lockSeized'), undo: t('tickets.log.undo'),
+    cancel: t('tickets.log.cancel'),
   }
 }
+
+/** Returns whose reason the reviewer most needs to read — highlighted in the log. */
+const RETURN_ACTIONS: ReadonlySet<string> = new Set(['sendBack', 'auto_return'])
 
 function fmt(iso: string | null): string {
   return iso ? new Date(iso).toLocaleString('vi-VN') : '—'
@@ -236,7 +250,7 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
                         <span className="hn">{displaySub(s.holder, d.directory)}</span>
                       </div>
                     )}
-                    <div className="tm">{s.phase === 'next' ? t('tickets.detail.notYet') : fmt(s.enteredAt)}</div>
+                    <div className="tm">{s.phase === 'next' ? '' : fmt(s.enteredAt)}</div>
                   </li>
                 ))}
               </ol>
@@ -277,9 +291,24 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
                   <span className="tx">
                     {row.kind === 'event' ? (
                       <>
-                        <b>{displaySub(row.entry.actorSub, d.directory)}</b>{' '}
+                        <b>
+                          {row.entry.actorSub === SYSTEM_SUB
+                            ? t('tickets.detail.logSystemActor')
+                            : displaySub(row.entry.actorSub, d.directory)}
+                        </b>{' '}
                         {ACTION_VI[row.entry.action] ?? row.entry.action}
-                        {row.entry.reason && t('tickets.detail.logReason', { reason: row.entry.reason })}
+                        {row.entry.action === 'reopen' && (
+                          <span className="newround">{t('tickets.detail.logNewRound')}</span>
+                        )}
+                        {row.entry.reason &&
+                          (RETURN_ACTIONS.has(row.entry.action) ? (
+                            <span className="logreason">
+                              <b>{t('tickets.detail.logReturnReasonLabel')}</b>{' '}
+                              {row.entry.reason}
+                            </span>
+                          ) : (
+                            t('tickets.detail.logReason', { reason: row.entry.reason })
+                          ))}
                       </>
                     ) : row.kind === 'pause' ? (
                       <>

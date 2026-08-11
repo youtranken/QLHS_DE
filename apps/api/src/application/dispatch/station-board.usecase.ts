@@ -36,6 +36,9 @@ export interface BoardCard {
   paused: boolean
   /** F8 — this viewer holds the ticket, so only they may stop/restart its clock. */
   mine: boolean
+  /** Reconcile lane only — the free-text reason DCC2/DCC3 gave (missing/wrong paper),
+   *  shown on the card so DCC1 reads it without opening the ticket. */
+  reconcileComment?: string | null
 }
 export interface BoardColumn {
   status: string
@@ -63,7 +66,7 @@ const RECEIVE: LegalAction = {
 // dedicated resend endpoint, not a state-machine edge (status is unchanged).
 const RESEND: LegalAction = {
   event: '__resend' as never,
-  label: 'Đã bổ sung, bàn giao lại →',
+  label: 'Đã bổ sung, gửi lại →',
   toStatus: TICKET_STATUS.SubmittedToDcc2,
   reversible: false,
   reasonRequired: false,
@@ -71,26 +74,19 @@ const RESEND: LegalAction = {
 // Payment counterpart of RESEND — routes to the DCC3 resend endpoint (Story 4.1).
 const RESEND_DCC3: LegalAction = {
   event: '__resend-dcc3' as never,
-  label: 'Đã bổ sung, bàn giao lại →',
+  label: 'Đã bổ sung, gửi lại →',
   toStatus: TICKET_STATUS.SubmittedToDcc3,
   reversible: false,
   reasonRequired: false,
 }
 // DCC2 "đẩy ngược DCC1" (AC4) — a note, not an edge; DCC1 performs the Return.
+// Requires a reason (why the hardcopy is wrong) so DCC1 sees it in the log.
 const PUSHBACK: LegalAction = {
   event: '__pushback' as never,
   label: 'Đẩy ngược DCC1 (bản cứng sai)',
   toStatus: TICKET_STATUS.ReceivedByDcc2,
   reversible: false,
-  reasonRequired: false,
-}
-// Payment counterpart (H2) — DCC3 pushes back from Received by DCC3; DCC1 Returns.
-const PUSHBACK_DCC3: LegalAction = {
-  event: '__pushback-dcc3' as never,
-  label: 'Đẩy ngược DCC1 (bản cứng sai)',
-  toStatus: TICKET_STATUS.ReceivedByDcc3,
-  reversible: false,
-  reasonRequired: false,
+  reasonRequired: true,
 }
 // DCC1 clears a pushed-back ticket by Returning it (reason required) — routed to
 // the dedicated return-pushback endpoint (clears flag + sendBack atomically).
@@ -162,8 +158,8 @@ export class StationBoardUseCase {
     for (const card of pool.cards) card.dupOf = hints.get(card.id) ?? []
   }
 
-  /** DCC1's flag-driven "chờ đối chiếu" lane: tickets DCC2 bounced back. The
-   *  per-card action depends on WHY — re-hand over (missing paper) or Return
+  /** DCC1's flag-driven "chờ kiểm tra lại" lane: tickets DCC2/DCC3 bounced back.
+   *  The per-card action depends on WHY — re-hand over (missing paper) or Return
    *  (pushed back). Absent for other roles or when nothing is flagged. */
   private async reconcileLane(
     role: Role | null,
@@ -178,16 +174,18 @@ export class StationBoardUseCase {
       all.filter((r) => r.reconcileFlag).map((r) => ({ ...r, priority: r.priority as Priority })),
     )
     if (flagged.length === 0) return null
+    const comments = await this.tickets.reconcileComments(flagged.map((r) => r.id))
     const cards = await Promise.all(
-      flagged.map((r) => {
+      flagged.map(async (r) => {
         const action = reconcileAction(r.reconcileReason, r.flow as Flow)
-        return this.toCard(r, r.status as TicketStatus, viewerSub, now, clock, thresholdOf, () => [action])
+        const card = await this.toCard(r, r.status as TicketStatus, viewerSub, now, clock, thresholdOf, () => [action])
+        return { ...card, reconcileComment: comments.get(r.id) ?? null }
       }),
     )
     return {
       status: TICKET_STATUS.SubmittedToDcc2,
       reconcile: true,
-      label: 'Chờ đối chiếu (DCC2/DCC3 báo thiếu giấy / đẩy ngược)',
+      label: 'Chờ kiểm tra lại (DCC2/DCC3 báo thiếu giấy)',
       overSla: cards.some((c) => c.overdueDays > 0),
       cards,
     }
@@ -250,10 +248,9 @@ function actionsFor(
   if (role === ROLE.Dcc2 && (status === TICKET_STATUS.ReceivedByDcc2 || status === TICKET_STATUS.Hardcopy)) {
     return [...actions, PUSHBACK]
   }
-  // H2: symmetric DCC3 push-back from Received by DCC3 (before Payment closes).
-  if (role === ROLE.Dcc3 && status === TICKET_STATUS.ReceivedByDcc3) {
-    return [...actions, PUSHBACK_DCC3]
-  }
+  // DCC3 has NO push-back after receiving (H2 dropped): a wrong hardcopy caught at
+  // `Received by DCC3` is handled out-of-band (pause SLA). Missing/wrong paper is
+  // reported at the receive step (`Submitted to DCC3`) instead, with a reason.
   return actions
 }
 

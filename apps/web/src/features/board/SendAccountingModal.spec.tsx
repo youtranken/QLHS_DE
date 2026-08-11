@@ -37,22 +37,26 @@ describe('SendAccountingModal (FR-11 — Document No)', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('đã tồn tại'))
   })
 
-  it('with a note (Payment) gates the POST behind a danger confirm (H5)', async () => {
+  it('confirmClose (Payment) gates the POST behind a danger confirm (H5), no scary note', async () => {
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     const onClose = vi.fn()
     render(
       <SendAccountingModal
         code="CT-2026-0002"
-        note="Gửi ACC sẽ đóng hồ sơ ngay và không thể hoàn tác."
+        docLabel="Payment number"
+        confirmClose
         onSubmit={onSubmit}
         onClose={onClose}
       />,
     )
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: '26-CC-02-CT' } })
+    // The Payment field is labelled "Payment number"; the old warning text is gone.
+    expect(screen.getByText('Payment number')).toBeInTheDocument()
+    expect(screen.queryByText(/không thể hoàn tác|không email Applicant/)).not.toBeInTheDocument()
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'PN-2026-02' } })
     fireEvent.click(screen.getByRole('button', { name: 'Gửi ACC' }))
     // First click only opens the confirm — no POST yet.
     expect(onSubmit).not.toHaveBeenCalled()
     fireEvent.click(await screen.findByRole('button', { name: 'Gửi ACC & đóng hồ sơ' }))
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith('26-CC-02-CT'))
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith('PN-2026-02'))
   })
 })

@@ -3,6 +3,7 @@ import { AuditRepo, type AuditFilters } from '../../infra/prisma/admin/audit.rep
 import { UserDirectoryRepo } from '../../infra/prisma/users/user-directory.repo'
 import { SystemClock } from '../../infra/clock/system-clock'
 import { pageWindow, totalPages } from '../../domain/admin/audit'
+import { actorDisplayName } from '../../domain/audit/actor-name'
 
 export interface AuditEventOut {
   id: string
@@ -55,7 +56,7 @@ export class SearchAuditUseCase {
       events: rows.map((r) => ({
         ...r,
         occurredAt: r.occurredAt.toISOString(),
-        actorName: names[r.actorSub] ?? r.actorSub,
+        actorName: actorDisplayName(r.actorSub, names[r.actorSub]),
       })),
       total,
       page: win.page,

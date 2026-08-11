@@ -14,12 +14,12 @@ export interface ClosedResultsTableProps {
   rows: TicketView[]
   role?: string | null
   onReopen: (id: string) => void
-  onPropose: (id: string) => void
 }
 
 /** Read-only results grid for FR-17 lookup; responsive (th scope + data-label →
- *  card layout ≤680px). Row actions depend on the viewer's DCC role. */
-export function ClosedResultsTable({ rows, role, onReopen, onPropose }: ClosedResultsTableProps) {
+ *  card layout ≤680px). Only DCC1 gets a row action (Reopen) — reopening is
+ *  DCC1's alone, so DCC2/DCC3 have no "propose reopen" here. */
+export function ClosedResultsTable({ rows, role, onReopen }: ClosedResultsTableProps) {
   return (
     <div className="tblwrap">
       <table className="tbl closedtbl">
@@ -83,11 +83,6 @@ export function ClosedResultsTable({ rows, role, onReopen, onPropose }: ClosedRe
                     onClick={() => onReopen(tk.id)}
                   >
                     {t('closed.reopenBtn')}
-                  </button>
-                )}
-                {(role === 'DCC2' || role === 'DCC3') && (
-                  <button type="button" className="btn ghost" onClick={() => onPropose(tk.id)}>
-                    {t('closed.proposeBtn')}
                   </button>
                 )}
               </td>

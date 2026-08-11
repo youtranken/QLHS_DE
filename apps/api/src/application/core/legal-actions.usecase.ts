@@ -21,7 +21,8 @@ const LABEL: Partial<Record<TicketEvent, string>> = {
   [TICKET_EVENT.ConfirmReceivedByDcc2]: 'Đã nhận bản cứng',
   [TICKET_EVENT.HandoverToDcc3]: 'Chuyển cho DCC3 →',
   [TICKET_EVENT.ConfirmReceivedByDcc3]: 'Đã nhận bản cứng',
-  [TICKET_EVENT.SendToAccounting]: 'Nhập Document No & gửi Accounting',
+  // Flow-aware in labelFor() — this fallback is the Contract wording.
+  [TICKET_EVENT.SendToAccounting]: 'Nhập Contract No & gửi Accounting',
   [TICKET_EVENT.ReceiveFromAcc]: 'Nhận về từ ACC',
   [TICKET_EVENT.SubmitToBop]: 'Trình BOP →',
   [TICKET_EVENT.CompleteContract]: 'Nhập đường dẫn scan & hoàn tất',
@@ -41,6 +42,13 @@ function labelFor(event: TicketEvent, flow: Flow): string {
   if (event === TICKET_EVENT.BopApprove) {
     return flow === FLOW.Contract ? 'BOP duyệt → bàn giao DCC2' : 'BOP duyệt → hoàn tất'
   }
+  // The value entered differs by flow (DCC2 a Contract No, DCC3 a Payment number),
+  // so the action label names the right thing per flow.
+  if (event === TICKET_EVENT.SendToAccounting) {
+    return flow === FLOW.Payment
+      ? 'Nhập Payment number & gửi ACC'
+      : 'Nhập Contract No & gửi Accounting'
+  }
   return LABEL[event] ?? event
 }
 
@@ -53,8 +61,12 @@ export function legalActionsFor(status: TicketStatus, role: Role, flow: Flow): L
       label: labelFor(event, flow),
       toStatus: edge?.to ?? status,
       reversible: edge?.reversible ?? false,
-      // Reopen chains into a sendBack, which mandates a reason.
-      reasonRequired: event === TICKET_EVENT.SendBack || event === TICKET_EVENT.Reopen,
+      // Reopen chains into a sendBack, which mandates a reason. SubmitToBop takes a
+      // required comment (DCC1's note to BOP), shown in the handover log.
+      reasonRequired:
+        event === TICKET_EVENT.SendBack ||
+        event === TICKET_EVENT.Reopen ||
+        event === TICKET_EVENT.SubmitToBop,
     }
   })
 }

@@ -5,9 +5,8 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 vi.mock('./api', () => ({
   searchClosed: vi.fn(),
   reopenClosed: vi.fn(),
-  requestReopen: vi.fn(),
 }))
-import { searchClosed, reopenClosed, requestReopen } from './api'
+import { searchClosed, reopenClosed } from './api'
 import { ClosedTickets } from './ClosedTickets'
 
 const ROW = {
@@ -63,21 +62,17 @@ describe('ClosedTickets (FR-17 lookup)', () => {
     await waitFor(() => expect(reopenClosed).toHaveBeenCalledWith('t1', 'Sai số tiền'))
   })
 
-  it('DCC3 may only propose a reopen on a closed Payment (→ requestReopen, Story 4.3 AC4)', async () => {
+  it('DCC3 gets NO reopen action on a closed Payment (reopening is DCC1 only)', async () => {
     const payment = { ...ROW, id: 'p1', code: 'CT-2026-0304', flow: 'Payment', status: 'Sent to Accounting' }
     vi.mocked(searchClosed).mockResolvedValue(page([payment]))
-    vi.mocked(requestReopen).mockResolvedValue({ ok: true })
     render(<ClosedTickets role="DCC3" />)
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Tìm kiếm' }))
     })
     await waitFor(() => expect(screen.getByText('CT-2026-0304')).toBeInTheDocument())
-    // DCC3 never gets the direct "Mở lại" action — only the proposal.
+    // Neither the direct "Mở lại…" nor the old "Đề nghị mở lại" is offered anymore.
     expect(screen.queryByRole('button', { name: /Mở lại/ })).toBeNull()
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Đề nghị mở lại' }))
-    })
-    await waitFor(() => expect(requestReopen).toHaveBeenCalledWith('p1'))
+    expect(screen.queryByRole('button', { name: 'Đề nghị mở lại' })).toBeNull()
   })
 
   it('pages the archive with "Tải thêm" (appends the next keyset page)', async () => {

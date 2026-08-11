@@ -8,7 +8,7 @@ import { ClosedResultsTable } from './ClosedResultsTable'
 import { DatePicker } from '../../shared/DatePicker'
 import { buildCsv, downloadCsv } from '../../shared/csv'
 import { closedCsvRows } from './closedCsv'
-import { reopenClosed, requestReopen, searchClosed, type ClosedFilters } from './api'
+import { reopenClosed, searchClosed, type ClosedFilters } from './api'
 
 // 'All' là giá trị nội bộ (không dịch); nhãn hiển thị lấy từ catalog lúc render.
 const FLOWS = ['All', 'Contract', 'Payment', 'General'] as const
@@ -105,15 +105,6 @@ export function ClosedTickets({ role, onBack }: { role?: string | null; onBack?:
       setCursor(p.nextCursor)
     } catch {
       toast.err(t('closed.reopenFailed'))
-    }
-  }
-
-  async function propose(id: string) {
-    try {
-      await requestReopen(id)
-      toast.ok(t('closed.proposeSent'))
-    } catch {
-      toast.err(t('closed.proposeFailed'))
     }
   }
 
@@ -229,12 +220,7 @@ export function ClosedTickets({ role, onBack }: { role?: string | null; onBack?:
         </p>
       )}
       {shown !== null && shown.length > 0 && (
-        <ClosedResultsTable
-          rows={shown}
-          role={role}
-          onReopen={(id) => setReopenId(id)}
-          onPropose={(id) => void propose(id)}
-        />
+        <ClosedResultsTable rows={shown} role={role} onReopen={(id) => setReopenId(id)} />
       )}
 
       {rows !== null && rows.length > 0 && cursor && (

@@ -6,8 +6,7 @@ import { GetCurrentUser, type CurrentUser } from '../auth/current-user'
 import { ConfirmReceivedByDcc3UseCase } from '../../application/handover/confirm-received-dcc3.usecase'
 import { ReportMissingPaperDcc3UseCase } from '../../application/handover/report-missing-paper-dcc3.usecase'
 import { SendAccountingDcc3UseCase } from '../../application/accounting/send-accounting-dcc3.usecase'
-import { RequestReturnDcc3UseCase } from '../../application/returns/request-return-dcc3.usecase'
-import { ReceiveDateDto } from '../dcc-shared/ticket-action.dto'
+import { ReasonDto, ReceiveDateDto } from '../dcc-shared/ticket-action.dto'
 import { SendAccountingDto } from '../dcc-shared/dcc2-receive.dto'
 
 /** DCC3 hardcopy handover actions (Story 4.1, AD-10): confirm receipt (phase 2)
@@ -20,7 +19,6 @@ export class Dcc3Controller {
     private readonly confirmReceived: ConfirmReceivedByDcc3UseCase,
     private readonly reportMissing: ReportMissingPaperDcc3UseCase,
     private readonly sendAccounting: SendAccountingDcc3UseCase,
-    private readonly requestReturn: RequestReturnDcc3UseCase,
   ) {}
 
   @Post('tickets/:id/receive')
@@ -40,18 +38,9 @@ export class Dcc3Controller {
   async missingPaper(
     @GetCurrentUser() user: CurrentUser,
     @Param('id') id: string,
+    @Body() dto: ReasonDto,
   ): Promise<{ ok: true }> {
-    await this.reportMissing.execute({ ticketId: id, actorSub: user.sub })
-    return { ok: true }
-  }
-
-  /** DCC3 "đẩy ngược DCC1" (H2) — a push-back note; DCC1 performs the Return (AD-11). */
-  @Post('tickets/:id/request-return')
-  async pushBack(
-    @GetCurrentUser() user: CurrentUser,
-    @Param('id') id: string,
-  ): Promise<{ ok: true }> {
-    await this.requestReturn.execute({ ticketId: id, actorSub: user.sub })
+    await this.reportMissing.execute({ ticketId: id, actorSub: user.sub, reason: dto.reason })
     return { ok: true }
   }
 

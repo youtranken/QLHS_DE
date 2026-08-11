@@ -50,6 +50,8 @@ export interface TicketDetail {
   description: string | null
   paymentTerm: string | null
   contractNo: string | null
+  /** DCC2/DCC3-entered number sent to Accounting (Contract No / Payment No). */
+  documentNo: string | null
   projectTeam: string | null
   budgetCode: string | null
   contractor: string | null
@@ -148,6 +150,7 @@ export class TicketDetailUseCase {
       description: t.description,
       paymentTerm: t.paymentTerm,
       contractNo: t.contractNo,
+      documentNo: t.documentNo,
       projectTeam: t.projectTeam,
       budgetCode: t.budgetCode,
       contractor: t.contractor,

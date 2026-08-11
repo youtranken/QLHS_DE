@@ -10,25 +10,36 @@ export interface SendAccountingModalProps {
   code: string
   onSubmit: (documentNo: string) => Promise<void>
   onClose: () => void
-  /** One-line consequence shown before the confirm button (e.g. Payment closes
-   *  irreversibly at `Sent to Accounting`, H5 — Story 4.2). */
-  note?: string
+  /** Field label — flow-aware: "Contract No" (DCC2/Contract) vs "Payment number"
+   *  (DCC3/Payment); the value entered differs by flow though the column is shared. */
+  docLabel?: string
+  /** Payment closes irreversibly at `Sent to Accounting` (H5), so gate the send
+   *  behind a "close ticket?" confirm. No scary warning paragraph — just the gate. */
+  confirmClose?: boolean
 }
 
 /**
- * DCC2 Document No entry before sending to Accounting (FR-11). Format is checked
- * client-side for immediate feedback (aria-invalid + role=alert); the server's DB
- * UNIQUE index is the real guard — a 409 duplicate is surfaced in the same alert.
+ * DCC2/DCC3 entry of the contract/payment number before sending to Accounting
+ * (FR-11) — the field label is flow-aware (see `docLabel`). Empty is blocked
+ * client-side (aria-invalid + role=alert); the server's DB UNIQUE index is the
+ * real guard — a 409 duplicate is surfaced in the same alert.
  */
-export function SendAccountingModal({ code, onSubmit, onClose, note }: SendAccountingModalProps) {
+export function SendAccountingModal({
+  code,
+  onSubmit,
+  onClose,
+  confirmClose = false,
+  // Default keeps standalone usage sensible; StationBoard overrides it per flow.
+  docLabel = t('board.modals.sendAccounting.docNoLabel'),
+}: SendAccountingModalProps) {
   const { ref, onKeyDown } = useFocusTrap<HTMLDivElement>(onClose)
   const [documentNo, setDocumentNo] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
-  // Payment closes the ticket for good at "Sent to Accounting" (note set) — gate it
-  // behind an explicit danger confirm instead of a passive warning line (H5).
+  // Payment closes the ticket for good at "Sent to Accounting" (confirmClose) — gate
+  // it behind an explicit danger confirm instead of a passive warning line (H5).
   const [confirming, setConfirming] = useState(false)
-  // A drag-select ending on the overlay must not throw away the typed Document No.
+  // A drag-select ending on the overlay must not throw away the typed value.
   const backdrop = useBackdropClose(() => {
     if (!busy) onClose()
   })
@@ -37,11 +48,11 @@ export function SendAccountingModal({ code, onSubmit, onClose, note }: SendAccou
     if (busy) return
     const value = documentNo.trim()
     if (value === '') {
-      setError(t('board.modals.sendAccounting.emptyError'))
+      setError(t('board.modals.sendAccounting.emptyError', { field: docLabel }))
       return
     }
-    // Irreversible branch (Payment) → confirm the consequence before posting.
-    if (note) {
+    // Irreversible branch (Payment) → confirm closing the ticket before posting.
+    if (confirmClose) {
       setError(null)
       setConfirming(true)
       return
@@ -58,7 +69,7 @@ export function SendAccountingModal({ code, onSubmit, onClose, note }: SendAccou
     } catch (e) {
       setError(
         e instanceof ApiClientError && e.code === 'DocumentNoDuplicate'
-          ? t('board.modals.sendAccounting.duplicateError', { value })
+          ? t('board.modals.sendAccounting.duplicateError', { value, field: docLabel })
           : t('board.modals.sendAccounting.failError'),
       )
       setBusy(false)
@@ -87,7 +98,7 @@ export function SendAccountingModal({ code, onSubmit, onClose, note }: SendAccou
         <div className="mb">
           <div className="field">
             <label htmlFor="send-acc-docno">
-              {t('board.modals.sendAccounting.docNoLabel')} <span className="req">*</span>
+              {docLabel} <span className="req">*</span>
             </label>
             <input
               id="send-acc-docno"
@@ -107,7 +118,6 @@ export function SendAccountingModal({ code, onSubmit, onClose, note }: SendAccou
               {error}
             </p>
           )}
-          {note && <p style={{ color: 'var(--ink-3)', fontSize: 12, margin: '12px 0 0' }}>{note}</p>}
         </div>
         <div className="mf">
           <button type="button" className="btn ghost" onClick={onClose}>
@@ -122,7 +132,7 @@ export function SendAccountingModal({ code, onSubmit, onClose, note }: SendAccou
       {confirming && (
         <ConfirmModal
           title={t('board.modals.sendAccounting.confirmTitle')}
-          message={note ?? ''}
+          message={t('board.modals.sendAccounting.confirmMessage')}
           code={code}
           danger
           confirmLabel={t('board.modals.sendAccounting.confirmSubmit')}

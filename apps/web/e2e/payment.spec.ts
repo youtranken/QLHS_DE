@@ -5,7 +5,6 @@ import {
   switchTo,
   createTicket,
   cardAction,
-  confirmHandover,
   confirmModal,
   expectStatus,
 } from './support/app'
@@ -15,8 +14,9 @@ test.beforeEach(async () => {
 })
 
 // Golden journey #3 — Payment hitting a Return: Pool → Andy → DCC3 handover →
-// DCC3 spots a wrong hardcopy → pushes back → DCC1 Returns to the Applicant.
-test('Payment: DCC3 push-back → DCC1 returns to the Applicant', async ({ page }) => {
+// DCC3 spots a missing/wrong hardcopy AT RECEIPT and bounces it back with a
+// reason → DCC1 Returns to the Applicant. (DCC3 has no push-back after receiving.)
+test('Payment: DCC3 missing-paper at receipt → DCC1 returns to the Applicant', async ({ page }) => {
   await loginAs(page, { sub: 'applicant-3', roles: [] })
   await page.goto('/')
   await createTicket(page, {
@@ -39,13 +39,14 @@ test('Payment: DCC3 push-back → DCC1 returns to the Applicant', async ({ page 
   await expectStatus(code!, 'Submitted to DCC3')
 
   await switchTo(page, 'dcc3-lan', ['DCC3'])
+  // Opens the handover modal, then reports missing paper (with a reason) instead
+  // of confirming — the ticket stays put and bounces to DCC1's reconcile lane.
   await cardAction(page, 'Đã nhận bản cứng')
-  await confirmHandover(page)
-  await expectStatus(code!, 'Received by DCC3')
-
-  // Wrong hardcopy → DCC3 pushes back to DCC1 (a note, not an edge).
-  await cardAction(page, 'Đẩy ngược DCC1 (bản cứng sai)')
-  await confirmModal(page, 'Đẩy ngược')
+  await page.getByRole('button', { name: 'Thiếu giấy, trả về DCC1' }).click()
+  const confirm = page.getByRole('dialog').last()
+  await confirm.getByRole('textbox').fill('Bản cứng sai — thiếu trang 3')
+  await confirm.getByRole('button', { name: 'Trả về DCC1' }).click()
+  await expectStatus(code!, 'Submitted to DCC3') // status unchanged (reconcile-flagged)
 
   // DCC1 clears the reconcile lane by Returning the ticket to the Applicant.
   await switchTo(page, 'dcc1-nam', ['DCC1'])

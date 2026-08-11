@@ -6,6 +6,7 @@ import {
   createTicket,
   cardAction,
   confirmHandover,
+  confirmModal,
   sendToAccounting,
   completeContract,
   expectStatus,
@@ -45,7 +46,7 @@ test('Contract: full line through every station to Completed', async ({ page }) 
   await confirmHandover(page)
   await expectStatus(code!, 'Received by DCC2')
 
-  await cardAction(page, 'Nhập Document No & gửi Accounting')
+  await cardAction(page, 'Nhập Contract No & gửi Accounting')
   await sendToAccounting(page, '26-CC-1-CT')
   await expectStatus(code!, 'Submitted to Accounting')
 
@@ -55,6 +56,8 @@ test('Contract: full line through every station to Completed', async ({ page }) 
   await expectStatus(code!, 'Received from ACC')
 
   await cardAction(page, 'Trình BOP →')
+  // SubmitToBop now takes a required DCC1 comment (shown in the handover log).
+  await confirmModal(page, 'Trình BOP →', 'Trình BOP sau khi ACC duyệt')
   await expectStatus(code!, 'Submitted to BOP')
 
   await cardAction(page, 'BOP duyệt → bàn giao DCC2')

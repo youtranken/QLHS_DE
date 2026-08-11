@@ -17,9 +17,10 @@ function today(): string {
 export interface HandoverModalProps {
   code: string
   onConfirm: (receivedAt: string) => Promise<void>
-  /** When present, renders the opposing "missing paper" button (DCC2 handover).
-   *  Omit for a date-only receipt (e.g. DCC1 "Nhận về từ ACC"). */
-  onMissing?: () => Promise<void>
+  /** When present, renders the opposing "missing paper" button (DCC2/DCC3 handover).
+   *  Receives the required reason (why the hardcopy is missing/wrong). Omit for a
+   *  date-only receipt (e.g. DCC1 "Nhận về từ ACC"). */
+  onMissing?: (reason: string) => Promise<void>
   onClose: () => void
   title?: string
   confirmLabel?: string
@@ -117,11 +118,12 @@ export function HandoverModal({
         <ConfirmModal
           message={t('board.modals.handover.missingConfirm')}
           code={code}
+          reason
           danger
           confirmLabel={t('board.modals.handover.missingConfirmBtn')}
-          onConfirm={() => {
+          onConfirm={(reason) => {
             setConfirmingMissing(false)
-            return guard(onMissing)
+            return guard(() => onMissing(reason ?? ''))
           }}
           onCancel={() => setConfirmingMissing(false)}
         />

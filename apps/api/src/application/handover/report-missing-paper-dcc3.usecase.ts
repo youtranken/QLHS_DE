@@ -7,7 +7,7 @@ import { HandoverRepo } from '../../infra/prisma/ticket/handover.repo'
 export class ReportMissingPaperDcc3UseCase {
   constructor(private readonly repo: HandoverRepo) {}
 
-  execute(req: { ticketId: string; actorSub: string }): Promise<void> {
-    return this.repo.flagMissingPaperDcc3(req.ticketId, req.actorSub)
+  execute(req: { ticketId: string; actorSub: string; reason?: string }): Promise<void> {
+    return this.repo.flagMissingPaperDcc3(req.ticketId, req.actorSub, req.reason)
   }
 }

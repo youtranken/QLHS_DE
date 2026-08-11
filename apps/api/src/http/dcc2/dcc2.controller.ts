@@ -9,6 +9,7 @@ import { SubmitToAccountingUseCase } from '../../application/accounting/submit-t
 import { CompleteContractUseCase } from '../../application/accounting/complete-contract.usecase'
 import { RequestReturnUseCase } from '../../application/returns/request-return.usecase'
 import { CompleteContractDto, Dcc2ReceiveDto, SendAccountingDto } from '../dcc-shared/dcc2-receive.dto'
+import { ReasonDto } from '../dcc-shared/ticket-action.dto'
 
 /** DCC2 hardcopy handover actions (Story 3.1, AD-10): confirm receipt (phase 2)
  *  and the "missing paper" reconcile bounce. Contract flow only. */
@@ -42,8 +43,9 @@ export class Dcc2Controller {
   async missingPaper(
     @GetCurrentUser() user: CurrentUser,
     @Param('id') id: string,
+    @Body() dto: ReasonDto,
   ): Promise<{ ok: true }> {
-    await this.reportMissing.execute({ ticketId: id, actorSub: user.sub })
+    await this.reportMissing.execute({ ticketId: id, actorSub: user.sub, reason: dto.reason })
     return { ok: true }
   }
 
@@ -74,8 +76,9 @@ export class Dcc2Controller {
   async pushBack(
     @GetCurrentUser() user: CurrentUser,
     @Param('id') id: string,
+    @Body() dto: ReasonDto,
   ): Promise<{ ok: true }> {
-    await this.requestReturn.execute({ ticketId: id, actorSub: user.sub })
+    await this.requestReturn.execute({ ticketId: id, actorSub: user.sub, reason: dto.reason })
     return { ok: true }
   }
 }

@@ -162,6 +162,11 @@ export function BoardCardView({
         )}
       </div>
       <div className="who">{c.contractor ?? '—'}</div>
+      {c.reconcileComment && (
+        <div className="recnote" title={c.reconcileComment}>
+          <span aria-hidden>💬</span> {c.reconcileComment}
+        </div>
+      )}
       {(c.amount || (primary.length > 0 && !c.lockedBy)) && (
         <div className="actrow">
           {c.amount && <span className="amt">{groupAmount(c.amount)}</span>}

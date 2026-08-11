@@ -104,9 +104,9 @@ export function useBoardActions(load: () => Promise<void>) {
     await load()
   }
 
-  async function doMissing(card: BoardCard) {
+  async function doMissing(card: BoardCard, reason: string) {
     try {
-      await (card.flow === 'Payment' ? missingPaperDcc3 : missingPaperDcc2)(card.id)
+      await (card.flow === 'Payment' ? missingPaperDcc3 : missingPaperDcc2)(card.id, reason)
       toast.ok(t('board.toasts.missingReported'))
     } catch {
       toast.err(t('board.toasts.actionFailed'))

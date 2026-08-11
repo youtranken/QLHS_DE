@@ -77,10 +77,11 @@ export function makeCardAction({
           title: t('board.ask.pushbackTitle'),
           message: t('board.ask.pushbackMessage'),
           code,
+          reason: true,
           danger: true,
           confirmLabel: t('board.ask.pushbackConfirm'),
-          onOk: async () => {
-            await pushBack(card.id)
+          onOk: async (reason) => {
+            await pushBack(card.id, reason ?? '')
             toast.ok(t('board.toasts.pushbackDone'))
             await load()
           },
@@ -128,7 +129,9 @@ export function makeCardAction({
         setAsk({
           title: action.label,
           message: t('board.ask.reasonMessage'),
-          code,
+          // Only a real minted code — a Pool ticket has none, and showing the raw
+          // internal id (e.g. "b15b16e1") in the dialog just confused DCC1.
+          code: card.code ?? undefined,
           reason: true,
           reasonDefault: dup
             ? t('board.ask.reasonDupDefault', { code: dup.code ?? dup.id.slice(0, 8) })

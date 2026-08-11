@@ -70,33 +70,6 @@ export class TicketWriteRepo {
     })
   }
 
-  /**
-   * DCC2/DCC3 "Đề nghị Reopen" (B6): a typed audit note on a closed ticket that
-   * flags DCC1 — it does NOT change status (only DCC1 actually reopens). Enforced:
-   * the ticket must be in the caller's flow scope (AD-16; cross-flow → 404 no-leak)
-   * and must be a reopenable closed status (FR-17; Cancelled is closed but dead).
-   */
-  async writeReopenRequest(id: string, actorSub: string, flows: string[]): Promise<void> {
-    await this.prisma.$transaction(async (tx) => {
-      const t = await tx.ticket.findUnique({ where: { id } })
-      if (!t || !flows.includes(t.flow)) throw new TicketNotFoundError(id)
-      if (t.status === TICKET_STATUS.Cancelled || !isTerminal(t.status as TicketStatus)) {
-        throw new TicketNotClosedError('Chỉ đề nghị mở lại hồ sơ đã đóng')
-      }
-      await tx.ticketEvent.create({
-        data: {
-          ticketId: id,
-          actorSub,
-          action: TICKET_EVENT.ReopenRequested,
-          fromStatus: t.status,
-          toStatus: t.status,
-          roundNo: t.roundNo,
-          occurredAt: new Date(),
-        },
-      })
-    })
-  }
-
   async changePriority(id: string, actorSub: string, next: Priority): Promise<void> {
     await this.writePriority(id, actorSub, next, true)
   }

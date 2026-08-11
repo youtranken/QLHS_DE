@@ -45,6 +45,25 @@ describe('transition (AD-2 — the single status writer)', () => {
     })
   })
 
+  it('auto-return (system) sends an un-picked Pool ticket straight to Return-fixing, no round bump', () => {
+    const t = ticketAt(TICKET_STATUS.Submitted, { roundNo: 0, currentHolderSub: null })
+    const { ticket, event } = transition(t, {
+      event: TICKET_EVENT.AutoReturn,
+      actor: { sub: 'system', activeRole: ROLE.Dcc1 },
+      now: NOW,
+      reason: 'Quá hạn tiếp nhận',
+    })
+    expect(ticket.status).toBe(TICKET_STATUS.ReturnFixing)
+    expect(ticket.currentHolderSub).toBe('app-a') // Return-fixing is Applicant-owned
+    expect(ticket.roundNo).toBe(0) // light bounce — ticket never entered a flow
+    expect(event).toMatchObject({
+      action: TICKET_EVENT.AutoReturn,
+      actorSub: 'system',
+      toStatus: TICKET_STATUS.ReturnFixing,
+      reason: 'Quá hạn tiếp nhận',
+    })
+  })
+
   it('rejects an illegal edge without mutating anything', () => {
     const t = ticketAt(TICKET_STATUS.Submitted)
     expect(() => transition(t, { event: TICKET_EVENT.BopApprove, actor: DCC1, now: NOW })).toThrow(

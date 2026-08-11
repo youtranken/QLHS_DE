@@ -28,8 +28,6 @@ const HANDOVER_STATES: readonly string[] = [
 const HANDOVER_STATES_DCC3: readonly string[] = [TICKET_STATUS.SubmittedToDcc3]
 /** The DCC2-held states from which DCC2 may push a wrong hardcopy back to DCC1. */
 const PUSHBACK_STATES: readonly string[] = [TICKET_STATUS.ReceivedByDcc2, TICKET_STATUS.Hardcopy]
-/** The single DCC3-held state from which DCC3 pushes back a wrong hardcopy (H2). */
-const PUSHBACK_STATES_DCC3: readonly string[] = [TICKET_STATUS.ReceivedByDcc3]
 
 /**
  * DCC2 handover exceptions (AD-10/AD-11, Stories 3.1/3.4). "Missing paper" and
@@ -42,9 +40,10 @@ const PUSHBACK_STATES_DCC3: readonly string[] = [TICKET_STATUS.ReceivedByDcc3]
 export class HandoverRepo {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** DCC2 flags a missing hardcopy → status-preserving bounce to DCC1. */
-  flagMissingPaper(id: string, actorSub: string): Promise<void> {
-    return this.setReconcile(id, actorSub, HANDOVER_STATES, RECONCILE_REASON.MissingPaper, true)
+  /** DCC2 flags a missing hardcopy → status-preserving bounce to DCC1. The
+   *  `comment` (why) is recorded on the audit event so DCC1 sees it in the log. */
+  flagMissingPaper(id: string, actorSub: string, comment?: string): Promise<void> {
+    return this.setReconcile(id, actorSub, HANDOVER_STATES, RECONCILE_REASON.MissingPaper, true, comment)
   }
 
   /** DCC1 re-hands over after reconciling → clears the flag, status unchanged. */
@@ -53,8 +52,8 @@ export class HandoverRepo {
   }
 
   /** DCC3 flags a missing hardcopy at `Submitted to DCC3` (Payment, Story 4.1). */
-  flagMissingPaperDcc3(id: string, actorSub: string): Promise<void> {
-    return this.setReconcile(id, actorSub, HANDOVER_STATES_DCC3, RECONCILE_REASON.MissingPaper, true)
+  flagMissingPaperDcc3(id: string, actorSub: string, comment?: string): Promise<void> {
+    return this.setReconcile(id, actorSub, HANDOVER_STATES_DCC3, RECONCILE_REASON.MissingPaper, true, comment)
   }
 
   /** DCC1 re-hands over a reconciled Payment ticket → clears the flag. */
@@ -63,15 +62,10 @@ export class HandoverRepo {
   }
 
   /** DCC2 "đẩy ngược DCC1" (AC4, AD-11): flag with a return reason so DCC1 sees it
-   *  in the reconcile lane and completion is locked out; DCC1 runs the Return. */
-  requestReturn(id: string, actorSub: string): Promise<void> {
-    return this.setReconcile(id, actorSub, PUSHBACK_STATES, RECONCILE_REASON.ReturnRequested, true)
-  }
-
-  /** DCC3 "đẩy ngược DCC1" from `Received by DCC3` (H2): same reconcile-flag note
-   *  as DCC2, scoped to the DCC3 station so a DCC2 can't flag a Payment ticket. */
-  requestReturnDcc3(id: string, actorSub: string): Promise<void> {
-    return this.setReconcile(id, actorSub, PUSHBACK_STATES_DCC3, RECONCILE_REASON.ReturnRequested, true)
+   *  in the reconcile lane and completion is locked out; DCC1 runs the Return. The
+   *  `comment` (why the hardcopy is wrong) is recorded on the audit event. */
+  requestReturn(id: string, actorSub: string, comment?: string): Promise<void> {
+    return this.setReconcile(id, actorSub, PUSHBACK_STATES, RECONCILE_REASON.ReturnRequested, true, comment)
   }
 
   /**
@@ -95,7 +89,7 @@ export class HandoverRepo {
       const row = rows[0]
       if (!row) throw new TicketNotFoundError(id)
       if (row.reconcile_flag) {
-        throw new ReconcileStateError('Đang chờ đối chiếu — DCC1 cần bàn giao lại trước')
+        throw new ReconcileStateError('Đang chờ kiểm tra lại — DCC1 cần bàn giao lại trước')
       }
       const state: TicketState = {
         id: row.id,
@@ -204,6 +198,7 @@ export class HandoverRepo {
     allowedFrom: readonly string[],
     reason: string | null,
     next: boolean,
+    comment?: string,
   ): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       const rows = await tx.$queryRaw<TicketRow[]>`
@@ -215,7 +210,7 @@ export class HandoverRepo {
       }
       if (t.reconcile_flag === next) {
         throw new ReconcileStateError(
-          next ? 'Hồ sơ đã được đánh dấu' : 'Hồ sơ không ở trạng thái chờ đối chiếu',
+          next ? 'Hồ sơ đã được đánh dấu' : 'Hồ sơ không ở trạng thái chờ kiểm tra lại',
         )
       }
       await tx.ticket.update({
@@ -234,6 +229,7 @@ export class HandoverRepo {
                 : TICKET_EVENT.MissingPaperCleared,
           fromStatus: t.status,
           toStatus: t.status,
+          reason: next && comment?.trim() ? comment.trim() : null,
           roundNo: t.round_no,
           occurredAt: new Date(),
         },

@@ -9,6 +9,8 @@ export const TICKET_EVENT = {
   AndyRequireBop: 'andyRequireBop',
   BopApprove: 'bopApprove',
   SendBack: 'sendBack',
+  // System auto-returns an un-picked Pool ticket to the Applicant (grace elapsed).
+  AutoReturn: 'auto_return',
   ConfirmReturnReceipt: 'confirmReturnReceipt',
   Resubmit: 'resubmit',
   Reopen: 'reopen',

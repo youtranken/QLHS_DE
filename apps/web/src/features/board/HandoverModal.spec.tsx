@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { HandoverModal } from './HandoverModal'
 
 function setup(over: Partial<Parameters<typeof HandoverModal>[0]> = {}) {
@@ -43,7 +43,13 @@ describe('HandoverModal — 2-phase confirmation (UX-DR8, AC2/AC3)', () => {
     expect(onMissing).not.toHaveBeenCalled()
 
     fireEvent.click(screen.getByRole('button', { name: 'Thiếu giấy, trả về DCC1' }))
-    fireEvent.click(await screen.findByRole('button', { name: 'Trả về DCC1' }))
-    await waitFor(() => expect(onMissing).toHaveBeenCalledTimes(1))
+    // A reason is now required before the bounce is enabled. The confirm dialog is
+    // nested inside the handover dialog, so target the last one.
+    await screen.findByRole('button', { name: 'Trả về DCC1' })
+    const dialogs = screen.getAllByRole('dialog')
+    const confirm = within(dialogs[dialogs.length - 1] as HTMLElement)
+    fireEvent.change(confirm.getByRole('textbox'), { target: { value: 'Thiếu trang 3' } })
+    fireEvent.click(confirm.getByRole('button', { name: 'Trả về DCC1' }))
+    await waitFor(() => expect(onMissing).toHaveBeenCalledWith('Thiếu trang 3'))
   })
 })

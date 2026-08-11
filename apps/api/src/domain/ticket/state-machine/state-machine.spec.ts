@@ -49,6 +49,21 @@ describe('legalActions (basis for AD-17 actionbar)', () => {
     )
   })
 
+  it('resolves the system auto-return edge: Submitted --auto_return--> Return-fixing (DCC1-owned, any flow)', () => {
+    for (const flow of [FLOW.General, FLOW.Contract, FLOW.Payment]) {
+      const edge = findEdge(TICKET_STATUS.Submitted, TICKET_EVENT.AutoReturn, flow)
+      expect(edge?.to).toBe(TICKET_STATUS.ReturnFixing)
+      expect(edge?.ownerRole).toBe(ROLE.Dcc1)
+      expect(edge?.enteredFlow).toBeFalsy() // light: no round bump, ticket never left Pool
+    }
+  })
+
+  it('auto-return is system-only — never a manual DCC1 actionbar button at Submitted', () => {
+    expect(legalActions(TICKET_STATUS.Submitted, ROLE.Dcc1, FLOW.General)).not.toContain(
+      TICKET_EVENT.AutoReturn,
+    )
+  })
+
   it('DCC1 is the single Return actor — DCC2/DCC3 have no sendBack (AC3)', () => {
     expect(legalActions(TICKET_STATUS.ReceivedByDcc2, ROLE.Dcc2, FLOW.Contract)).not.toContain(
       TICKET_EVENT.SendBack,

@@ -91,18 +91,16 @@ describe('Payment reopen from Sent to Accounting (e2e)', () => {
     expect(row.status).toBe('Sent to Accounting') // unchanged
   })
 
-  it('DCC3 may only REQUEST a reopen — never reopen directly (AC4)', async () => {
+  it('DCC3 cannot reopen — direct reopen is DCC1 only (403); request endpoint removed (404)', async () => {
     const dcc3 = await login('dcc3-e2e', ['DCC3'])
     const id = await closedPayment('CT-2026-0303')
     // Direct reopen is DCC1-only → 403 for DCC3.
     expect((await dcc3.post(`/dcc1/tickets/${id}/reopen`).send({ reason: 'x' })).status).toBe(403)
-    // But DCC3 can request one (Payment is in DCC3's flow scope).
-    expect((await dcc3.post(`/dcc/tickets/${id}/request-reopen`)).status).toBe(201)
+    // The old DCC2/DCC3 "request reopen" endpoint was retired → 404 (reopening is DCC1's alone).
+    expect((await dcc3.post(`/dcc/tickets/${id}/request-reopen`)).status).toBe(404)
 
     const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
-    expect(row.status).toBe('Sent to Accounting') // request does NOT change status
-    const note = await admin.ticketEvent.findFirst({ where: { ticketId: id, action: 'reopen_requested' } })
-    expect(note?.actorSub).toBe('dcc3-e2e')
+    expect(row.status).toBe('Sent to Accounting') // still closed, unchanged
   })
 
   it('closed Payment surfaces in the "Hồ sơ đã đóng" search (DCC3 scope)', async () => {

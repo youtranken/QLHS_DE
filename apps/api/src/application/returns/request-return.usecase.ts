@@ -7,7 +7,7 @@ import { HandoverRepo } from '../../infra/prisma/ticket/handover.repo'
 export class RequestReturnUseCase {
   constructor(private readonly repo: HandoverRepo) {}
 
-  execute(req: { ticketId: string; actorSub: string }): Promise<void> {
-    return this.repo.requestReturn(req.ticketId, req.actorSub)
+  execute(req: { ticketId: string; actorSub: string; reason?: string }): Promise<void> {
+    return this.repo.requestReturn(req.ticketId, req.actorSub, req.reason)
   }
 }

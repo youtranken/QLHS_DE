@@ -237,14 +237,19 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
         <HandoverModal
           code={handover.code ?? handover.id.slice(0, 8)}
           onConfirm={(d) => doReceive(handover, d)}
-          onMissing={() => doMissing(handover)}
+          onMissing={(reason) => doMissing(handover, reason)}
           onClose={() => setHandover(null)}
         />
       )}
       {sendAcc && (
         <SendAccountingModal
           code={sendAcc.code ?? sendAcc.id.slice(0, 8)}
-          note={sendAcc.flow === 'Payment' ? t('board.modals.sendAccounting.paymentNote') : undefined}
+          docLabel={
+            sendAcc.flow === 'Payment'
+              ? t('board.modals.sendAccounting.payNoLabel')
+              : t('board.modals.sendAccounting.docNoLabel')
+          }
+          confirmClose={sendAcc.flow === 'Payment'}
           onSubmit={(docNo) => doSendAcc(sendAcc, docNo)}
           onClose={() => setSendAcc(null)}
         />

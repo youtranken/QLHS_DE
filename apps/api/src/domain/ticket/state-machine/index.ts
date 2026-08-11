@@ -33,7 +33,7 @@ export function findEdge(
 /** Events a role may fire from a status in a flow (basis for AD-17 actionbar). */
 export function legalActions(from: TicketStatus, role: Role, flow: Flow): TicketEvent[] {
   const events = EDGES.filter(
-    (e) => e.from === from && e.ownerRole === role && (e.flow === flow || e.flow === '*'),
+    (e) => e.from === from && e.ownerRole === role && (e.flow === flow || e.flow === '*') && !e.system,
   ).map((e) => e.event)
   return [...new Set(events)]
 }

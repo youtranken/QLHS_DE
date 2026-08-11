@@ -21,7 +21,6 @@ import { SlaPauseController } from './http/dcc-shared/sla-pause.controller'
 import { DccAdjustPriorityUseCase } from './application/board/dcc-adjust-priority.usecase'
 import { ConfirmFlowUseCase } from './application/board/confirm-flow.usecase'
 import { ReopenTicketUseCase } from './application/closed/reopen-ticket.usecase'
-import { RequestReopenUseCase } from './application/closed/request-reopen.usecase'
 import { ConfirmReceivedByDcc2UseCase } from './application/handover/confirm-received-dcc2.usecase'
 import { ReportMissingPaperUseCase } from './application/handover/report-missing-paper.usecase'
 import { ResendToDcc2UseCase } from './application/handover/resend-to-dcc2.usecase'
@@ -33,7 +32,6 @@ import { SubmitToAccountingUseCase } from './application/accounting/submit-to-ac
 import { ReceiveFromAccUseCase } from './application/accounting/receive-from-acc.usecase'
 import { CompleteContractUseCase } from './application/accounting/complete-contract.usecase'
 import { RequestReturnUseCase } from './application/returns/request-return.usecase'
-import { RequestReturnDcc3UseCase } from './application/returns/request-return-dcc3.usecase'
 import { ReturnFromPushbackUseCase } from './application/returns/return-from-pushback.usecase'
 import { UndoActionUseCase } from './application/board/undo-action.usecase'
 import { BatchActionUseCase } from './application/board/batch-action.usecase'
@@ -63,6 +61,7 @@ import { SmtpResolver } from './infra/mail/smtp-resolver'
 import { SmtpConfigRepo } from './infra/prisma/config/smtp-config.repo'
 import { OutboxDispatcher } from './infra/scheduler/outbox.dispatcher'
 import { ReturnReminderScheduler } from './infra/scheduler/return-reminder.scheduler'
+import { PoolAutoReturnScheduler } from './infra/scheduler/pool-auto-return.scheduler'
 import { EscalationScheduler } from './infra/scheduler/escalation.scheduler'
 import { DigestScheduler } from './infra/scheduler/digest.scheduler'
 import { DigestDispatcher } from './infra/scheduler/digest.dispatcher'
@@ -75,7 +74,6 @@ import { Dcc2Controller } from './http/dcc2/dcc2.controller'
 import { Dcc3Controller } from './http/dcc3/dcc3.controller'
 import { TicketDetailController } from './http/ticket/ticket-detail.controller'
 import { ClosedTicketsController } from './http/dcc-shared/closed-tickets.controller'
-import { DccReopenRequestController } from './http/dcc-shared/dcc-reopen-request.controller'
 import { DispatchController } from './http/dispatch/dispatch.controller'
 
 @Module({
@@ -88,7 +86,6 @@ import { DispatchController } from './http/dispatch/dispatch.controller'
     TicketDetailController,
     SlaPauseController,
     ClosedTicketsController,
-    DccReopenRequestController,
     DispatchController,
   ],
   providers: [
@@ -113,7 +110,6 @@ import { DispatchController } from './http/dispatch/dispatch.controller'
     DccAdjustPriorityUseCase,
     ConfirmFlowUseCase,
     ReopenTicketUseCase,
-    RequestReopenUseCase,
     ConfirmReceivedByDcc2UseCase,
     ReportMissingPaperUseCase,
     ResendToDcc2UseCase,
@@ -125,7 +121,6 @@ import { DispatchController } from './http/dispatch/dispatch.controller'
     ReceiveFromAccUseCase,
     CompleteContractUseCase,
     RequestReturnUseCase,
-    RequestReturnDcc3UseCase,
     ReturnFromPushbackUseCase,
     UndoActionUseCase,
     BatchActionUseCase,
@@ -152,6 +147,7 @@ import { DispatchController } from './http/dispatch/dispatch.controller'
     SystemClock,
     OutboxDispatcher,
     ReturnReminderScheduler,
+    PoolAutoReturnScheduler,
     EscalationScheduler,
     DigestScheduler,
     DigestDispatcher,

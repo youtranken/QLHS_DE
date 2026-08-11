@@ -33,6 +33,20 @@ export const SHARED_EDGES: readonly Edge[] = [
     reversible: false,
   },
   {
+    // No DCC1 picked it up within the Pool grace window → the system returns it
+    // to the Applicant to fix. Skips `Returned`'s confirm-receipt step (no
+    // hardcopy ever changed hands) and lands straight at Return-fixing. Light
+    // (pre-flow): no round bump, no code minted. Owner role is DCC1 — the system
+    // acts in DCC1's stead (actor sub = SYSTEM_SUB in the audit row).
+    from: TICKET_STATUS.Submitted,
+    event: TICKET_EVENT.AutoReturn,
+    to: TICKET_STATUS.ReturnFixing,
+    ownerRole: ROLE.Dcc1,
+    flow: '*',
+    reversible: false,
+    system: true,
+  },
+  {
     from: TICKET_STATUS.Submitted,
     event: TICKET_EVENT.Cancel,
     to: TICKET_STATUS.Cancelled,

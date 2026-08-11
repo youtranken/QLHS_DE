@@ -73,6 +73,18 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Lý do đối chiếu (DCC2/DCC3 báo thiếu giấy) in thẳng trên thẻ ở lane reconcile —
+   DCC1 đọc được vì sao mà không phải mở từng hồ sơ. */
+.tcard .recnote {
+  margin-top: 5px;
+  padding: 3px 7px;
+  border-left: 3px solid var(--sla);
+  border-radius: 4px;
+  background: var(--sla-bg);
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--ink-1);
+}
 /* hàng đáy thẻ: số tiền (trái) + nút hành-động-chính (phải). Cho wrap để nhãn
    nút dài (label server chưa rút gọn) rớt xuống dòng thay vì tràn cột hẹp. */
 .tcard .actrow {

@@ -22,4 +22,10 @@ export interface Edge {
    * (wrong type, Andy/BOP-General reject before ACC) do not (AD-11, PRD §6).
    */
   enteredFlow?: boolean
+  /**
+   * System-only edge (e.g. the Pool auto-return): resolvable by `transition()`
+   * but hidden from `legalActions()` so it never surfaces as a user actionbar
+   * button. `ownerRole` still gates it — the system acts in that role's stead.
+   */
+  system?: boolean
 }

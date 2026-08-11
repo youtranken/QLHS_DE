@@ -46,6 +46,29 @@ describe('TicketDetail — read-only deep-link page', () => {
     expect(screen.getByLabelText('Quá hạn 4 ngày')).toBeInTheDocument()
   })
 
+  it('renders human labels for technical events, a highlighted return reason, and the system actor', async () => {
+    vi.mocked(getTicketDetail).mockResolvedValue({
+      ...fixture,
+      timeline: [
+        { action: 'field_changed', fromStatus: 'Submitted', toStatus: 'Submitted', actorSub: 'sub-an', occurredAt: '2026-06-29T09:00:00Z', reason: null },
+        { action: 'missing_paper_cleared', fromStatus: 'Submitted to DCC2', toStatus: 'Submitted to DCC2', actorSub: 'sub-kt', occurredAt: '2026-06-30T09:00:00Z', reason: null },
+        { action: 'reopen', fromStatus: 'Completed', toStatus: 'Reopened', actorSub: 'sub-kt', occurredAt: '2026-07-01T09:00:00Z', reason: null },
+        { action: 'auto_return', fromStatus: 'Submitted', toStatus: 'Return-fixing', actorSub: 'system', occurredAt: '2026-07-02T09:00:00Z', reason: 'Quá hạn tiếp nhận' },
+      ],
+    })
+    render(<TicketDetail ticketId="t1" />)
+    await waitFor(() => expect(screen.getByText('CT-2026-0042')).toBeInTheDocument())
+    // Raw technical event keys must never leak to the reader.
+    expect(screen.queryByText(/field_changed|missing_paper_cleared|auto_return/)).not.toBeInTheDocument()
+    expect(screen.getByText('sửa dữ liệu hồ sơ')).toBeInTheDocument()
+    expect(screen.getByText('đã bàn giao lại (đủ giấy)')).toBeInTheDocument()
+    // Reopen marks a new round; the auto-return reason is highlighted; system actor named.
+    expect(screen.getByText('Bắt đầu vòng mới')).toBeInTheDocument()
+    expect(screen.getByText('Lý do trả lại:')).toBeInTheDocument()
+    expect(screen.getByText(/Quá hạn tiếp nhận/)).toBeInTheDocument()
+    expect(screen.getByText('Hệ thống')).toBeInTheDocument()
+  })
+
   // A transient failure shows the error screen with Retry; clicking it must
   // recover and render the ticket (regression: load() didn't clear `error`).
   it('recovers on Retry after a transient load failure', async () => {

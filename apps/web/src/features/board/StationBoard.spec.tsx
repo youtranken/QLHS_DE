@@ -309,7 +309,7 @@ const dcc3SendBoard: BoardColumn[] = [
         actions: [
           {
             event: 'sendToAccounting',
-            label: 'Nhập Document No & gửi ACC',
+            label: 'Nhập Payment number & gửi ACC',
             toStatus: 'Sent to Accounting',
             reversible: false,
             reasonRequired: false,
@@ -329,7 +329,9 @@ describe('StationBoard — Payment send ACC closes at Sent to Accounting (Story 
     render(<StationBoard />)
     fireEvent.click(await screen.findByRole('button', { name: 'Gửi Kế toán…' }))
     const dialog = await screen.findByRole('dialog')
-    expect(dialog).toHaveTextContent('không email Applicant')
+    // Payment (DCC3) field is labelled "Payment number"; the old warning text is gone.
+    expect(dialog).toHaveTextContent('Payment number')
+    expect(dialog).not.toHaveTextContent('không email Applicant')
     fireEvent.change(within(dialog).getByRole('textbox'), { target: { value: '26-CC-9-CT' } })
     fireEvent.click(within(dialog).getByRole('button', { name: 'Gửi ACC' }))
     // Payment is irreversible → a danger confirm gate appears before the POST.

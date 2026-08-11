@@ -36,6 +36,8 @@ export interface BoardCard {
   paused?: boolean
   /** F8 — you hold this ticket, so you may stop/restart its clock. */
   mine?: boolean
+  /** Reconcile lane only — the reason DCC2/DCC3 gave (missing/wrong paper). */
+  reconcileComment?: string | null
 }
 export interface BoardColumn {
   status: string
@@ -78,8 +80,8 @@ export const resumeSla = (id: string) => apiPost<{ ok: true }>(`/ticket/${id}/sl
 // Story 3.1 — 2-phase handover DCC1↔DCC2
 export const receiveDcc2 = (id: string, receivedAt?: string) =>
   apiPost<{ status: string }>(`/dcc2/tickets/${id}/receive`, receivedAt ? { receivedAt } : {})
-export const missingPaperDcc2 = (id: string) =>
-  apiPost<{ ok: true }>(`/dcc2/tickets/${id}/missing-paper`)
+export const missingPaperDcc2 = (id: string, reason?: string) =>
+  apiPost<{ ok: true }>(`/dcc2/tickets/${id}/missing-paper`, reason ? { reason } : {})
 export const resendDcc2 = (id: string) =>
   apiPost<{ ok: true }>(`/dcc1/tickets/${id}/resend-dcc2`)
 export const sendAccounting = (id: string, documentNo: string) =>
@@ -91,18 +93,18 @@ export const receiveFromAcc = (id: string, receivedAt?: string) =>
   )
 export const completeContract = (id: string, scanPath: string) =>
   apiPost<{ status: string }>(`/dcc2/tickets/${id}/complete`, { scanPath })
-export const requestReturn = (id: string) =>
-  apiPost<{ ok: true }>(`/dcc2/tickets/${id}/request-return`)
-export const requestReturnDcc3 = (id: string) =>
-  apiPost<{ ok: true }>(`/dcc3/tickets/${id}/request-return`)
+export const requestReturn = (id: string, reason?: string) =>
+  apiPost<{ ok: true }>(`/dcc2/tickets/${id}/request-return`, reason ? { reason } : {})
+export const requestReturnDcc3 = (id: string, reason?: string) =>
+  apiPost<{ ok: true }>(`/dcc3/tickets/${id}/request-return`, reason ? { reason } : {})
 export const returnPushback = (id: string, reason: string) =>
   apiPost<{ status: string }>(`/dcc1/tickets/${id}/return-pushback`, { reason })
 
 // Story 4.1 — 2-phase handover DCC1→DCC3 (Payment)
 export const receiveDcc3 = (id: string, receivedAt?: string) =>
   apiPost<{ status: string }>(`/dcc3/tickets/${id}/receive`, receivedAt ? { receivedAt } : {})
-export const missingPaperDcc3 = (id: string) =>
-  apiPost<{ ok: true }>(`/dcc3/tickets/${id}/missing-paper`)
+export const missingPaperDcc3 = (id: string, reason?: string) =>
+  apiPost<{ ok: true }>(`/dcc3/tickets/${id}/missing-paper`, reason ? { reason } : {})
 export const resendDcc3 = (id: string) =>
   apiPost<{ ok: true }>(`/dcc1/tickets/${id}/resend-dcc3`)
 export const sendAccountingDcc3 = (id: string, documentNo: string) =>
