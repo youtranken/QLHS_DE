@@ -28,6 +28,9 @@ export interface TimelineEntry {
   occurredAt: string
   reason: string | null
   dwellDays: number
+  /** Processing round this event belongs to — the detail log groups by it so older
+   *  rounds collapse behind a toggle. */
+  roundNo: number
 }
 
 /** F8 — a stopped clock, kept OUT of `timeline`: ticket_event has exactly one
@@ -137,6 +140,7 @@ export class TicketDetailUseCase {
         occurredAt: e.occurredAt.toISOString(),
         reason: e.reason,
         dwellDays: businessDaysBetween(e.occurredAt, end),
+        roundNo: e.roundNo,
       }
     })
 

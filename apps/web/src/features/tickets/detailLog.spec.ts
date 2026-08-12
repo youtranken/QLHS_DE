@@ -9,6 +9,7 @@ const event = (occurredAt: string): TimelineEntry => ({
   actorSub: 'dcc1-lan',
   occurredAt,
   reason: null,
+  roundNo: 0,
 })
 
 const pause = (pausedAt: string, resumedAt: string | null): PauseEntry => ({

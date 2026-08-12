@@ -50,6 +50,8 @@ export interface TimelineEntry {
   actorSub: string
   occurredAt: string
   reason: string | null
+  /** Processing round this event belongs to — the log groups older rounds behind a toggle. */
+  roundNo: number
 }
 
 export interface PauseEntry {

@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
-import { SYSTEM_SUB, TICKET_STATUS } from '@qlhs/contracts'
+import { TICKET_STATUS } from '@qlhs/contracts'
 import { useLiveRefetch } from '../../shared/useLiveRefetch'
-import { getTicketDetail, type TicketDetail as Detail, type TimelineEntry } from './api'
+import { getTicketDetail, type TicketDetail as Detail } from './api'
 import { statusVi } from './statusLabel'
 import { groupAmount, displaySub } from '../../shared/format'
 import { goBack } from '../../shared/route'
@@ -9,44 +9,10 @@ import { mergeLog } from './detailLog'
 import { ReturnPanel } from './ReturnPanel'
 import { SubmittedEditForm } from './SubmittedEditForm'
 import { DetailActions } from './DetailActions'
+import { HandoverLog } from './HandoverLog'
 import { RETURN_STATES } from './ticketStates'
 import { StateNotice } from '../../shared/StateNotice'
 import { applyVp, t } from '../../i18n'
-
-
-/** Human verb for an immutable-log line; falls back to the raw event name.
- *  A function (not a module const) so a future locale switch re-evaluates. */
-function actionVi(): Record<string, string> {
-  return {
-    created: t('tickets.log.created'), submit: t('tickets.log.submit'),
-    pool_picked: t('tickets.log.poolPicked'), pick: t('tickets.log.pick'), confirm: t('tickets.log.confirm'),
-    submitToAndy: t('tickets.log.submitToAndy'), sendToVpAndy: t('tickets.log.sendToVpAndy'),
-    andyApproveComplete: t('tickets.log.andyApproveComplete'),
-    andyRequireBop: t('tickets.log.andyRequireBop'),
-    handoverToDcc2: t('tickets.log.handoverToDcc2'), handoverToDcc3: t('tickets.log.handoverToDcc3'),
-    sendToDcc2: t('tickets.log.sendToDcc2'), sendToDcc3: t('tickets.log.sendToDcc3'),
-    confirmReceivedByDcc2: t('tickets.log.confirmReceivedByDcc2'),
-    confirmReceivedByDcc3: t('tickets.log.confirmReceivedByDcc3'),
-    sendToAccounting: t('tickets.log.sendToAccounting'), receiveFromAcc: t('tickets.log.receiveFromAcc'),
-    submitToBop: t('tickets.log.submitToBop'), sendToBop: t('tickets.log.sendToBop'),
-    bopApprove: t('tickets.log.bopApprove'),
-    completeContract: t('tickets.log.completeContract'), complete: t('tickets.log.complete'),
-    sendBack: t('tickets.log.sendBack'), auto_return: t('tickets.log.autoReturn'),
-    confirmReturnReceipt: t('tickets.log.confirmReturnReceipt'),
-    resubmit: t('tickets.log.resubmit'),
-    reopen: t('tickets.log.reopen'), reopen_requested: t('tickets.log.reopenRequested'),
-    return_requested: t('tickets.log.returnRequested'),
-    missing_paper_flagged: t('tickets.log.missingPaperFlagged'),
-    missing_paper_cleared: t('tickets.log.missingPaperCleared'),
-    priority_changed: t('tickets.log.priorityChanged'),
-    field_changed: t('tickets.log.fieldChanged'),
-    lock_seized: t('tickets.log.lockSeized'), undo: t('tickets.log.undo'),
-    cancel: t('tickets.log.cancel'),
-  }
-}
-
-/** Returns whose reason the reviewer most needs to read — highlighted in the log. */
-const RETURN_ACTIONS: ReadonlySet<string> = new Set(['sendBack', 'auto_return'])
 
 function fmt(iso: string | null): string {
   return iso ? new Date(iso).toLocaleString('vi-VN') : '—'
@@ -121,7 +87,6 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
   const flow = d.flow
   const code = d.code ?? d.id.slice(0, 8)
   const log = mergeLog(d.timeline, d.pauses)
-  const ACTION_VI = actionVi()
   // Built per render (not module-level) so a future locale switch re-evaluates.
   // "Contract No" vs "Payment No" depends on the flow (business rule):
   //  • Payment: the Applicant's contractNo IS the real, required contract number
@@ -318,52 +283,7 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
               </div>
             </div>
 
-            <div className="blk log flush">
-              <h3>{t('tickets.detail.sectionLog')}</h3>
-              {log.length === 0 && <p className="logempty">{t('tickets.detail.logEmpty')}</p>}
-              {log.map((row, i) => (
-                <div className={row.kind === 'event' ? 'li' : 'li pauseli'} key={i}>
-                  <span className="dt">{fmt(row.at)}</span>
-                  <span className="tx">
-                    {row.kind === 'event' ? (
-                      <>
-                        <b>
-                          {row.entry.actorSub === SYSTEM_SUB
-                            ? t('tickets.detail.logSystemActor')
-                            : displaySub(row.entry.actorSub, d.directory)}
-                        </b>{' '}
-                        {ACTION_VI[row.entry.action] ?? row.entry.action}
-                        {row.entry.action === 'reopen' && (
-                          <span className="newround">{t('tickets.detail.logNewRound')}</span>
-                        )}
-                        {row.entry.reason &&
-                          (RETURN_ACTIONS.has(row.entry.action) ? (
-                            <span className="logreason">
-                              <b>{t('tickets.detail.logReturnReasonLabel')}</b>{' '}
-                              {row.entry.reason}
-                            </span>
-                          ) : (
-                            // Any other typed note (DCC "missing paper" report, the DCC1
-                            // note to BOP, …) is highlighted too so it doesn't get lost.
-                            <span className="logcomment">
-                              <b>{t('tickets.detail.logCommentLabel')}</b>{' '}
-                              {row.entry.reason}
-                            </span>
-                          ))}
-                      </>
-                    ) : row.kind === 'pause' ? (
-                      <>
-                        {t('tickets.detail.logPausePrefix')}
-                        <b>{displaySub(row.pause.pausedBySub, d.directory)}</b>
-                        {t('tickets.detail.logPauseSuffix', { reason: row.pause.reason })}
-                      </>
-                    ) : (
-                      <>{t('tickets.detail.logResume')}</>
-                    )}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <HandoverLog log={log} directory={d.directory} />
           </div>
         </div>
       </div>

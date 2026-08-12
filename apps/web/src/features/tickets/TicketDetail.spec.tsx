@@ -22,8 +22,8 @@ const fixture: Detail = {
   pauseReason: null,
   pauses: [],
   timeline: [
-    { action: 'submit', fromStatus: '', toStatus: 'Submitted', actorSub: 'sub-an', occurredAt: '2026-06-28T09:20:00Z', reason: null },
-    { action: 'sendBack', fromStatus: 'x', toStatus: 'Returned', actorSub: 'sub-kt', occurredAt: '2026-07-01T10:00:00Z', reason: 'Thiếu biên bản' },
+    { action: 'submit', fromStatus: '', toStatus: 'Submitted', actorSub: 'sub-an', occurredAt: '2026-06-28T09:20:00Z', reason: null, roundNo: 0 },
+    { action: 'sendBack', fromStatus: 'x', toStatus: 'Returned', actorSub: 'sub-kt', occurredAt: '2026-07-01T10:00:00Z', reason: 'Thiếu biên bản', roundNo: 0 },
   ],
   directory: { 'sub-an': 'Nguyễn Thị An', 'sub-kt': 'Phòng Kế toán' },
 }
@@ -51,10 +51,10 @@ describe('TicketDetail — read-only deep-link page', () => {
     vi.mocked(getTicketDetail).mockResolvedValue({
       ...fixture,
       timeline: [
-        { action: 'field_changed', fromStatus: 'Submitted', toStatus: 'Submitted', actorSub: 'sub-an', occurredAt: '2026-06-29T09:00:00Z', reason: null },
-        { action: 'missing_paper_cleared', fromStatus: 'Submitted to DCC2', toStatus: 'Submitted to DCC2', actorSub: 'sub-kt', occurredAt: '2026-06-30T09:00:00Z', reason: null },
-        { action: 'reopen', fromStatus: 'Completed', toStatus: 'Reopened', actorSub: 'sub-kt', occurredAt: '2026-07-01T09:00:00Z', reason: null },
-        { action: 'auto_return', fromStatus: 'Submitted', toStatus: 'Return-fixing', actorSub: 'system', occurredAt: '2026-07-02T09:00:00Z', reason: 'Quá hạn tiếp nhận' },
+        { action: 'field_changed', fromStatus: 'Submitted', toStatus: 'Submitted', actorSub: 'sub-an', occurredAt: '2026-06-29T09:00:00Z', reason: null, roundNo: 0 },
+        { action: 'missing_paper_cleared', fromStatus: 'Submitted to DCC2', toStatus: 'Submitted to DCC2', actorSub: 'sub-kt', occurredAt: '2026-06-30T09:00:00Z', reason: null, roundNo: 0 },
+        { action: 'reopen', fromStatus: 'Completed', toStatus: 'Reopened', actorSub: 'sub-kt', occurredAt: '2026-07-01T09:00:00Z', reason: null, roundNo: 0 },
+        { action: 'auto_return', fromStatus: 'Submitted', toStatus: 'Return-fixing', actorSub: 'system', occurredAt: '2026-07-02T09:00:00Z', reason: 'Quá hạn tiếp nhận', roundNo: 0 },
       ],
     })
     render(<TicketDetail ticketId="t1" />)

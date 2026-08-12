@@ -134,6 +134,7 @@ export const tickets = {
     logReturnReasonLabel: 'Lý do trả lại:',
     logCommentLabel: 'Ghi chú:',
     logNewRound: 'Bắt đầu vòng mới',
+    logRoundBtn: 'Round {n}',
     logSystemActor: 'Hệ thống',
     logPausePrefix: '',
     logPauseSuffix: ' dừng đồng hồ SLA — “{reason}”',

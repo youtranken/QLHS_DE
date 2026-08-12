@@ -391,6 +391,35 @@
   font-size: 11.5px;
   color: var(--ink-3);
 }
+/* Older-round toggle: the latest round stays open; each earlier round (Round 0,
+   1, 2 …) collapses behind this chip so current activity isn't buried under old
+   rounds. The chevron rotates when its round is expanded. */
+.log .logroundtoggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  padding: 8px 0;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--line-soft);
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+  text-align: left;
+}
+.log .logroundtoggle:hover {
+  color: var(--ink);
+}
+.log .logroundtoggle .chev {
+  color: var(--ink-3);
+  transition: transform 0.15s ease;
+}
+.log .logroundtoggle.on .chev {
+  transform: rotate(90deg);
+}
 /* Lý do trả lại — nổi bật để người xem đọc ngay được vì sao hồ sơ bị trả về. */
 .log .logreason {
   display: block;

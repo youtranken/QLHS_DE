@@ -131,6 +131,7 @@ export const tickets = {
     logReturnReasonLabel: 'Return reason:',
     logCommentLabel: 'Note:',
     logNewRound: 'New round starts',
+    logRoundBtn: 'Round {n}',
     logSystemActor: 'System',
     logPausePrefix: '',
     logPauseSuffix: ' stopped the SLA clock — “{reason}”',

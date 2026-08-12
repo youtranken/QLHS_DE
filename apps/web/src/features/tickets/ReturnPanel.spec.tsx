@@ -45,6 +45,7 @@ function detailAt(status: string): TicketDetail {
         actorSub: 'dcc1-a',
         occurredAt: '2026-07-10T02:00:00.000Z',
         reason: 'Thiếu chữ ký',
+        roundNo: 0,
       },
     ],
     directory: {},
