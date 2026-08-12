@@ -8,7 +8,9 @@ import { t } from '../../i18n'
  * go bulk, so a batch can't silently skip the reason a single-card path demands.
  */
 export function isBulkable(a: LegalAction): boolean {
-  return !a.reasonRequired && !a.event.startsWith('__')
+  // `sendToAccounting` needs a DISTINCT number per ticket — it has its own batch
+  // sheet (BatchSendAccountingModal), never a one-action bulk.
+  return !a.reasonRequired && !a.event.startsWith('__') && a.event !== 'sendToAccounting'
 }
 
 /** A column earns a bulk-select checkbox only if some card there has a bulk-apply

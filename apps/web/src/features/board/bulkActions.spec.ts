@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { bulkSelectGroups, commonBulkActions, summarizeBatch, handoverEventOf, HANDOVER_DCC } from './bulkActions'
+import { bulkSelectGroups, commonBulkActions, isBulkable, summarizeBatch, handoverEventOf, HANDOVER_DCC } from './bulkActions'
 import type { BoardCard, LegalAction } from './api'
 
 const act = (event: string, over: Partial<LegalAction> = {}): LegalAction => ({
@@ -46,6 +46,17 @@ describe('commonBulkActions — actions legal for EVERY selected card', () => {
     const contract = card([act('handoverToDcc2')])
     const general = card([act('andyApproveComplete')])
     expect(commonBulkActions([contract, general])).toEqual([])
+  })
+})
+
+describe('isBulkable', () => {
+  it('allows DCC2 hardcopy confirm/complete, excludes sendToAccounting, pseudo, reason-gated', () => {
+    expect(isBulkable(act('confirmReceivedByDcc2'))).toBe(true)
+    expect(isBulkable(act('completeContract'))).toBe(true)
+    // sendToAccounting needs a per-ticket number → its own batch sheet, never a bulk.
+    expect(isBulkable(act('sendToAccounting'))).toBe(false)
+    expect(isBulkable(act('__pick'))).toBe(false)
+    expect(isBulkable(act('sendBack', { reasonRequired: true }))).toBe(false)
   })
 })
 

@@ -67,6 +67,8 @@ export const board = {
     // Umbrella label for a mixed Contract + Payment selection at "Submit to VP": each
     // ticket still routes to its own flow's DCC (DCC2 for Contract, DCC3 for Payment).
     handoverDcc: 'Hand to DCC',
+    // DCC2 bulk hardcopy: confirm receipt of many; tick to also complete them.
+    alsoComplete: 'Complete too',
     confirmTitle: 'Apply to {n} tickets',
     confirmMessage: 'This will apply "{action}" to the {n} selected tickets. The action may be irreversible. Continue?',
     resultOk: 'Applied to {n} tickets.',
@@ -79,6 +81,7 @@ export const board = {
     andyComplete: 'Boss approves → complete',
     andyBop: 'Submit to BOP',
     sendAccounting: 'Send to Accounting…',
+    confirmHardcopy: 'Confirm receipt',
     completeContract: 'Complete',
     submitBop: 'Submit to BOP',
   },

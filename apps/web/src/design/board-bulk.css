@@ -36,6 +36,20 @@
   font-size: 12.5px;
   border-radius: 8px;
 }
+/* "Hoàn tất luôn" modifier next to the DCC2 confirm action. */
+.bulkbar .bulkalso {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.bulkbar .bulkalso input {
+  cursor: pointer;
+}
 
 /* Nút thu gọn bản đồ tuyến (đưa bảng trạm lên trên khi cần). Chip nhất quán với
    .chiptoggle: có icon + chevron xoay theo trạng thái, target đủ lớn cho cảm ứng. */

@@ -7,8 +7,10 @@ import { ConfirmReceivedByDcc2UseCase } from '../../application/handover/confirm
 import { ReportMissingPaperUseCase } from '../../application/handover/report-missing-paper.usecase'
 import { SubmitToAccountingUseCase } from '../../application/accounting/submit-to-accounting.usecase'
 import { CompleteContractUseCase } from '../../application/accounting/complete-contract.usecase'
+import { BatchDcc2UseCase } from '../../application/board/batch-dcc2.usecase'
+import type { BatchResult } from '../../application/board/batch-action.usecase'
 import { Dcc2ReceiveDto, SendAccountingDto } from '../dcc-shared/dcc2-receive.dto'
-import { ReasonDto } from '../dcc-shared/ticket-action.dto'
+import { Dcc2BatchDto, ReasonDto } from '../dcc-shared/ticket-action.dto'
 
 /** DCC2 hardcopy handover actions (Story 3.1, AD-10): confirm receipt (phase 2)
  *  and the "missing paper" reconcile bounce. Contract flow only. */
@@ -21,7 +23,19 @@ export class Dcc2Controller {
     private readonly reportMissing: ReportMissingPaperUseCase,
     private readonly submitAccounting: SubmitToAccountingUseCase,
     private readonly completeContract: CompleteContractUseCase,
+    private readonly batch: BatchDcc2UseCase,
   ) {}
+
+  // Bulk hardcopy close: confirm receipt of many, or complete many, in one call.
+  // The FE chains confirm→complete for the "Hoàn tất luôn" shortcut (skips the
+  // resting Hardcopy step visually, not in the audit trail).
+  @Post('tickets/action')
+  batchAction(
+    @GetCurrentUser() user: CurrentUser,
+    @Body() dto: Dcc2BatchDto,
+  ): Promise<BatchResult[]> {
+    return this.batch.execute({ ticketIds: dto.ticketIds, event: dto.event, actorSub: user.sub })
+  }
 
   @Post('tickets/:id/receive')
   async receive(

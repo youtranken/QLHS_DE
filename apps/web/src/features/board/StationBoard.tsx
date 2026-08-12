@@ -18,9 +18,14 @@ import { applyVp, t } from '../../i18n'
 /** DCC "Trạm của tôi" board: columns per station, each card has a keyboard-
  *  accessible ⋯ menu of legal actions (AD-17). Drag-drop is an enhancement of
  *  this same launcher; the ⋯ menu is the required keyboard-equivalent path.
- *  `canManage` (DCC1 only) unlocks bulk-select on the Andy column (FR-8) and the
- *  any-status priority picker (FR-1). */
-export function StationBoard({ canManage = false }: { canManage?: boolean } = {}) {
+ *  `canManage` (DCC1 only) unlocks the flow filter + any-status priority picker
+ *  (FR-1). Bulk-select is available to DCC1 (Andy decisions, FR-8) AND DCC2 (bulk
+ *  hardcopy confirm / complete) — `canBulk` below. */
+export function StationBoard({ canManage = false, dcc2 = false }: { canManage?: boolean; dcc2?: boolean } = {}) {
+  // Who may bulk-select: DCC1 (its stations) or DCC2 (hardcopy close). The card
+  // actions are role-scoped server-side, so a column only offers a bulk action the
+  // viewer can actually take.
+  const canBulk = canManage || dcc2
   const [cols, setCols] = useState<BoardColumn[]>([])
   const [q, setQ] = useState('')
   const [overOnly, setOverOnly] = useState(false)
@@ -155,11 +160,13 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
           {t('board.header.findTicket')}
         </button>
       </div>
-      {canManage && (
+      {canBulk && (
         <BulkActionBar
           count={selectedCards.length}
           actions={bulkActions}
-          onApply={(action) => doBatch(selectedCards, action, () => setSel(new Set()))}
+          onApply={(action, alsoComplete) =>
+            doBatch(selectedCards, action, () => setSel(new Set()), { alsoComplete })
+          }
           onClear={() => setSel(new Set())}
         />
       )}
@@ -187,7 +194,7 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
           // Payment No, so offer a batch-entry sheet instead of a one-action bulk.
           const batchCards = shown.filter((c) => c.actions.some((a) => a.event === 'sendToAccounting'))
           // Cards in this column the DCC1 can bulk-select; drives the "select all" chip.
-          const selectableCards = canManage && !col.reconcile ? shown.filter((c) => c.actions.some(isBulkable)) : []
+          const selectableCards = canBulk && !col.reconcile ? shown.filter((c) => c.actions.some(isBulkable)) : []
           // One "select all" per bulk family — the Andy column splits General vs
           // Contract/Payment so a mixed pick never leaves the bulk bar empty.
           const selGroups = bulkSelectGroups(selectableCards)
@@ -256,7 +263,7 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
                     busy={inFlight.has(c.id)}
                     onAction={(card, action) => void run(card, action)}
                     onSeize={(id) => void doSeize(id)}
-                    selectable={canManage && !col.reconcile && columnHasBulkAction(shown)}
+                    selectable={canBulk && !col.reconcile && columnHasBulkAction(shown)}
                     selected={sel.has(c.id)}
                     onToggleSelect={toggleSel}
                   />

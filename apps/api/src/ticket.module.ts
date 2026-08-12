@@ -35,6 +35,7 @@ import { CheckDocumentNosUseCase } from './application/accounting/check-document
 import { ReturnFromPushbackUseCase } from './application/returns/return-from-pushback.usecase'
 import { UndoActionUseCase } from './application/board/undo-action.usecase'
 import { BatchActionUseCase } from './application/board/batch-action.usecase'
+import { BatchDcc2UseCase } from './application/board/batch-dcc2.usecase'
 import { ListWorkboxUseCase } from './application/board/list-workbox.usecase'
 import { TicketDetailUseCase } from './application/core/ticket-detail.usecase'
 import { ListMyTicketsUseCase } from './application/lifecycle/list-my-tickets.usecase'
@@ -126,6 +127,7 @@ import { DispatchController } from './http/dispatch/dispatch.controller'
     ReturnFromPushbackUseCase,
     UndoActionUseCase,
     BatchActionUseCase,
+    BatchDcc2UseCase,
     ListWorkboxUseCase,
     TicketDetailUseCase,
     ListMyTicketsUseCase,

@@ -67,6 +67,8 @@ export const board = {
     // Nhãn gộp khi chọn hỗn hợp Contract + Payment ở ga "Trình Sếp": mỗi hồ sơ vẫn
     // đi đúng DCC của luồng nó (DCC2 cho Contract, DCC3 cho Payment).
     handoverDcc: 'Chuyển cho DCC',
+    // DCC2 bulk hardcopy: xác nhận nhận nhiều bản cứng; tick để hoàn tất luôn.
+    alsoComplete: 'Hoàn tất luôn',
     confirmTitle: 'Áp dụng cho {n} hồ sơ',
     confirmMessage: 'Sẽ áp dụng "{action}" cho {n} hồ sơ đã chọn. Hành động có thể không hoàn tác. Tiếp tục?',
     resultOk: 'Đã áp dụng cho {n} hồ sơ.',
@@ -79,6 +81,7 @@ export const board = {
     andyComplete: 'Sếp duyệt → hoàn tất',
     andyBop: 'Trình BOP',
     sendAccounting: 'Gửi Kế toán…',
+    confirmHardcopy: 'Xác nhận nhận',
     completeContract: 'Hoàn tất',
     submitBop: 'Trình BOP',
   },

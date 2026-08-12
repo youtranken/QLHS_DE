@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import {
   batchAction,
+  batchDcc2Action,
   missingPaperDcc2,
   missingPaperDcc3,
   receiveDcc2,
@@ -136,17 +137,19 @@ export function useBoardActions(load: () => Promise<void>) {
   // (Approve→Complete is irreversible); each ticket's result is independent. The
   // "Chuyển cho DCC" umbrella spans two events (Contract→DCC2, Payment→DCC3), so
   // it fans out into one batch call per event and merges the results.
-  function doBatch(cards: BoardCard[], action: LegalAction, onDone: () => void) {
+  function doBatch(
+    cards: BoardCard[],
+    action: LegalAction,
+    onDone: () => void,
+    opts: { alsoComplete?: boolean } = {},
+  ) {
     setAsk({
       title: t('board.bulk.confirmTitle', { n: cards.length }),
       message: t('board.bulk.confirmMessage', { n: cards.length, action: primaryLabel(action) }),
       danger: true,
       confirmLabel: action.label,
       onOk: async () => {
-        const results =
-          action.event === HANDOVER_DCC
-            ? await batchByHandover(cards)
-            : await batchAction(cards.map((c) => c.id), action.event)
+        const results = await runBatch(cards, action, opts)
         const { ok, failed } = summarizeBatch(results)
         if (ok === 0) toast.err(t('board.bulk.resultFail'))
         else if (failed > 0) toast.info(t('board.bulk.resultPartial', { ok, failed }))
@@ -155,6 +158,25 @@ export function useBoardActions(load: () => Promise<void>) {
         await load()
       },
     })
+  }
+
+  // Route a bulk action to the right endpoint: the "hand to DCC" umbrella, the DCC2
+  // hardcopy endpoint (confirm / complete), or the generic DCC1 batch. For the DCC2
+  // "Hoàn tất luôn" shortcut, confirm first, then complete the ones that reached
+  // Hardcopy — the two-phase edge is preserved, just driven in one click.
+  async function runBatch(cards: BoardCard[], action: LegalAction, opts: { alsoComplete?: boolean }) {
+    if (action.event === HANDOVER_DCC) return batchByHandover(cards)
+    const ids = cards.map((c) => c.id)
+    if (action.event === 'confirmReceivedByDcc2' || action.event === 'completeContract') {
+      const confirmed = await batchDcc2Action(ids, action.event)
+      if (!opts.alsoComplete || action.event !== 'confirmReceivedByDcc2') return confirmed
+      const okIds = confirmed.filter((r) => r.ok).map((r) => r.id)
+      if (okIds.length === 0) return confirmed
+      const done = await batchDcc2Action(okIds, 'completeContract')
+      const doneById = new Map(done.map((d) => [d.id, d]))
+      return confirmed.map((r) => doneById.get(r.id) ?? r)
+    }
+    return batchAction(ids, action.event)
   }
 
   // Route each card to its own flow's handover event (DCC2 vs DCC3), one batch call

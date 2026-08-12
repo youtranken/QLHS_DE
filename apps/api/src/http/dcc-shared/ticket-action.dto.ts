@@ -74,3 +74,22 @@ export class BatchActionDto {
   @MaxLength(REASON_MAX)
   reason?: string
 }
+
+/** DCC2 hardcopy bulk (Contract close): confirm receipt of many hardcopies, or
+ *  complete many at once. Both route through the real per-ticket use cases (email
+ *  intent + reconcile guard), never a raw batch transition. */
+export const DCC2_BATCH_EVENTS: string[] = [
+  TICKET_EVENT.ConfirmReceivedByDcc2,
+  TICKET_EVENT.CompleteContract,
+]
+
+export class Dcc2BatchDto {
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayMaxSize(BATCH_MAX)
+  @IsString({ each: true })
+  ticketIds!: string[]
+
+  @IsIn(DCC2_BATCH_EVENTS)
+  event!: string
+}
