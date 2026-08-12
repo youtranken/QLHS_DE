@@ -22,13 +22,16 @@ export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Pr
     setHandover, setSendAcc, setReceiveAcc, setAsk,
     run, doReceive, doMissing, doSendAcc, doReceiveAcc,
   } = useBoardActions(onDone)
-  const { ref: detailsRef, onKeyDown } = useDetailsMenu<HTMLDetailsElement>({
-    menuSelector: '.dactpop button:not([disabled])',
-    summarySelector: '.dactdots',
-  })
 
   const { primary, menu } = splitActions(d.actions)
   const hasActions = primary.length > 0 || menu.length > 0
+  // `present` must track when the ⋯ <details> is actually in the DOM: d.actions can
+  // arrive AFTER mount via a live refetch, so the menu wiring re-attaches then.
+  const { ref: detailsRef, onKeyDown } = useDetailsMenu<HTMLDetailsElement>({
+    menuSelector: '.dactpop button:not([disabled])',
+    summarySelector: '.dactdots',
+    present: menu.length > 0,
+  })
 
   // A card-shaped view of the ticket for the shared runner/modals (they read
   // id/code/flow; the rest is filler the detail surface never shows).

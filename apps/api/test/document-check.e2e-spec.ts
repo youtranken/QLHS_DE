@@ -80,8 +80,8 @@ describe('Document No pre-flight check (e2e)', () => {
 
   it('Admin may probe too (both boards)', async () => {
     await seed('Submitted to Accounting', 'CT-2026-0010', 'ADM-1')
-    const admin = await login('admin-e2e', ['Admin'])
-    const res = await admin.post('/tickets/check-document-nos').send({ documentNos: ['ADM-1', 'ADM-2'] })
+    const adminAgent = await login('admin-e2e', ['Admin'])
+    const res = await adminAgent.post('/tickets/check-document-nos').send({ documentNos: ['ADM-1', 'ADM-2'] })
     expect(res.status).toBe(200)
     expect(res.body.existing).toEqual(['ADM-1'])
   })

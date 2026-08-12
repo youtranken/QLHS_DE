@@ -42,12 +42,15 @@ function fmt(iso: string | null): string {
   return iso ? new Date(iso).toLocaleString('vi-VN') : '—'
 }
 
-/** Which processing round a row belongs to. Events carry it; a pause/resume takes
- *  the round in effect when it happened (the latest event at-or-before its time). */
+/** Which processing round a row belongs to. Events carry it directly. A pause AND
+ *  its resume both anchor to when the pause OPENED (the latest event at-or-before
+ *  `pausedAt`) — so a pause held across a round bump keeps its ⏸/▶ pair together in
+ *  one round group instead of stranding an orphan "resume" in the newer round. */
 function roundOf(row: LogRow, events: ReadonlyArray<Extract<LogRow, { kind: 'event' }>>): number {
   if (row.kind === 'event') return row.entry.roundNo
+  const at = row.pause.pausedAt
   let round = 0
-  for (const e of events) if (e.at <= row.at) round = Math.max(round, e.entry.roundNo)
+  for (const e of events) if (e.at <= at) round = Math.max(round, e.entry.roundNo)
   return round
 }
 

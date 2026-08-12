@@ -12,9 +12,13 @@ export function useDetailsMenu<T extends HTMLDetailsElement>(opts: {
   menuSelector: string
   /** Selector for the summary to refocus on Escape. */
   summarySelector: string
+  /** Whether the <details> is currently in the DOM. The <details> can appear AFTER
+   *  mount (a card/detail refetches in place when actions arrive), so this must be a
+   *  dep — else the toggle listener never attaches to a late-mounted menu. */
+  present: boolean
 }) {
   const ref = useRef<T>(null)
-  const { menuSelector, summarySelector } = opts
+  const { menuSelector, summarySelector, present } = opts
 
   useEffect(() => {
     const el = ref.current
@@ -33,7 +37,7 @@ export function useDetailsMenu<T extends HTMLDetailsElement>(opts: {
       el.removeEventListener('toggle', onToggle)
       document.removeEventListener('pointerdown', onOutside, true)
     }
-  }, [menuSelector])
+  }, [menuSelector, present])
 
   const onKeyDown = (e: KeyboardEvent<T>) => {
     if (e.key === 'Escape' && ref.current?.open) {
