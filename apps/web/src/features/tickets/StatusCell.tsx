@@ -2,8 +2,8 @@ import { applyVp } from '../../i18n'
 import { statusVi } from './statusLabel'
 import { CLOSED, RETURN_STATES } from './ticketStates'
 
-/** Two-line status: English canonical chip (AD-13) with the Vietnamese gloss
- *  below it, so a narrow column keeps both readable instead of truncating. */
+/** Single-line status: the English canonical chip (AD-13). The Vietnamese gloss is
+ *  the chip's tooltip so the cell stays one line and every row shares a height. */
 export function StatusCell({ status }: { status: string }) {
   const cls =
     status === 'Completed' || CLOSED.has(status)
@@ -12,12 +12,9 @@ export function StatusCell({ status }: { status: string }) {
         ? 'chip sla'
         : 'chip'
   return (
-    <span className="statuscell">
-      <span className={cls}>
-        <span className="dot" aria-hidden />
-        <span lang="en">{applyVp(status)}</span>
-      </span>
-      <small className="vi">{statusVi(status)}</small>
+    <span className={cls} title={statusVi(status)}>
+      <span className="dot" aria-hidden />
+      <span lang="en">{applyVp(status)}</span>
     </span>
   )
 }
