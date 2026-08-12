@@ -69,6 +69,10 @@ export const batchAction = (ticketIds: string[], event: string, reason?: string)
 export const batchDcc2Action = (ticketIds: string[], event: string) =>
   apiPost<BatchResult[]>('/dcc2/tickets/action', { ticketIds, event })
 
+/** DCC3 hardcopy bulk — confirm receipt of many (Payment; no complete step). */
+export const batchDcc3Action = (ticketIds: string[], event: string) =>
+  apiPost<BatchResult[]>('/dcc3/tickets/action', { ticketIds, event })
+
 /** FR-1 — DCC1 re-prioritises a ticket in ANY state (audited server-side). */
 export const changePriority = (id: string, priority: string) =>
   apiPatch<{ ok: true }>(`/dcc1/tickets/${id}/priority`, { priority })

@@ -32,8 +32,11 @@ export function BulkActionBar({ count, actions, busy = false, onApply, onClear }
             onClick={() => onApply(a, a.event === 'confirmReceivedByDcc2' ? alsoComplete : undefined)}
           >
             {/* Bulk = confirm MANY, so name the confirm action for the batch context
-                without changing the card's neutral "Kiểm tra bản cứng" label. */}
-            {a.event === 'confirmReceivedByDcc2' ? t('board.primary.confirmHardcopy') : primaryLabel(a)}
+                (both DCC2/DCC3) without changing the card's neutral "Kiểm tra bản
+                cứng" label. */}
+            {a.event === 'confirmReceivedByDcc2' || a.event === 'confirmReceivedByDcc3'
+              ? t('board.primary.confirmHardcopy')
+              : primaryLabel(a)}
           </button>
         ))}
         {hasConfirm && (

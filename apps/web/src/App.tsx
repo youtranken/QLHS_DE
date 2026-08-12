@@ -241,7 +241,11 @@ export function App() {
                 />
               )}
             </div>
-            <StationBoard canManage={user.activeRole === ROLE.Dcc1} dcc2={user.activeRole === ROLE.Dcc2} />
+            <StationBoard
+              canManage={user.activeRole === ROLE.Dcc1}
+              dcc2={user.activeRole === ROLE.Dcc2}
+              dcc3={user.activeRole === ROLE.Dcc3}
+            />
           </section>
         )}
       </main>

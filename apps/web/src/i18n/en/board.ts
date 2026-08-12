@@ -81,7 +81,7 @@ export const board = {
     andyComplete: 'Boss approves → complete',
     andyBop: 'Submit to BOP',
     sendAccounting: 'Send to Accounting…',
-    confirmHardcopy: 'Confirm receipt',
+    confirmHardcopy: 'Confirm',
     completeContract: 'Complete',
     submitBop: 'Submit to BOP',
   },

@@ -21,11 +21,15 @@ import { applyVp, t } from '../../i18n'
  *  `canManage` (DCC1 only) unlocks the flow filter + any-status priority picker
  *  (FR-1). Bulk-select is available to DCC1 (Andy decisions, FR-8) AND DCC2 (bulk
  *  hardcopy confirm / complete) — `canBulk` below. */
-export function StationBoard({ canManage = false, dcc2 = false }: { canManage?: boolean; dcc2?: boolean } = {}) {
-  // Who may bulk-select: DCC1 (its stations) or DCC2 (hardcopy close). The card
-  // actions are role-scoped server-side, so a column only offers a bulk action the
-  // viewer can actually take.
-  const canBulk = canManage || dcc2
+export function StationBoard({
+  canManage = false,
+  dcc2 = false,
+  dcc3 = false,
+}: { canManage?: boolean; dcc2?: boolean; dcc3?: boolean } = {}) {
+  // Who may bulk-select: DCC1 (its stations), DCC2 (Contract hardcopy close) or DCC3
+  // (Payment hardcopy confirm). The card actions are role-scoped server-side, so a
+  // column only offers a bulk action the viewer can actually take.
+  const canBulk = canManage || dcc2 || dcc3
   const [cols, setCols] = useState<BoardColumn[]>([])
   const [q, setQ] = useState('')
   const [overOnly, setOverOnly] = useState(false)

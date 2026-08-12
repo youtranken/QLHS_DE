@@ -6,7 +6,9 @@ import { GetCurrentUser, type CurrentUser } from '../auth/current-user'
 import { ConfirmReceivedByDcc3UseCase } from '../../application/handover/confirm-received-dcc3.usecase'
 import { ReportMissingPaperDcc3UseCase } from '../../application/handover/report-missing-paper-dcc3.usecase'
 import { SendAccountingDcc3UseCase } from '../../application/accounting/send-accounting-dcc3.usecase'
-import { ReasonDto, ReceiveDateDto } from '../dcc-shared/ticket-action.dto'
+import { BatchDcc3UseCase } from '../../application/board/batch-dcc3.usecase'
+import type { BatchResult } from '../../application/board/batch-action.usecase'
+import { Dcc3BatchDto, ReasonDto, ReceiveDateDto } from '../dcc-shared/ticket-action.dto'
 import { SendAccountingDto } from '../dcc-shared/dcc2-receive.dto'
 
 /** DCC3 hardcopy handover actions (Story 4.1, AD-10): confirm receipt (phase 2)
@@ -19,7 +21,17 @@ export class Dcc3Controller {
     private readonly confirmReceived: ConfirmReceivedByDcc3UseCase,
     private readonly reportMissing: ReportMissingPaperDcc3UseCase,
     private readonly sendAccounting: SendAccountingDcc3UseCase,
+    private readonly batch: BatchDcc3UseCase,
   ) {}
+
+  // Bulk confirm-receipt of many Payment hardcopies at "Submitted to DCC3".
+  @Post('tickets/action')
+  batchAction(
+    @GetCurrentUser() user: CurrentUser,
+    @Body() dto: Dcc3BatchDto,
+  ): Promise<BatchResult[]> {
+    return this.batch.execute({ ticketIds: dto.ticketIds, actorSub: user.sub })
+  }
 
   @Post('tickets/:id/receive')
   receive(

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import {
   batchAction,
   batchDcc2Action,
+  batchDcc3Action,
   missingPaperDcc2,
   missingPaperDcc3,
   receiveDcc2,
@@ -179,6 +180,7 @@ export function useBoardActions(load: () => Promise<void>) {
       const doneById = new Map(done.map((d) => [d.id, d]))
       return confirmed.map((r) => doneById.get(r.id) ?? r)
     }
+    if (action.event === 'confirmReceivedByDcc3') return batchDcc3Action(ids, action.event)
     return batchAction(ids, action.event)
   }
 

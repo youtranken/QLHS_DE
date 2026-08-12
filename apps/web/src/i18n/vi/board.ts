@@ -81,7 +81,7 @@ export const board = {
     andyComplete: 'Sếp duyệt → hoàn tất',
     andyBop: 'Trình BOP',
     sendAccounting: 'Gửi Kế toán…',
-    confirmHardcopy: 'Xác nhận nhận',
+    confirmHardcopy: 'Xác nhận',
     completeContract: 'Hoàn tất',
     submitBop: 'Trình BOP',
   },

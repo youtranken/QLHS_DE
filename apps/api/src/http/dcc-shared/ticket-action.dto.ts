@@ -93,3 +93,17 @@ export class Dcc2BatchDto {
   @IsIn(DCC2_BATCH_EVENTS)
   event!: string
 }
+
+/** DCC3 hardcopy bulk (Payment): confirm-receipt only — no complete step. */
+export const DCC3_BATCH_EVENTS: string[] = [TICKET_EVENT.ConfirmReceivedByDcc3]
+
+export class Dcc3BatchDto {
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayMaxSize(BATCH_MAX)
+  @IsString({ each: true })
+  ticketIds!: string[]
+
+  @IsIn(DCC3_BATCH_EVENTS)
+  event!: string
+}
