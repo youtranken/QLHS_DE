@@ -42,6 +42,76 @@
   background: var(--accent-soft);
   color: var(--accent);
 }
+/* Header action bar — DCC parity with the board card (primary button + ⋯ menu).
+   The ⋯ popup opens DOWNWARD into the card body so .dcard's overflow:hidden (kept
+   for the rounded corners) never clips it. */
+.dhead .dactions {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+.dhead .dactions .btn.primary {
+  white-space: nowrap;
+}
+.dhead .dactmenu {
+  position: relative;
+}
+.dhead .dactdots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--ink-2);
+  cursor: pointer;
+  list-style: none;
+}
+.dhead .dactdots::-webkit-details-marker {
+  display: none;
+}
+.dhead .dactdots:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+.dhead .dactpop {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 30;
+  min-width: 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.5);
+}
+.dhead .dactpop button {
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 13px;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.dhead .dactpop button:hover {
+  background: var(--panel-2);
+}
+.dhead .dactpop button.danger {
+  color: var(--sla);
+}
+.dhead .dactpop button.danger:hover {
+  background: color-mix(in srgb, var(--sla) 12%, transparent);
+}
 .dbody {
   display: grid;
   grid-template-columns: 1fr 320px;

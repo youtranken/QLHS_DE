@@ -1,4 +1,5 @@
 import { apiGet, apiPatch, apiPost } from '../../shared/api-client'
+import type { LegalAction } from '../board/api'
 
 export interface TicketView {
   id: string
@@ -87,6 +88,9 @@ export interface TicketDetail {
   route: RouteStation[]
   timeline: TimelineEntry[]
   pauses: PauseEntry[]
+  /** The viewer's legal actions on this ticket right now (role-scoped server-side,
+   *  same derivation as the board card). Empty when the viewer can't act. */
+  actions: LegalAction[]
   /** sub → display name (AD-12); resolve holder/actor subs through this. */
   directory: Record<string, string>
 }

@@ -23,7 +23,7 @@ export const auth = {
     hidePassword: 'Hide password',
     heroEyebrow: 'Ticket management · Internal',
     heroTitle: 'Track tickets,',
-    heroTitleEm: 'clear through every station.',
+    heroTitleEm: 'station by station.',
     heroLead:
       'Intake → processing → approval → archive. One sign-in gate, tracking the progress and SLA of every ticket.',
   },

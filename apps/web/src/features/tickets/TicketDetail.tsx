@@ -8,6 +8,7 @@ import { goBack } from '../../shared/route'
 import { mergeLog } from './detailLog'
 import { ReturnPanel } from './ReturnPanel'
 import { SubmittedEditForm } from './SubmittedEditForm'
+import { DetailActions } from './DetailActions'
 import { RETURN_STATES } from './ticketStates'
 import { StateNotice } from '../../shared/StateNotice'
 import { applyVp, t } from '../../i18n'
@@ -223,6 +224,12 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
               {t('tickets.detail.pausedTag')}
               {d.pauseReason ? t('tickets.detail.pausedReasonSuffix', { reason: d.pauseReason }) : ''}
             </span>
+          )}
+          {/* Act on the ticket right here (DCC parity with the board card). Skipped in
+              the Pool/Return states — those are the Applicant's own edit/resubmit
+              panels above; DetailActions renders nothing when there's no legal action. */}
+          {!RETURN_STATES.has(d.status) && d.status !== TICKET_STATUS.Submitted && (
+            <DetailActions d={d} onDone={load} />
           )}
         </div>
 

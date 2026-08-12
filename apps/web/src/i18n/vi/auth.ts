@@ -23,7 +23,7 @@ export const auth = {
     hidePassword: 'Ẩn mật khẩu',
     heroEyebrow: 'Quản lý hồ sơ · Nội bộ',
     heroTitle: 'Theo dõi hồ sơ,',
-    heroTitleEm: 'thông suốt từng ga.',
+    heroTitleEm: 'từng trạm xử lý.',
     heroLead:
       'Tiếp nhận → xử lý → phê duyệt → lưu trữ. Một cửa đăng nhập, theo sát tiến độ và SLA của từng hồ sơ.',
   },

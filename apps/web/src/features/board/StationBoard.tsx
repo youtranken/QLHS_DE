@@ -1,12 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLiveRefetch } from '../../shared/useLiveRefetch'
 import { getStationBoard, type BoardCard, type BoardColumn } from './api'
-import { HandoverModal } from './HandoverModal'
-import { SendAccountingModal } from './SendAccountingModal'
 import { BatchSendAccountingModal } from './BatchSendAccountingModal'
-import { ConfirmModal } from '../../shared/ConfirmModal'
+import { BoardActionModals } from './BoardActionModals'
 import { StateNotice } from '../../shared/StateNotice'
-import { toast } from '../../shared/toast'
 import { BoardCardView } from './BoardCardView'
 import { BulkActionBar } from './BulkActionBar'
 import { commonBulkActions, columnHasBulkAction } from './bulkActions'
@@ -87,12 +84,6 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
   const filterActive = q.trim() !== '' || overOnly || flow !== 'All' || priority !== 'All'
   const noMatches = filterActive && loaded && cols.every((col) => !col.cards.some(match))
   const hhmm = (ms: number) => new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-  const applyFilter = (f: BoardFilter) => {
-    setQ(f.q)
-    setOverOnly(f.overOnly)
-    setFlow(f.flow)
-    setPriority(f.priority)
-  }
 
   // Bulk-select is DCC1-only and offered on every real station column (not the
   // reconcile lane). The bulk bar only shows actions legal for the WHOLE selection
@@ -119,6 +110,8 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
                 : ''}
           </span>
         )}
+        {/* Facets live on this same header row now (next to the "Cập nhật …" cue). */}
+        <BoardFilterBar canManage={canManage} filter={filter} onFlow={setFlow} onPriority={setPriority} />
         <label className="srch">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />
@@ -151,13 +144,6 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
           {t('board.header.findTicket')}
         </button>
       </div>
-      <BoardFilterBar
-        canManage={canManage}
-        filter={filter}
-        onFlow={setFlow}
-        onPriority={setPriority}
-        onApplyView={applyFilter}
-      />
       {canManage && (
         <BulkActionBar
           count={selectedCards.length}
@@ -244,37 +230,6 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
         })}
       </div>
       )}
-      {handover && (
-        <HandoverModal
-          code={handover.code ?? handover.id.slice(0, 8)}
-          onConfirm={(d) => doReceive(handover, d)}
-          onMissing={(reason) => doMissing(handover, reason)}
-          onClose={() => setHandover(null)}
-        />
-      )}
-      {sendAcc && (
-        <SendAccountingModal
-          code={sendAcc.code ?? sendAcc.id.slice(0, 8)}
-          docLabel={
-            sendAcc.flow === 'Payment'
-              ? t('board.modals.sendAccounting.payNoLabel')
-              : t('board.modals.sendAccounting.docNoLabel')
-          }
-          confirmClose={sendAcc.flow === 'Payment'}
-          onSubmit={(docNo) => doSendAcc(sendAcc, docNo)}
-          onClose={() => setSendAcc(null)}
-        />
-      )}
-      {receiveAcc && (
-        <HandoverModal
-          title={t('board.modals.receiveAcc.title')}
-          confirmLabel={t('board.modals.receiveAcc.confirm')}
-          dateLabel={t('board.modals.receiveAcc.dateLabel')}
-          code={receiveAcc.code ?? receiveAcc.id.slice(0, 8)}
-          onConfirm={(d) => doReceiveAcc(receiveAcc, d)}
-          onClose={() => setReceiveAcc(null)}
-        />
-      )}
       {batchSend && (
         <BatchSendAccountingModal
           cards={batchSend}
@@ -282,28 +237,21 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
           onDone={load}
         />
       )}
-      {ask && (
-        <ConfirmModal
-          title={ask.title}
-          message={ask.message}
-          code={ask.code}
-          reason={ask.reason}
-          reasonDefault={ask.reasonDefault}
-          danger={ask.danger}
-          confirmLabel={ask.confirmLabel}
-          onConfirm={async (reason) => {
-            const pending = ask
-            setAsk(null)
-            try {
-              await pending.onOk(reason)
-            } catch {
-              toast.err(t('board.toasts.actionFailed'))
-              await load()
-            }
-          }}
-          onCancel={() => setAsk(null)}
-        />
-      )}
+      <BoardActionModals
+        handover={handover}
+        sendAcc={sendAcc}
+        receiveAcc={receiveAcc}
+        ask={ask}
+        setHandover={setHandover}
+        setSendAcc={setSendAcc}
+        setReceiveAcc={setReceiveAcc}
+        setAsk={setAsk}
+        doReceive={doReceive}
+        doMissing={doMissing}
+        doSendAcc={doSendAcc}
+        doReceiveAcc={doReceiveAcc}
+        onReload={load}
+      />
     </section>
   )
 }

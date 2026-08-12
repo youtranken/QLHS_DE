@@ -23,13 +23,6 @@ export const board = {
     priorityLabel: 'Filter by priority',
     newAria: 'Key n: open ticket lookup',
   },
-  views: {
-    label: 'Saved views',
-    save: '+ Save view',
-    confirmSave: 'Save',
-    namePlaceholder: 'View name…',
-    delete: 'Delete view {name}',
-  },
   column: {
     overSla: 'have overdue tickets',
     reconcileHint: 'DCC2/DCC3 reported missing paperwork – needs re-check',

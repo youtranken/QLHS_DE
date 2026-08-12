@@ -89,86 +89,23 @@
   }
 }
 
-/* Hàng lọc board: nhóm chip tuyến (DCC1) + nhóm chip ưu tiên (mọi DCC) */
-.boardfilters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
+/* Board facets moved ONTO the header row (flow chips DCC1 + priority dropdown),
+   right next to the "Cập nhật …" cue. Saved views were removed as unused. */
+.boardhead .boardfacets {
+  display: inline-flex;
   align-items: center;
-  margin: 0 2px 12px;
+  gap: 10px;
+  flex: none;
 }
-.boardfilters .fgrp {
-  display: flex;
+.boardhead .boardfacets .fgrp {
+  display: inline-flex;
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
 }
 /* Priority filter dropdown — stable compact width so it reads as one control. */
-.boardfilters .priosel {
-  min-width: 120px;
-}
-/* Nhóm "bộ lọc đã lưu" (FR #9) tách sang phải bằng một vạch mảnh */
-.boardfilters .fgrp.views {
-  margin-left: auto;
-  padding-left: 16px;
-  border-left: 1px solid var(--line);
-}
-.boardfilters .addview {
-  border-style: dashed;
-}
-/* chip bộ lọc đã lưu = [áp dụng | ✕] gộp trong một viên bo tròn */
-.boardfilters .viewchip {
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  overflow: hidden;
-}
-.boardfilters .viewchip.on {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-}
-.boardfilters .viewchip .apply {
-  padding: 5px 4px 5px 11px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-2);
-  background: none;
-  border: 0;
-  cursor: pointer;
-}
-.boardfilters .viewchip.on .apply {
-  color: var(--accent);
-}
-.boardfilters .viewchip .del {
-  display: grid;
-  place-items: center;
-  padding: 0 8px 0 4px;
-  color: var(--ink-3);
-  background: none;
-  border: 0;
-  cursor: pointer;
-}
-.boardfilters .viewchip .del:hover {
-  color: var(--sla);
-}
-.boardfilters .viewsave {
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
-}
-.boardfilters .viewsave input {
-  width: 130px;
-  padding: 5px 9px;
-  font-size: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--line);
-  background: var(--panel-2);
-  color: var(--ink);
-}
-.boardfilters .viewsave input:focus {
-  outline: none;
-  border-color: var(--accent);
+.boardhead .boardfacets .priosel {
+  min-width: 128px;
 }
 
 /* Nút lọc nhanh "Chỉ quá hạn" ở đầu bảng (power-user) */

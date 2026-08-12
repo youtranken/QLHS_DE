@@ -23,13 +23,6 @@ export const board = {
     priorityLabel: 'Lọc theo ưu tiên',
     newAria: 'Phím n: mở tra cứu hồ sơ',
   },
-  views: {
-    label: 'Bộ lọc đã lưu',
-    save: '+ Lưu bộ lọc',
-    confirmSave: 'Lưu',
-    namePlaceholder: 'Tên bộ lọc…',
-    delete: 'Xóa bộ lọc {name}',
-  },
   column: {
     overSla: 'có hồ sơ quá hạn',
     reconcileHint: 'DCC2/DCC3 báo thiếu giấy – cần kiểm tra lại',

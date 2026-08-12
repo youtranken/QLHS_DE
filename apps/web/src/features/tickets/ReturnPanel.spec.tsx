@@ -32,6 +32,7 @@ function detailAt(status: string): TicketDetail {
     overdueDays: 0,
     dwellDays: 1,
     isClosed: false,
+    actions: [],
     route: [],
     paused: false,
     pauseReason: null,

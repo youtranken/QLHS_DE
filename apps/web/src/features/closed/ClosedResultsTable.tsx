@@ -20,6 +20,9 @@ export interface ClosedResultsTableProps {
  *  card layout ≤680px). Only DCC1 gets a row action (Reopen) — reopening is
  *  DCC1's alone, so DCC2/DCC3 have no "propose reopen" here. */
 export function ClosedResultsTable({ rows, role, onReopen }: ClosedResultsTableProps) {
+  // Only DCC1 can Reopen, so only they get an action cell. For DCC2/DCC3 the column
+  // would be a dead "Hành động" header over empty cells — drop it entirely.
+  const showActions = role === 'DCC1'
   return (
     <div className="tblwrap">
       <table className="tbl closedtbl">
@@ -34,7 +37,7 @@ export function ClosedResultsTable({ rows, role, onReopen }: ClosedResultsTableP
             <th scope="col">{t('closed.thContractNo')}</th>
             <th scope="col">{t('closed.thCreated')}</th>
             <th scope="col">{t('closed.thStatus')}</th>
-            <th scope="col">{t('closed.thActions')}</th>
+            {showActions && <th scope="col">{t('closed.thActions')}</th>}
           </tr>
         </thead>
         <tbody>
@@ -74,8 +77,8 @@ export function ClosedResultsTable({ rows, role, onReopen }: ClosedResultsTableP
                 </span>
                 <span className="vi">{statusVi(tk.status)}</span>
               </td>
-              <td className="act" data-label={t('closed.thActions')}>
-                {role === 'DCC1' && (
+              {showActions && (
+                <td className="act" data-label={t('closed.thActions')}>
                   <button
                     type="button"
                     className="btn warn"
@@ -84,8 +87,8 @@ export function ClosedResultsTable({ rows, role, onReopen }: ClosedResultsTableP
                   >
                     {t('closed.reopenBtn')}
                   </button>
-                )}
-              </td>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

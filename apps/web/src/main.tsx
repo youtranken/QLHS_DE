@@ -30,10 +30,10 @@ import './design/admin-aurora/kit.css'
 import { App } from './App'
 import { applyStartupLocale } from './i18n/locale'
 
-// Dark is the default surface (EXPERIENCE §Foundation); light is a peer. Set the
-// theme before first paint to avoid a flash.
+// Light is the default surface; dark is a peer the user can opt into. Set the
+// theme before first paint to avoid a flash — only an explicit saved 'dark' wins.
 const saved = localStorage.getItem('qlhs-theme')
-document.documentElement.dataset.theme = saved === 'light' ? 'light' : 'dark'
+document.documentElement.dataset.theme = saved === 'dark' ? 'dark' : 'light'
 
 // Apply the saved UI language before first render (VI is the built-in default).
 applyStartupLocale()

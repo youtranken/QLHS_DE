@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { t } from '../i18n'
 
-/** Dark is default; light is a peer. Persists to localStorage, flips data-theme
- *  on <html> (EXPERIENCE §Foundation). */
+/** Light is default; dark is a peer. Persists to localStorage, flips data-theme
+ *  on <html> (main.tsx sets it before first paint). */
 export function ThemeToggle() {
-  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme ?? 'dark')
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme ?? 'light')
 
   function toggle() {
     const next = theme === 'light' ? 'dark' : 'light'
