@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { TICKET_STATUS } from '@qlhs/contracts'
 import { useLiveRefetch } from '../../shared/useLiveRefetch'
 import { getStationBoard, type BoardCard, type BoardColumn } from './api'
 import { BatchSendAccountingModal } from './BatchSendAccountingModal'
@@ -116,6 +117,10 @@ export function StationBoard({
     })
   const selectedCards = cols.flatMap((c) => c.cards).filter((c) => sel.has(c.id))
   const bulkActions = commonBulkActions(selectedCards)
+  // The "Hoàn tất luôn" chain only means something when a post-BOP hardcopy card is
+  // in the selection (its confirm reaches Hardcopy → completable). Gate the checkbox
+  // on this so a pure first-handover selection never shows a no-op option.
+  const canChainComplete = selectedCards.some((c) => c.status === TICKET_STATUS.SubmittedToDcc2Hardcopy)
 
   return (
     <section>
@@ -168,6 +173,7 @@ export function StationBoard({
         <BulkActionBar
           count={selectedCards.length}
           actions={bulkActions}
+          canChainComplete={canChainComplete}
           onApply={(action, alsoComplete) =>
             doBatch(selectedCards, action, () => setSel(new Set()), { alsoComplete })
           }

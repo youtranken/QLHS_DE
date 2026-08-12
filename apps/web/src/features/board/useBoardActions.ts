@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { TICKET_STATUS } from '@qlhs/contracts'
 import {
   batchAction,
   batchDcc2Action,
@@ -174,7 +175,7 @@ export function useBoardActions(load: () => Promise<void>) {
       // Only chain complete for tickets whose confirm reached Hardcopy (the post-BOP
       // handover). The FIRST handover's confirm lands at Received-by-DCC2, which
       // can't be completed — so "Hoàn tất luôn" is a harmless no-op there.
-      const okIds = confirmed.filter((r) => r.ok && r.status === 'Hardcopy').map((r) => r.id)
+      const okIds = confirmed.filter((r) => r.ok && r.status === TICKET_STATUS.Hardcopy).map((r) => r.id)
       if (okIds.length === 0) return confirmed
       const done = await batchDcc2Action(okIds, 'completeContract')
       const doneById = new Map(done.map((d) => [d.id, d]))
