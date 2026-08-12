@@ -17,7 +17,7 @@ const fields = (documentType: string) =>
 
 function make(catalogFlow: string | null) {
   const repo = { updateFields: vi.fn().mockResolvedValue(undefined) }
-  const options = { flowForDocType: vi.fn().mockResolvedValue(catalogFlow) }
+  const options = { flowForDocType: vi.fn().mockResolvedValue(catalogFlow), isDocTypeHidden: vi.fn().mockResolvedValue(false) }
   const uc = new UpdateFieldsUseCase(repo as never, new FlowResolver(options as never))
   return { uc, repo }
 }

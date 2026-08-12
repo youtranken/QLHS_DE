@@ -17,6 +17,12 @@ export class FlowResolver {
   async resolve(documentType: string): Promise<Flow> {
     const fromCatalog = await this.options.flowForDocType(documentType)
     if (fromCatalog) return fromCatalog as Flow
+    // fromCatalog=null có hai nghĩa: (a) loại BỊ ẨN (admin gỡ khỏi danh mục) — từ
+    // chối tạo mới ở MỌI đường, đừng để fallback built-in cho lọt lại loại đã ẩn;
+    // (b) chưa từng có trong catalog — mới fallback mapFlow cho 6 loại built-in.
+    if (await this.options.isDocTypeHidden(documentType)) {
+      throw new BadRequestException({ code: 'InactiveDocumentType', message: 'Loại hồ sơ đã bị ẩn' })
+    }
     const builtin = mapFlow(documentType as DocumentType) as Flow | undefined
     if (builtin) return builtin
     throw new BadRequestException({ code: 'InvalidDocumentType', message: 'Loại hồ sơ không hợp lệ' })

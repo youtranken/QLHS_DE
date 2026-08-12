@@ -4,10 +4,12 @@ import userEvent from '@testing-library/user-event'
 import { AdminDocTypes } from './AdminDocTypes'
 import * as api from './api'
 import type { AdminDocTypeGroup } from './api'
+import { toast } from '../../shared/toast'
 
 const getGroups = vi.spyOn(api, 'getAdminDocTypes')
 const setActive = vi.spyOn(api, 'setDocTypeActive')
 const del = vi.spyOn(api, 'deleteDocType')
+const toastErr = vi.spyOn(toast, 'err').mockImplementation(() => 0)
 
 function groups(): AdminDocTypeGroup[] {
   return [
@@ -31,8 +33,12 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
-  setActive.mockResolvedValue({ id: 'x' })
-  del.mockResolvedValue({ ok: true })
+  // Clear call history (not implementation) so per-test call-count assertions
+  // (e.g. "reloads after delete") start from zero; each test sets its own resolves.
+  getGroups.mockClear()
+  setActive.mockClear().mockResolvedValue({ id: 'x' })
+  del.mockClear().mockResolvedValue({ ok: true })
+  toastErr.mockClear()
 })
 
 describe('AdminDocTypes', () => {
@@ -83,6 +89,31 @@ describe('AdminDocTypes', () => {
     const confirm = await screen.findByRole('button', { name: 'Xoá' })
     await userEvent.click(confirm)
     await waitFor(() => expect(del).toHaveBeenCalledWith('p2'))
+    // list reloads after a successful mutation (initial load + post-delete)
+    await waitFor(() => expect(getGroups).toHaveBeenCalledTimes(2))
+  })
+
+  it('does NOT delete when the confirm is cancelled', async () => {
+    getGroups.mockResolvedValue(groups())
+    render(<AdminDocTypes />)
+    await screen.findByRole('button', { name: 'Thao tác cho Payment' })
+
+    await userEvent.click(screen.getByRole('button', { name: 'Thao tác cho Payment request' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Xoá' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Hủy' }))
+    expect(del).not.toHaveBeenCalled()
+  })
+
+  it('surfaces an error toast when delete fails (no silent failure)', async () => {
+    getGroups.mockResolvedValue(groups())
+    del.mockRejectedValueOnce(new Error('boom'))
+    render(<AdminDocTypes />)
+    await screen.findByRole('button', { name: 'Thao tác cho Payment' })
+
+    await userEvent.click(screen.getByRole('button', { name: 'Thao tác cho Payment request' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Xoá' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Xoá' }))
+    await waitFor(() => expect(toastErr).toHaveBeenCalled())
   })
 
   it('hides an active type via its menu', async () => {

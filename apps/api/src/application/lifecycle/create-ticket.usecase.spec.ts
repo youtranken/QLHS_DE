@@ -2,9 +2,12 @@ import { describe, it, expect, vi } from 'vitest'
 import { CreateTicketUseCase } from './create-ticket.usecase'
 import { FlowResolver } from './flow-resolver'
 
-function make(catalogFlow: string | null) {
+function make(catalogFlow: string | null, hidden = false) {
   const repo = { create: vi.fn().mockResolvedValue({ id: 't1' }) }
-  const options = { flowForDocType: vi.fn().mockResolvedValue(catalogFlow) }
+  const options = {
+    flowForDocType: vi.fn().mockResolvedValue(catalogFlow),
+    isDocTypeHidden: vi.fn().mockResolvedValue(hidden),
+  }
   const flow = new FlowResolver(options as never)
   return { uc: new CreateTicketUseCase(repo as never, flow), repo }
 }
@@ -40,6 +43,14 @@ describe('CreateTicketUseCase — suy luồng document type', () => {
   it('từ chối loại không xác định được luồng (không catalog, không built-in)', async () => {
     const { uc, repo } = make(null)
     await expect(uc.execute(req('Loại lạ ZZZ'))).rejects.toThrow()
+    expect(repo.create).not.toHaveBeenCalled()
+  })
+
+  it('từ chối loại ĐÃ BỊ ẨN, kể cả built-in (không lọt qua fallback mapFlow)', async () => {
+    // flowForDocType trả null (loại inactive) nhưng row tồn tại & bị ẩn → phải từ
+    // chối, KHÔNG được fallback mapFlow tạo lại loại built-in admin đã gỡ.
+    const { uc, repo } = make(null, true)
+    await expect(uc.execute(req('Contract'))).rejects.toThrow()
     expect(repo.create).not.toHaveBeenCalled()
   })
 })

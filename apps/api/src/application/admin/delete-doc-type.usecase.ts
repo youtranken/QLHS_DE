@@ -13,6 +13,10 @@ export class DeleteDocTypeUseCase {
     if (!existing || existing.kind !== DOC_TYPE_KIND) {
       throw new NotFoundException({ code: 'DocTypeNotFound', message: 'Không tìm thấy loại hồ sơ' })
     }
+    // Check-then-delete không nguyên tử: một hồ sơ tạo xen giữa count và delete có
+    // thể lọt (usedBy đọc 0 rồi mới có ticket). Vô hại — ticket.documentType là text
+    // không FK, flow đã lưu sẵn trên ticket; hệ quả chỉ là bookkeeping usedBy lệch,
+    // không đóng được bằng transaction đơn vì không có ràng buộc DB để khoá.
     const used = await this.options.usageCount(DOC_TYPE_KIND, existing.value)
     if (used > 0) {
       throw new ConflictException({

@@ -82,6 +82,11 @@ export function AdminDocTypes() {
   }
 
   const hasHidden = groups?.some((g) => g.types.some((d) => !d.active)) ?? false
+  // Every type hidden and the toggle off → the list area would look empty even though
+  // the catalog isn't; show a hint pointing at the toggle (the empty notice above only
+  // covers a truly empty catalog).
+  const allHidden =
+    !!groups && groups.length > 0 && !showHidden && groups.every((g) => g.types.every((d) => !d.active))
 
   return (
     <section className="doctypes card" aria-label={t('adminOptions.docTypes.title')}>
@@ -117,7 +122,13 @@ export function AdminDocTypes() {
                   <span className="dt-val" lang="en">
                     {d.value}
                   </span>
-                  <span className="dt-count">·{d.usedBy}</span>
+                  <span
+                    className="dt-count"
+                    title={t('adminOptions.docTypes.usedBy', { n: d.usedBy })}
+                    aria-label={t('adminOptions.docTypes.usedBy', { n: d.usedBy })}
+                  >
+                    ·{d.usedBy}
+                  </span>
                   {!d.active && <span className="dt-off-pill">{t('adminOptions.docTypes.hiddenChip')}</span>}
                   <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
@@ -130,7 +141,14 @@ export function AdminDocTypes() {
                       </button>
                     </DropdownMenu.Trigger>
                     <DropdownMenu.Portal>
-                      <DropdownMenu.Content className="dt-menu" align="end" sideOffset={4}>
+                      {/* Keep focus on the modal that opens from a menu item — let Confirm-
+                          Modal's own autofocus win instead of Radix returning it to the ⋯. */}
+                      <DropdownMenu.Content
+                        className="dt-menu"
+                        align="end"
+                        sideOffset={4}
+                        onCloseAutoFocus={(e) => e.preventDefault()}
+                      >
                         <DropdownMenu.Item className="dt-mi" onSelect={() => void toggleActive(d)}>
                           {d.active ? <EyeOff size={14} aria-hidden /> : <Eye size={14} aria-hidden />}
                           {t(d.active ? 'adminOptions.docTypes.hide' : 'adminOptions.docTypes.unhide')}
@@ -141,7 +159,9 @@ export function AdminDocTypes() {
                             {t('adminOptions.docTypes.delete')}
                           </DropdownMenu.Item>
                         ) : (
-                          <div className="dt-mi-note">{t('adminOptions.docTypes.deleteBlocked', { n: d.usedBy })}</div>
+                          <DropdownMenu.Label className="dt-mi-note">
+                            {t('adminOptions.docTypes.deleteBlocked', { n: d.usedBy })}
+                          </DropdownMenu.Label>
                         )}
                       </DropdownMenu.Content>
                     </DropdownMenu.Portal>
@@ -152,6 +172,8 @@ export function AdminDocTypes() {
           </div>
         )
       })}
+
+      {allHidden && <p className="dt-empty">{t('adminOptions.docTypes.allHidden')}</p>}
 
       <form className="dt-add" onSubmit={add}>
         <input

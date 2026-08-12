@@ -17,7 +17,7 @@ const source = (documentType: string) => ({
 function make(catalogFlow: string | null, src: unknown) {
   const repo = { findByIdForApplicant: vi.fn().mockResolvedValue(src) }
   const writes = { create: vi.fn().mockResolvedValue({ id: 't2' }) }
-  const options = { flowForDocType: vi.fn().mockResolvedValue(catalogFlow) }
+  const options = { flowForDocType: vi.fn().mockResolvedValue(catalogFlow), isDocTypeHidden: vi.fn().mockResolvedValue(false) }
   const uc = new CreateFromExistingUseCase(repo as never, writes as never, new FlowResolver(options as never))
   return { uc, writes }
 }

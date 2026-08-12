@@ -119,4 +119,13 @@ export class OptionRepo {
     })
     return row && row.active ? row.flow : null
   }
+
+  /** Loại ĐÃ BỊ ẨN (row tồn tại nhưng active=false) — để FlowResolver phân biệt với
+   *  loại chưa từng có trong catalog (fallback built-in): ẩn thì từ chối tạo mới. */
+  async isDocTypeHidden(value: string): Promise<boolean> {
+    const row = await this.prisma.optionItem.findUnique({
+      where: { kind_value: { kind: DOC_TYPE_KIND, value } },
+    })
+    return !!row && !row.active
+  }
 }

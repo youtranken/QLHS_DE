@@ -66,11 +66,25 @@ describe('admin document-types hide/delete (e2e)', () => {
     return row.id
   }
 
-  it('rejects a non-admin (403)', async () => {
+  it('rejects a non-admin (403) on every verb — authz before existence', async () => {
     const nobody = request.agent(app.getHttpServer())
     await nobody.post('/auth/dev-login').send({ sub: 'u', email: 'plain@test.local', roles: ['Applicant'] })
     expect((await nobody.get('/admin/document-types')).status).toBe(403)
+    expect((await nobody.patch('/admin/document-types/x').send({ active: false })).status).toBe(403)
     expect((await nobody.delete('/admin/document-types/x')).status).toBe(403)
+  })
+
+  it('never touches a NON-documentType option row (paymentTerm id → 404)', async () => {
+    const admin = await adminAgent()
+    // an option of a different kind — its id must be inert on the doc-type endpoints
+    const opt = await admin.post('/admin/options/paymentTerm').send({ value: 'Net 30' })
+    const otherId = opt.body.id
+
+    expect((await admin.patch(`/admin/document-types/${otherId}`).send({ active: false })).status).toBe(404)
+    expect((await admin.delete(`/admin/document-types/${otherId}`)).status).toBe(404)
+    // the paymentTerm row is untouched (not hidden, not deleted)
+    const row = await db.optionItem.findUnique({ where: { id: otherId } })
+    expect(row).toMatchObject({ kind: 'paymentTerm', active: true })
   })
 
   it('lists all types (incl. hidden) with usage count, grouped by flow', async () => {
@@ -106,8 +120,26 @@ describe('admin document-types hide/delete (e2e)', () => {
     expect(off.status).toBe(200)
     expect(off.body.active).toBe(false)
 
+    // hidden → gone from the create-form projection
+    await admin.patch(`/admin/document-types/${id}`).send({ active: false })
+    let form = (await admin.get('/options/document-types')).body as DocTypeGroup[]
+    expect(form.flatMap((g) => g.types as unknown as string[])).not.toContain('Advance request')
+
+    // un-hide → reappears in the projection (the real "reversible" contract)
     const on = await admin.patch(`/admin/document-types/${id}`).send({ active: true })
     expect(on.body.active).toBe(true)
+    form = (await admin.get('/options/document-types')).body as DocTypeGroup[]
+    expect(form.flatMap((g) => g.types as unknown as string[])).toContain('Advance request')
+  })
+
+  it('deletes a HIDDEN but unused type (hide-first-then-delete flow)', async () => {
+    const admin = await adminAgent()
+    const id = await addType(admin, 'Phụ lục Tạm', 'Contract')
+    await admin.patch(`/admin/document-types/${id}`).send({ active: false })
+
+    const del = await admin.delete(`/admin/document-types/${id}`)
+    expect(del.status).toBe(200)
+    expect(await db.optionItem.findUnique({ where: { id } })).toBeNull()
   })
 
   it('deletes a type that no ticket uses (usedBy = 0)', async () => {
