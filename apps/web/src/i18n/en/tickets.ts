@@ -3,6 +3,8 @@ export const tickets = {
   myList: {
     eyebrow: 'My tickets',
     title: 'Track tickets',
+    searchBtn: 'Search tickets',
+    searchTitle: 'Search my tickets',
     subCount: '{n} tickets',
     subAwaitingFix: ' · {n} awaiting your fix',
     subLive: ' · updated in real time',

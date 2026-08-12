@@ -20,6 +20,7 @@ import { useSsoAutostart } from './features/auth/sso-autostart'
 import RecordVault3D from './features/auth/RecordVault3D'
 import { CreateTicketForm } from './features/tickets/CreateTicketForm'
 import { MyTickets } from './features/tickets/MyTickets'
+import { ApplicantSearch } from './features/tickets/ApplicantSearch'
 import { AdminShell } from './features/admin/AdminShell'
 import { LineMap } from './features/dispatch/LineMap'
 import { StationBoard } from './features/board/StationBoard'
@@ -180,6 +181,12 @@ export function App() {
 
         {route.view === 'search' && isDcc && (
           <ClosedTickets role={user.activeRole} onBack={goHome} />
+        )}
+
+        {/* Applicant's own lookup — same /search route, but owner-scoped data so it
+            only ever shows the applicant's own tickets (never anyone else's). */}
+        {route.view === 'search' && user.activeRole === ROLE.Applicant && (
+          <ApplicantSearch onBack={goHome} />
         )}
 
         {home && user.activeRole === null && (

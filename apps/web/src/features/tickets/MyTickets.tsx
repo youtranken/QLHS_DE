@@ -12,6 +12,7 @@ import { TicketDetailModal } from './TicketDetailModal'
 import { openCreateFormWith } from './CreateTicketForm'
 import { CLOSED, RETURN_STATES, type Filter } from './ticketStates'
 import { StateNotice } from '../../shared/StateNotice'
+import { openSearch } from '../../shared/route'
 import { ConfirmModal } from '../../shared/ConfirmModal'
 import { toast } from '../../shared/toast'
 import { t } from '../../i18n'
@@ -193,6 +194,9 @@ export function MyTickets({ reloadKey, action }: { reloadKey: number; action?: R
           ))}
         </div>
         <span className="cnt">{t('tickets.myList.visibleCount', { n: total })}</span>
+        <button type="button" className="btn ghost sm" onClick={openSearch}>
+          {t('tickets.myList.searchBtn')}
+        </button>
         <span className="fb-action">{action}</span>
       </div>
 
