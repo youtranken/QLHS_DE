@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import {
+  FLOW,
   TICKET_EVENT,
   TICKET_STATUS,
   type Flow,
@@ -14,13 +15,11 @@ import {
   PriorityLockedError,
 } from '../../../application/core/ticket-errors'
 import { TicketNotFoundError } from '../../../domain/errors'
-import { diffFields, type ApplicantFields } from '../../../domain/ticket/applicant-fields'
-
-/** Contract No is stored UPPERCASE everywhere it is entered. */
-const upperContractNo = (f: ApplicantFields): ApplicantFields => ({
-  ...f,
-  contractNo: f.contractNo.toUpperCase(),
-})
+import {
+  diffFields,
+  normalizeContractNo,
+  type ApplicantFields,
+} from '../../../domain/ticket/applicant-fields'
 
 /** The Contract No partial-unique index (Contract flow) is the final guard, so
  *  create and field edits translate its P2002 into a friendly duplicate error
@@ -54,7 +53,11 @@ export class TicketWriteRepo {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(input: CreateTicketInput): Promise<{ id: string }> {
-    const f = upperContractNo(input.fields)
+    // Contract No is DCC2-owned on the Contract flow (AD-16) — force the applicant
+    // slot to 'N/A' here so a clone of a numbered Contract ticket (FR-3) or any
+    // direct API create can't seed/collide a real Contract No the DB unique index
+    // then rejects. Payment/General references are kept (uppercased).
+    const f = normalizeContractNo(input.fields, input.flow)
     return this.createTx(input, f).catch((e) => asContractNoDuplicate(e, f.contractNo))
   }
 
@@ -111,7 +114,7 @@ export class TicketWriteRepo {
    * (B6); status/code are never touched here.
    */
   async updateFields(id: string, actorSub: string, rawNext: ApplicantFields, resolvedFlow: Flow): Promise<void> {
-    const next = upperContractNo(rawNext)
+    const incoming = normalizeContractNo(rawNext, resolvedFlow)
     await this.prisma.$transaction(async (tx) => {
       const t = await tx.ticket.findFirst({ where: { id, applicantSub: actorSub } })
       if (!t) throw new TicketNotFoundError(id)
@@ -127,6 +130,16 @@ export class TicketWriteRepo {
       if (t.code !== null && resolvedFlow !== t.flow) {
         throw new FieldsLockedError('Không đổi được loại hồ sơ sang luồng khác sau khi đã cấp mã')
       }
+      // Contract No is DCC2-owned — the applicant NEVER writes it (AD-16, MED-1).
+      // `incoming` already pinned the Contract-flow slot to 'N/A' (pre-DCC2); once
+      // DCC2 has minted the code + assigned the number, pin to the STORED value so a
+      // crafted PATCH at Return-fixing can't overwrite or wipe it (the FE shows it
+      // read-only; this is the server guard behind that). Payment/General keep the
+      // applicant's normalized reference.
+      const next: ApplicantFields =
+        resolvedFlow === FLOW.Contract && t.code !== null
+          ? { ...incoming, contractNo: t.contractNo ?? 'N/A' }
+          : incoming
       // DB columns are nullable, but the 9 fields are non-empty once created;
       // coerce defensively so the diff compares like-for-like strings.
       const prev: ApplicantFields = {
@@ -185,7 +198,7 @@ export class TicketWriteRepo {
           },
         })
       }
-    }).catch((e) => asContractNoDuplicate(e, next.contractNo))
+    }).catch((e) => asContractNoDuplicate(e, incoming.contractNo))
   }
 
   private async writePriority(

@@ -81,6 +81,26 @@ describe('findDuplicates — same docType + contractNo + projectTeam within a mo
   })
 })
 
+// A Contract ticket carries contractNo='N/A' from creation until DCC2 assigns the
+// real number at send-to-Accounting. That placeholder is ABSENCE, not a match key —
+// otherwise every applicant-stage Contract ticket collapses the rule to
+// docType+projectTeam and floods DCC1 with false duplicates (MED-3).
+describe('findDuplicates — the N/A placeholder is absence, not a contract-number match', () => {
+  it('does NOT flag two Contract tickets sharing only docType + team while both are N/A', () => {
+    const me = t({ id: 'me', contractNo: 'N/A' })
+    expect(findDuplicates(me, [t({ contractNo: 'N/A' })], NOW)).toEqual([])
+  })
+
+  it('treats lowercase / punctuated n/a as absence too', () => {
+    expect(findDuplicates(t({ id: 'me', contractNo: 'n/a' }), [t({ contractNo: 'N / A' })], NOW)).toEqual([])
+  })
+
+  it('still flags two tickets that share a REAL contract number (unaffected by the N/A rule)', () => {
+    const hits = findDuplicates(t({ id: 'me', contractNo: 'HD-2026/ABC' }), [t()], NOW)
+    expect(hits[0]?.tier).toBe(DUP_TIER.Strong)
+  })
+})
+
 describe('findDuplicates — the one-month window', () => {
   it('does NOT flag two submissions more than 30 days apart', () => {
     expect(findDuplicates(t({ id: 'me' }), [t({ createdAt: days(35) })], NOW)).toEqual([])

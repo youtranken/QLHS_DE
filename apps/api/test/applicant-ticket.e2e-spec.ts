@@ -94,6 +94,19 @@ describe('applicant ticket (e2e — CAP-1)', () => {
     expect(c.documentType).toBe('Contract')
   })
 
+  it('clones a NUMBERED Contract ticket → succeeds with Contract No reset to N/A (HIGH-1, FR-3)', async () => {
+    const agent = await applicant()
+    const src = await agent.post('/tickets').send({ ...FIELDS, documentType: 'Contract' })
+    // Simulate DCC2 having assigned the real Contract No on the source (post-send).
+    await admin.ticket.update({ where: { id: src.body.id }, data: { contractNo: 'CT-ACC-42' } })
+    // Before the fix this collided on the per-flow unique index → 409 duplicate.
+    const clone = await agent.post(`/tickets/from/${src.body.id}`).send({})
+    expect(clone.status).toBe(201)
+    const row = await admin.ticket.findUniqueOrThrow({ where: { id: clone.body.id } })
+    expect(row.flow).toBe('Contract')
+    expect(row.contractNo).toBe('N/A') // DCC2 assigns a fresh number later, not the clone
+  })
+
   it('cancels while Submitted → Cancelled', async () => {
     const agent = await applicant()
     const res = await agent.post('/tickets').send(FIELDS)

@@ -56,11 +56,14 @@ export class AccountingRepo {
           roundNo: row.round_no,
           statusEnteredAt: row.status_entered_at,
         }
-        // The number lands in the flow's own column: DCC2 writes the Contract No
-        // (Contract, normalised UPPERCASE), DCC3 writes the Payment No (Payment). A
-        // Payment's existing contract_no (the Applicant's reference) is untouched.
-        // The audit meta records the SAME (stored) value so the log matches the DB.
-        const storedNumber = state.flow === FLOW.Payment ? documentNo : documentNo.toUpperCase()
+        // The number lands in the flow's own column: DCC2 → contract_no, DCC3 →
+        // payment_no. BOTH are normalised UPPERCASE so the per-flow unique index is
+        // effectively case-insensitive (MED-2 — a paper number differing only in
+        // case is the same number, not a new one; storing Payment No verbatim let two
+        // Payment tickets hold `pmt-a1` and `PMT-A1` at once). A Payment's existing
+        // contract_no (the Applicant's reference) is untouched. The audit meta records
+        // the SAME (stored) value so the log matches the DB.
+        const storedNumber = documentNo.toUpperCase()
         const out = transition(state, {
           event: TICKET_EVENT.SendToAccounting,
           actor,

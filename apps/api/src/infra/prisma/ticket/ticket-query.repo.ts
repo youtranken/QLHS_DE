@@ -124,16 +124,17 @@ export class TicketQueryRepo {
     const trimmed = [...new Set(documentNos.map((n) => n.trim()).filter(Boolean))]
     if (trimmed.length === 0) return []
     const notCancelled = { not: TICKET_STATUS.Cancelled }
+    // Both Contract No and Payment No are stored uppercase (MED-2), so probe uppercase
+    // to mirror the write path + the per-flow unique index (a non-FE client may send
+    // mixed case; without this the pre-flight would miss a case-only clash).
+    const wanted = trimmed.map((n) => n.toUpperCase())
     if (flow === FLOW.Payment) {
       const rows = await this.prisma.ticket.findMany({
-        where: { flow, status: notCancelled, paymentNo: { in: trimmed } },
+        where: { flow, status: notCancelled, paymentNo: { in: wanted } },
         select: { paymentNo: true },
       })
       return rows.map((r) => r.paymentNo).filter((n): n is string => n !== null)
     }
-    // Contract No is stored uppercase, so probe uppercase to mirror the write path +
-    // the unique index (a non-FE client may send mixed case).
-    const wanted = trimmed.map((n) => n.toUpperCase())
     const rows = await this.prisma.ticket.findMany({
       where: { flow, status: notCancelled, contractNo: { in: wanted } },
       select: { contractNo: true },

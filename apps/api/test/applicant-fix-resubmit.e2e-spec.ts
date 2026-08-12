@@ -150,6 +150,46 @@ describe('Applicant fix & resubmit (e2e)', () => {
     expect(confirm.body.code).toBe(row.code) // same code, no new mint
   })
 
+  it('cannot overwrite the DCC2-assigned Contract No at Return-fixing (MED-1)', async () => {
+    const applicant = await login('app-e2e', ['Applicant'])
+    // A Contract ticket returned to the applicant AFTER DCC2 assigned its Contract No.
+    const id = (
+      await admin.ticket.create({
+        data: {
+          status: 'Return-fixing',
+          flow: 'Contract',
+          applicantSub: 'app-e2e',
+          currentHolderSub: 'app-e2e',
+          priority: 'normal',
+          code: 'CT-2026-0001',
+          roundNo: 1,
+          documentType: 'Contract',
+          description: 'HĐ',
+          paymentTerm: 'N/A',
+          contractNo: 'CT-ACC-42',
+          projectTeam: 'Team A',
+          currency: 'VND',
+          amount: 1000n,
+          budgetCode: 'BUD',
+          contractor: 'ACME',
+        },
+      })
+    ).id
+    // Applicant PATCHes a DIFFERENT contractNo (bypassing the FE read-only field).
+    const res = await applicant.patch(`/tickets/${id}`).send({
+      ...FIELDS,
+      documentType: 'Contract',
+      description: 'HĐ sửa',
+      contractNo: 'CT-HACK-99',
+    })
+    expect(res.status).toBe(200) // the legitimate field edit is accepted…
+    const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
+    expect(row.contractNo).toBe('CT-ACC-42') // …but the Contract No is pinned server-side
+    expect(row.description).toBe('HĐ sửa')
+    const changed = await admin.ticketEvent.findMany({ where: { ticketId: id, action: 'field_changed' } })
+    expect(changed.map((e) => (e.meta as { field: string }).field)).not.toContain('contractNo')
+  })
+
   it('another applicant cannot edit or resubmit my ticket (404)', async () => {
     const { id } = await returnedTicket()
     const intruder = await login('intruder', ['Applicant'])

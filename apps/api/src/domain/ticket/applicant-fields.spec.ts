@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { DOCUMENT_TYPE } from '@qlhs/contracts'
-import { cloneFields, diffFields, type ApplicantFields } from './applicant-fields'
+import { DOCUMENT_TYPE, FLOW } from '@qlhs/contracts'
+import { cloneFields, diffFields, normalizeContractNo, type ApplicantFields } from './applicant-fields'
 
 const SRC: ApplicantFields = {
   documentType: DOCUMENT_TYPE.Contract,
@@ -26,6 +26,26 @@ describe('cloneFields (FR-3 — clone copies only the 9 fields)', () => {
     expect('roundNo' in cloned).toBe(false)
     expect('paymentNo' in cloned).toBe(false)
     expect(Object.keys(cloned)).toHaveLength(9)
+  })
+})
+
+describe('normalizeContractNo (AD-16 — Contract No is DCC2-owned, enforced server-side)', () => {
+  it('forces the Contract-flow applicant slot to N/A, discarding any supplied number', () => {
+    expect(normalizeContractNo({ ...SRC, contractNo: 'CT-ACC-42' }, FLOW.Contract).contractNo).toBe('N/A')
+  })
+
+  it('keeps the Payment reference but uppercases it (case-fold like Contract No)', () => {
+    expect(normalizeContractNo({ ...SRC, contractNo: 'pmt-a1' }, FLOW.Payment).contractNo).toBe('PMT-A1')
+  })
+
+  it('uppercases the General reference too', () => {
+    expect(normalizeContractNo({ ...SRC, contractNo: 'ref-9' }, FLOW.General).contractNo).toBe('REF-9')
+  })
+
+  it('does not mutate its input', () => {
+    const input = { ...SRC, contractNo: 'HD-1' }
+    normalizeContractNo(input, FLOW.Contract)
+    expect(input.contractNo).toBe('HD-1')
   })
 })
 

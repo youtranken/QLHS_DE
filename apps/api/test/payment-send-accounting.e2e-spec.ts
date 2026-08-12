@@ -110,6 +110,24 @@ describe('Payment send to Accounting = closed at Sent to Accounting (e2e)', () =
     expect(dup.body.code).toBe('DocumentNoDuplicate')
   })
 
+  it('stores Payment No UPPERCASE — case-fold parity with Contract No (MED-2)', async () => {
+    const dcc3 = await login('dcc3-e2e', ['DCC3'])
+    const id = await receivedByDcc3('CT-2026-0210')
+    await dcc3.post(`/dcc3/tickets/${id}/send-accounting`).send({ documentNo: 'pmt-a1' })
+    const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
+    expect(row.paymentNo).toBe('PMT-A1')
+  })
+
+  it('a case-variant duplicate Payment No is rejected — no bypass by lowercase (MED-2)', async () => {
+    const dcc3 = await login('dcc3-e2e', ['DCC3'])
+    const a = await receivedByDcc3('CT-2026-0211')
+    const b = await receivedByDcc3('CT-2026-0212')
+    expect((await dcc3.post(`/dcc3/tickets/${a}/send-accounting`).send({ documentNo: 'PMT-Z9' })).status).toBe(201)
+    const dup = await dcc3.post(`/dcc3/tickets/${b}/send-accounting`).send({ documentNo: 'pmt-z9' })
+    expect(dup.status).toBe(409)
+    expect(dup.body.code).toBe('DocumentNoDuplicate')
+  })
+
   it('DCC1 cannot send to Accounting on the DCC3 route (403)', async () => {
     const dcc1 = await login('dcc1-e2e', ['DCC1'])
     const id = await receivedByDcc3('CT-2026-0206')

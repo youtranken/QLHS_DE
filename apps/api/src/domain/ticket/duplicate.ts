@@ -54,10 +54,14 @@ function foldVi(v: string): string {
 }
 
 /** Contract numbers are typed by hand from paper: `HĐ-2026/ABC`, `hd 2026 abc`
- *  and `HD2026ABC` are the same number, so compare on alphanumerics alone. */
+ *  and `HD2026ABC` are the same number, so compare on alphanumerics alone. The
+ *  'N/A' placeholder a Contract ticket carries until DCC2 assigns the real number
+ *  is ABSENCE, not a value — folding it to `NA` would make every applicant-stage
+ *  Contract ticket "match" every other on doctype+team alone (F12 false positives,
+ *  MED-3), so it maps to null like an empty field. */
 function contractKey(v: string | null): string | null {
   const k = foldVi(v ?? '').replace(/[^\p{L}\p{N}]/gu, '').toUpperCase()
-  return k.length > 0 ? k : null
+  return k.length > 0 && k !== 'NA' ? k : null
 }
 
 /** Document Type / Project-Team come from admin dropdowns but may carry stray

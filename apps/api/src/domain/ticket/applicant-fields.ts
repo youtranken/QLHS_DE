@@ -1,4 +1,4 @@
-import type { DocumentType } from '@qlhs/contracts'
+import { FLOW, type DocumentType, type Flow } from '@qlhs/contracts'
 
 /**
  * The 9 mandatory Applicant fields (PRD §3.1). Amount is an integer in the
@@ -47,6 +47,20 @@ export function diffFields(prev: ApplicantFields, next: ApplicantFields): FieldC
     }
   }
   return changes
+}
+
+/**
+ * Contract No is DCC2-owned on the Contract flow: the applicant slot stays the
+ * 'N/A' placeholder until DCC2 assigns the real number at send-to-Accounting. This
+ * is the SERVER-side invariant (AD-16) — the create form mirrors it, but the FR-3
+ * clone endpoint and any direct API client bypass the form, so every write path
+ * (create / clone / field-edit) must pass through here. Payment/General keep the
+ * applicant-entered reference, stored UPPERCASE (case-folded like Contract No so the
+ * per-flow unique index can't be bypassed by case).
+ */
+export function normalizeContractNo(fields: ApplicantFields, flow: Flow): ApplicantFields {
+  if (flow === FLOW.Contract) return { ...fields, contractNo: 'N/A' }
+  return { ...fields, contractNo: fields.contractNo.toUpperCase() }
 }
 
 /**
