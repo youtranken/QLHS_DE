@@ -43,14 +43,14 @@ describe('SendAccountingModal (FR-11 — Document No)', () => {
     render(
       <SendAccountingModal
         code="CT-2026-0002"
-        docLabel="Payment number"
+        docLabel="Payment No"
         confirmClose
         onSubmit={onSubmit}
         onClose={onClose}
       />,
     )
-    // The Payment field is labelled "Payment number"; the old warning text is gone.
-    expect(screen.getByText('Payment number')).toBeInTheDocument()
+    // The Payment field is labelled "Payment No"; the old warning text is gone.
+    expect(screen.getByText('Payment No')).toBeInTheDocument()
     expect(screen.queryByText(/không thể hoàn tác|không email Applicant/)).not.toBeInTheDocument()
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'PN-2026-02' } })
     fireEvent.click(screen.getByRole('button', { name: 'Gửi ACC' }))

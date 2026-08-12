@@ -172,7 +172,7 @@ export const board = {
     sendAccounting: {
       title: 'Send to Accounting',
       docNoLabel: 'Contract No',
-      payNoLabel: 'Payment number',
+      payNoLabel: 'Payment No',
       emptyError: 'Please enter {field}.',
       duplicateError: '{field} "{value}" already exists — enter a different code.',
       failError: 'Failed to send to ACC — try again.',

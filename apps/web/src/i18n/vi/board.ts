@@ -173,7 +173,7 @@ export const board = {
     sendAccounting: {
       title: 'Gửi Accounting',
       docNoLabel: 'Contract No',
-      payNoLabel: 'Payment number',
+      payNoLabel: 'Payment No',
       emptyError: 'Vui lòng nhập {field}.',
       duplicateError: '{field} "{value}" đã tồn tại — nhập mã khác.',
       failError: 'Gửi ACC thất bại — thử lại.',

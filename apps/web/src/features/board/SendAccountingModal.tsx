@@ -10,13 +10,14 @@ export interface SendAccountingModalProps {
   code: string
   onSubmit: (documentNo: string) => Promise<void>
   onClose: () => void
-  /** Field label — flow-aware: "Contract No" (DCC2/Contract) vs "Payment number"
+  /** Field label — flow-aware: "Contract No" (DCC2/Contract) vs "Payment No"
    *  (DCC3/Payment); the value entered differs by flow though the column is shared. */
   docLabel?: string
   /** Payment closes irreversibly at `Sent to Accounting` (H5), so gate the send
    *  behind a "close ticket?" confirm. No scary warning paragraph — just the gate. */
   confirmClose?: boolean
-  /** Contract No is normalised to uppercase as you type (DCC2); Payment No isn't. */
+  /** Both Contract No (DCC2) and Payment No (DCC3) are normalised to uppercase as you
+   *  type, matching the server (MED-2) so the field shows exactly what is stored. */
   uppercase?: boolean
 }
 

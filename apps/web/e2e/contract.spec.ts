@@ -54,8 +54,9 @@ test('Contract: full line through every station to Completed', async ({ page }) 
   await confirmHandover(page, 'Đã nhận về từ ACC')
   await expectStatus(code!, 'Received from ACC')
 
-  await cardAction(page, 'Trình BOP →')
-  // SubmitToBop now takes a required DCC1 comment (shown in the handover log).
+  // Card primary button is "Trình BOP" (no arrow); the confirm modal title/button
+  // keeps the "→" — submitToBop takes a required DCC1 comment (shown in the log).
+  await cardAction(page, 'Trình BOP')
   await confirmModal(page, 'Trình BOP →', 'Trình BOP sau khi ACC duyệt')
   await expectStatus(code!, 'Submitted to BOP')
 

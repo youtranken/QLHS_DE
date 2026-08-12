@@ -32,8 +32,9 @@ export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAc
     ? t('board.modals.sendAccounting.payNoLabel')
     : t('board.modals.sendAccounting.docNoLabel')
   const send = isPayment ? sendAccountingDcc3 : sendAccounting
-  // Contract No is normalised to uppercase; Payment No keeps the typed casing.
-  const norm = (v: string) => (isPayment ? v : v.toUpperCase())
+  // Both Contract No and Payment No are normalised to uppercase, matching the server
+  // (MED-2) so the case-insensitive unique index can't be bypassed by case.
+  const norm = (v: string) => v.toUpperCase()
 
   const [vals, setVals] = useState<Record<string, string>>({})
   const [errs, setErrs] = useState<Record<string, string>>({})
