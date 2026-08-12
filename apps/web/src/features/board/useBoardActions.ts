@@ -159,14 +159,30 @@ export function useBoardActions(load: () => Promise<void>) {
 
   // Route each card to its own flow's handover event (DCC2 vs DCC3), one batch call
   // per event, then flatten so summarizeBatch tallies the whole selection at once.
+  // allSettled (not all): if ONE flow-group's POST rejects at the transport level
+  // while the other succeeded, we must still report the successes honestly and count
+  // the rejected group as failed — never discard a group that already applied and
+  // tell the user the whole batch failed (which would invite a re-fire).
   async function batchByHandover(cards: BoardCard[]) {
     const groups = new Map<string, string[]>()
+    const unmatched: string[] = []
     for (const c of cards) {
       const ev = handoverEventOf(c)
       if (ev) groups.set(ev, [...(groups.get(ev) ?? []), c.id])
+      else unmatched.push(c.id)
     }
-    const parts = await Promise.all([...groups].map(([ev, ids]) => batchAction(ids, ev)))
-    return parts.flat()
+    const entries = [...groups]
+    const settled = await Promise.allSettled(entries.map(([ev, ids]) => batchAction(ids, ev)))
+    const results: { id: string; ok: boolean }[] = []
+    settled.forEach((s, i) => {
+      const ids = entries[i]![1]
+      if (s.status === 'fulfilled') results.push(...s.value)
+      else results.push(...ids.map((id) => ({ id, ok: false })))
+    })
+    // commonBulkActions guarantees every selected card carries a handover event, but
+    // count any stray unmatched card as failed so the tally always sums to the selection.
+    for (const id of unmatched) results.push({ id, ok: false })
+    return results
   }
 
   return {

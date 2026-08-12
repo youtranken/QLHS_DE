@@ -122,7 +122,7 @@ export function AdminShell({
   }, [section])
 
   // Icon theme toggle lives in the account menu (same logic as the shared ThemeToggle).
-  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme ?? 'dark')
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme ?? 'light')
   const toggleTheme = () => {
     const next = theme === 'light' ? 'dark' : 'light'
     document.documentElement.dataset.theme = next

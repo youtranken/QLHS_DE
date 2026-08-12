@@ -1,8 +1,8 @@
-import { useRef } from 'react'
 import { MoreVertical } from 'lucide-react'
 import { useBoardActions } from '../board/useBoardActions'
 import { BoardActionModals } from '../board/BoardActionModals'
 import { splitActions, primaryLabel } from '../board/primaryAction'
+import { useDetailsMenu } from '../../shared/useDetailsMenu'
 import type { BoardCard } from '../board/api'
 import type { TicketDetail } from './api'
 import { t } from '../../i18n'
@@ -22,10 +22,13 @@ export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Pr
     setHandover, setSendAcc, setReceiveAcc, setAsk,
     run, doReceive, doMissing, doSendAcc, doReceiveAcc,
   } = useBoardActions(onDone)
-  const detailsRef = useRef<HTMLDetailsElement>(null)
+  const { ref: detailsRef, onKeyDown } = useDetailsMenu<HTMLDetailsElement>({
+    menuSelector: '.dactpop button:not([disabled])',
+    summarySelector: '.dactdots',
+  })
 
   const { primary, menu } = splitActions(d.actions)
-  if (primary.length === 0 && menu.length === 0) return null
+  const hasActions = primary.length > 0 || menu.length > 0
 
   // A card-shaped view of the ticket for the shared runner/modals (they read
   // id/code/flow; the rest is filler the detail surface never shows).
@@ -48,41 +51,48 @@ export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Pr
   const busy = inFlight.has(d.id)
   const closeMenu = () => detailsRef.current?.removeAttribute('open')
 
+  // The modals render from a stable spot regardless of `hasActions`: a live refetch
+  // can flip d.actions to empty mid-interaction, and an open handover/confirm modal
+  // (with a half-typed reason) must NOT be torn down just because the buttons vanished.
   return (
-    <div className="dactions">
-      {primary.map((a) => (
-        <button
-          key={a.event}
-          type="button"
-          className="btn primary"
-          disabled={busy}
-          onClick={() => void run(card, a)}
-        >
-          {primaryLabel(a)}
-        </button>
-      ))}
-      {menu.length > 0 && (
-        <details ref={detailsRef} className="dactmenu">
-          <summary className="dactdots" aria-label={t('board.menu.aria')} aria-busy={busy}>
-            <MoreVertical size={16} aria-hidden />
-          </summary>
-          <div className="dactpop">
-            {menu.map((a) => (
-              <button
-                key={a.event}
-                type="button"
-                disabled={busy}
-                className={a.reasonRequired ? 'danger' : undefined}
-                onClick={() => {
-                  closeMenu()
-                  void run(card, a)
-                }}
-              >
-                {a.label}
-              </button>
-            ))}
-          </div>
-        </details>
+    <>
+      {hasActions && (
+        <div className="dactions">
+          {primary.map((a) => (
+            <button
+              key={a.event}
+              type="button"
+              className="btn primary"
+              disabled={busy}
+              onClick={() => void run(card, a)}
+            >
+              {primaryLabel(a)}
+            </button>
+          ))}
+          {menu.length > 0 && (
+            <details ref={detailsRef} className="dactmenu" onKeyDown={onKeyDown}>
+              <summary className="dactdots" tabIndex={0} aria-label={t('board.menu.aria')} aria-busy={busy}>
+                <MoreVertical size={16} aria-hidden />
+              </summary>
+              <div className="dactpop">
+                {menu.map((a) => (
+                  <button
+                    key={a.event}
+                    type="button"
+                    disabled={busy}
+                    className={a.reasonRequired ? 'danger' : undefined}
+                    onClick={() => {
+                      closeMenu()
+                      void run(card, a)
+                    }}
+                  >
+                    {a.label}
+                  </button>
+                ))}
+              </div>
+            </details>
+          )}
+        </div>
       )}
       <BoardActionModals
         handover={handover}
@@ -99,6 +109,6 @@ export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Pr
         doReceiveAcc={doReceiveAcc}
         onReload={onDone}
       />
-    </div>
+    </>
   )
 }

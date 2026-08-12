@@ -59,14 +59,14 @@ describe('Document No pre-flight check (e2e)', () => {
       .post('/tickets/check-document-nos')
       .send({ documentNos: ['DUP-1', 'CANCELLED-1', 'FRESH-1', '  DUP-1  '] })
 
-    expect(res.status).toBe(201)
+    expect(res.status).toBe(200)
     expect([...res.body.existing].sort()).toEqual(['DUP-1'])
   })
 
   it('empty input → empty result (no DB hit needed)', async () => {
     const dcc3 = await login('dcc3-e2e', ['DCC3'])
     const res = await dcc3.post('/tickets/check-document-nos').send({ documentNos: [] })
-    expect(res.status).toBe(201)
+    expect(res.status).toBe(200)
     expect(res.body.existing).toEqual([])
   })
 
@@ -74,8 +74,23 @@ describe('Document No pre-flight check (e2e)', () => {
     await seed('Sent to Accounting', 'PM-2026-0001', 'PAY-9')
     const dcc3 = await login('dcc3-e2e', ['DCC3'])
     const res = await dcc3.post('/tickets/check-document-nos').send({ documentNos: ['PAY-9', 'PAY-X'] })
-    expect(res.status).toBe(201)
+    expect(res.status).toBe(200)
     expect(res.body.existing).toEqual(['PAY-9'])
+  })
+
+  it('Admin may probe too (both boards)', async () => {
+    await seed('Submitted to Accounting', 'CT-2026-0010', 'ADM-1')
+    const admin = await login('admin-e2e', ['Admin'])
+    const res = await admin.post('/tickets/check-document-nos').send({ documentNos: ['ADM-1', 'ADM-2'] })
+    expect(res.status).toBe(200)
+    expect(res.body.existing).toEqual(['ADM-1'])
+  })
+
+  it('rejects an over-cap array (>500) at the DTO (400)', async () => {
+    const dcc2 = await login('dcc2-e2e', ['DCC2'])
+    const tooMany = Array.from({ length: 501 }, (_, i) => `N-${i}`)
+    const res = await dcc2.post('/tickets/check-document-nos').send({ documentNos: tooMany })
+    expect(res.status).toBe(400)
   })
 
   it('an Applicant cannot probe Document Nos (403)', async () => {
