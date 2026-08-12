@@ -81,11 +81,8 @@ export const board = {
     resumeAction: 'Paperwork received — resume SLA',
   },
   dup: {
-    tierStrong: 'Same Document Type + Contract No + Project/Team (30 days)',
-    tierMedium: 'Same contractor + amount (30 days)',
-    badgeAria: '{n} tickets suspected duplicate — view to reconcile',
-    head: 'Suspected duplicate of {n} tickets',
-    hint: 'If valid, go ahead and receive; if truly a duplicate, Return it with a reason.',
+    line: 'Suspected duplicate of {code}',
+    lineMany: 'Suspected duplicate of {code} +{n}',
   },
   consequence: {
     completed: 'Completing will close the ticket and email the Applicant. Continue?',
@@ -114,7 +111,7 @@ export const board = {
     completed: 'Completed · {code}.',
     undone: 'Undone.',
     undoFailed: 'Could not undo (over 5 seconds or status already changed).',
-    undoButton: 'Undo (5s)',
+    undoButton: 'Undo',
     codeGenerated: 'Code {code} generated.',
     resentDcc2: 'Re-handed over to DCC2.',
     resentDcc3: 'Re-handed over to DCC3.',
@@ -154,6 +151,9 @@ export const board = {
       failToast: 'Could not send any ticket — check again.',
       dupInList: 'Duplicate of another row in this list.',
       dupBlocked: 'Some numbers are duplicates — fix them before sending (nothing sent yet).',
+      colCode: 'Code',
+      colContractor: 'Contractor',
+      colAmount: 'Amount',
     },
     sendAccounting: {
       title: 'Send to Accounting',

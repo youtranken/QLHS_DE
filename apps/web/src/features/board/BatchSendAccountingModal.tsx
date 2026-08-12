@@ -139,6 +139,12 @@ export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAc
         <div className="mb">
           <p>{t('board.modals.batchAcc.hint', { field: docLabel })}</p>
           <div className="batchtbl">
+            <div className="batchrow batchhead" aria-hidden>
+              <span>{t('board.modals.batchAcc.colCode')}</span>
+              <span>{t('board.modals.batchAcc.colContractor')}</span>
+              <span className="ba">{t('board.modals.batchAcc.colAmount')}</span>
+              <span>{docLabel}</span>
+            </div>
             {rows.map((c) => (
               <div className={`batchrow${rowErr(c.id) ? ' bad' : ''}`} key={c.id}>
                 <span className="bc mono">{c.code ?? c.id.slice(0, 8)}</span>

@@ -19,10 +19,14 @@ const CURRENCY_FALLBACK = ['VND', 'USD', 'EURO', 'N/A']
 export function TicketFieldsFieldset({
   form,
   set,
+  invalid,
 }: {
   form: CreateTicketBody
   set: (k: keyof CreateTicketBody, v: string) => void
+  /** Keys the parent flagged empty on submit — the field is outlined red. */
+  invalid?: ReadonlySet<string>
 }) {
+  const bad = (k: string) => (invalid?.has(k) ? ' bad' : '')
   const [payTerms, setPayTerms] = useState<string[]>([])
   const [teams, setTeams] = useState<string[]>([])
   const [currencies, setCurrencies] = useState<string[]>([])
@@ -136,7 +140,7 @@ export function TicketFieldsFieldset({
           onChange={(e) => set('contractNo', e.target.value)}
         />
       </div>
-      <div className="field">
+      <div className={`field${bad('projectTeam')}`}>
         <label htmlFor={id('projectTeam')} lang="en">
           Project/Team <span className="req">*</span>
         </label>
@@ -179,7 +183,7 @@ export function TicketFieldsFieldset({
           ariaLabel="Currency"
         />
       </div>
-      <div className="field">
+      <div className={`field${bad('paymentTerm')}`}>
         <label htmlFor={id('paymentTerm')} lang="en">
           Payment Term (If not-Pls, choose N/A)<span className="req">*</span>
         </label>

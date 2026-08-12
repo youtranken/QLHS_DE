@@ -69,6 +69,8 @@ export interface TicketDetail {
   paused: boolean
   pauseReason: string | null
   isClosed: boolean
+  /** The viewer personally holds this ticket (F8 clock-control gate). */
+  mine: boolean
   actions: LegalAction[]
   timeline: TimelineEntry[]
   pauses: PauseEntry[]
@@ -168,6 +170,9 @@ export class TicketDetailUseCase {
       paused: clock.paused,
       pauseReason: clock.pauseReason,
       isClosed: isTerminal(t.status as TicketStatus),
+      // The viewer personally holds this ticket → they alone may stop/restart its
+      // SLA clock (F8), same rule the board card uses.
+      mine: t.currentHolderSub === viewer.sub,
       actions: viewer.role
         ? legalActionsFor(t.status as TicketStatus, viewer.role, t.flow as Flow)
         : [],

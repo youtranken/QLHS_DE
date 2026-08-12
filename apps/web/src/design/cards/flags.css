@@ -1,10 +1,7 @@
 /* F12 — duplicate warning on Pool cards. Amber (not SLA red): it is a hint for
-   DCC1 to check, not a breach. The popover opens on hover AND focus so it is
-   reachable by keyboard, and is read-only — every action stays on the card. */
-.tcard .dupwrap {
-  position: relative;
-  display: inline-flex;
-}
+   DCC1 to check, not a breach. A compact "⚠ N" button whose title names the
+   suspected ticket; clicking opens it to compare (no hover card — it overflowed
+   the column). Strong-tier matches deepen to SLA red. */
 .tcard .duppill {
   font-family: var(--mono);
   font-size: var(--fs-xs);
@@ -14,76 +11,14 @@
   border: none;
   border-radius: 5px;
   padding: 1px 6px;
-  cursor: help;
-}
-.tcard .dupwrap.strong .duppill {
-  color: var(--sla);
-  background: var(--sla-bg);
-}
-.tcard .duppop {
-  position: absolute;
-  z-index: 40;
-  top: calc(100% + 6px);
-  left: 0;
-  width: 268px;
-  display: none;
-  flex-direction: column;
-  gap: 6px;
-  padding: 9px 10px;
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
-  text-align: left;
-  white-space: normal;
-}
-.tcard .dupwrap:hover .duppop,
-.tcard .dupwrap:focus-within .duppop {
-  display: flex;
-}
-.tcard .duphead {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--rush);
-}
-.tcard .dupitem {
-  border-left: 2px solid var(--rush);
-  padding-left: 7px;
-}
-.tcard .dupitem.strong {
-  border-left-color: var(--sla);
-}
-.tcard .dupitem .r1 {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-.tcard .dupitem .code {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--accent);
-  background: none;
-  border: none;
-  padding: 0;
   cursor: pointer;
 }
-.tcard .dupitem .st {
-  font-size: var(--fs-xs);
-  color: var(--ink-2);
+.tcard .duppill:hover {
+  filter: brightness(1.06);
 }
-.tcard .dupitem .why {
-  font-size: var(--fs-xs);
-  color: var(--ink-2);
-}
-.tcard .dupitem .meta {
-  font-size: var(--fs-xs);
-  color: var(--ink-2);
-}
-.tcard .duphint {
-  font-size: var(--fs-xs);
-  color: var(--ink-2);
-  border-top: 1px solid var(--line);
-  padding-top: 6px;
+.tcard .duppill.strong {
+  color: var(--sla);
+  background: var(--sla-bg);
 }
 
 /* F8 — "chờ bổ sung": the clock is stopped on purpose, so the card must read as

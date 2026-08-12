@@ -178,6 +178,19 @@
   max-height: 56vh;
   overflow-y: auto;
 }
+/* Column headers for the batch number-entry table (Mã hồ sơ / Contractor / Amount). */
+.batchhead {
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--line);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.batchhead .ba {
+  text-align: right;
+}
 .batchrow {
   display: grid;
   /* minmax(0,1fr) lets the contractor cell shrink (ellipsis) instead of pushing

@@ -1,7 +1,22 @@
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import { t } from '../i18n'
-import { subscribeToasts, dismissToast, type ToastItem } from './toast'
+import { subscribeToasts, dismissToast, type ToastItem, type ToastAction } from './toast'
+
+/** The action button, with a live "(Ns)" countdown when the toast set one (Undo). */
+function ToastActionButton({ action, secs, onRun }: { action: ToastAction; secs?: number; onRun: () => void }) {
+  const [left, setLeft] = useState(secs ?? 0)
+  useEffect(() => {
+    if (!secs) return
+    const iv = setInterval(() => setLeft((n) => (n > 0 ? n - 1 : 0)), 1000)
+    return () => clearInterval(iv)
+  }, [secs])
+  return (
+    <button type="button" className="tact" onClick={onRun}>
+      {secs ? `${action.label} (${left}s)` : action.label}
+    </button>
+  )
+}
 
 const ICON: Record<ToastItem['kind'], string> = {
   ok: 'M20 6 9 17l-5-5',
@@ -25,16 +40,14 @@ export function ToastHost() {
           </svg>
           <span className="tmsg">{it.text}</span>
           {it.action && (
-            <button
-              type="button"
-              className="tact"
-              onClick={() => {
+            <ToastActionButton
+              action={it.action}
+              secs={it.countdownSecs}
+              onRun={() => {
                 void it.action!.run()
                 dismissToast(it.id)
               }}
-            >
-              {it.action.label}
-            </button>
+            />
           )}
           <button type="button" className="tx" aria-label={t('common.actions.close')} onClick={() => dismissToast(it.id)}>
             <X size={14} aria-hidden />

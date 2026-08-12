@@ -41,10 +41,20 @@ export function CreateTicketForm({ onCreated }: { onCreated: () => void }) {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState<CreateTicketBody>(EMPTY)
   const [error, setError] = useState<string | null>(null)
+  // Keys of the required dropdowns left empty on the last submit — outlines them red.
+  const [invalid, setInvalid] = useState<ReadonlySet<string>>(new Set())
   const [busy, setBusy] = useState(false)
   const dialogRef = useRef<HTMLFormElement>(null)
 
-  const set = (k: keyof CreateTicketBody, v: string) => setForm((f) => ({ ...f, [k]: v }))
+  const set = (k: keyof CreateTicketBody, v: string) => {
+    setForm((f) => ({ ...f, [k]: v }))
+    // Clear a field's red mark as soon as the user gives it a value.
+    if (invalid.has(k)) setInvalid((prev) => {
+      const n = new Set(prev)
+      n.delete(k)
+      return n
+    })
+  }
   const backdrop = useBackdropClose(() => setOpen(false))
 
   // A ticket row can open this form pre-filled (clone). Registered once.
@@ -102,13 +112,17 @@ export function CreateTicketForm({ onCreated }: { onCreated: () => void }) {
     // The native-required inputs (Subject/Contractor/…) are already gated by the
     // browser before onSubmit fires; the dropdown-rendered required fields are NOT
     // (a custom Select can't carry `required`), so validate them here explicitly.
-    const missing: string[] = []
-    if (!form.projectTeam.trim()) missing.push('Project/Team')
-    if (!form.paymentTerm.trim()) missing.push('Payment Term')
+    const checks: Array<[keyof CreateTicketBody, string]> = [
+      ['projectTeam', 'Project/Team'],
+      ['paymentTerm', 'Payment Term'],
+    ]
+    const missing = checks.filter(([k]) => !(form[k] ?? '').trim())
     if (missing.length > 0) {
-      setError(t('tickets.createForm.errRequiredFields', { fields: missing.join(', ') }))
+      setError(t('tickets.createForm.errRequiredFields', { fields: missing.map(([, l]) => l).join(', ') }))
+      setInvalid(new Set(missing.map(([k]) => k)))
       return
     }
+    setInvalid(new Set())
     setBusy(true)
     setError(null)
     try {
@@ -160,7 +174,7 @@ export function CreateTicketForm({ onCreated }: { onCreated: () => void }) {
             </div>
             <div className="mb">
               <div className="fg">
-                <TicketFieldsFieldset form={form} set={set} />
+                <TicketFieldsFieldset form={form} set={set} invalid={invalid} />
                 <div className="field full">
                   <span id="ct-priority-lbl" className="fglbl" lang="en">
                     Priority

@@ -1,13 +1,16 @@
-import { describe, expect, it } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
+
+vi.mock('../../shared/route', () => ({ openTicketDetail: vi.fn() }))
+import { openTicketDetail } from '../../shared/route'
 import { DupBadge } from './DupBadge'
 import type { DupHint } from './api'
 
 const hint = (over: Partial<DupHint> = {}): DupHint => ({
   id: 'dup-1',
-  code: 'PMH-B-2026-0791',
-  status: 'Submitted',
-  flow: 'Contract-Budget',
+  code: 'CT-2026-0003',
+  status: 'Completed',
+  flow: 'Contract',
   tier: 'strong',
   contractor: 'Công ty ABC',
   amount: '500000000',
@@ -22,26 +25,24 @@ describe('DupBadge', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('warns with the number of suspected duplicates', () => {
-    render(<DupBadge hints={[hint(), hint({ id: 'dup-2', code: 'PMH-B-0002' })]} />)
-    expect(screen.getByRole('button', { name: /2 hồ sơ nghi trùng/i })).toBeInTheDocument()
+  it('labels the badge compactly with the suspected ticket code', () => {
+    render(<DupBadge hints={[hint()]} />)
+    expect(screen.getByRole('button', { name: 'Nghi trùng hồ sơ CT-2026-0003' })).toBeInTheDocument()
   })
 
-  it('lists each suspected ticket with what DCC1 needs to compare', () => {
+  it('clicking opens the suspected duplicate ticket', () => {
     render(<DupBadge hints={[hint()]} />)
-    expect(screen.getByText('PMH-B-2026-0791')).toBeInTheDocument()
-    expect(screen.getByText(/Công ty ABC/)).toBeInTheDocument()
-    expect(screen.getByText(/500\.000\.000/)).toBeInTheDocument()
-    expect(screen.getByText(/3 ngày trước/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /Nghi trùng/ }))
+    expect(openTicketDetail).toHaveBeenCalledWith('CT-2026-0003')
   })
 
-  it('states why a card is flagged: same Document Type + Contract No + Project/Team', () => {
-    render(<DupBadge hints={[hint()]} />)
-    expect(screen.getByText(/Document Type \+ Contract No \+ Project\/Team/i)).toBeInTheDocument()
+  it('summarises when more than one ticket is suspected', () => {
+    render(<DupBadge hints={[hint(), hint({ id: 'dup-2', code: 'CT-2026-0009' })]} />)
+    expect(screen.getByRole('button', { name: 'Nghi trùng hồ sơ CT-2026-0003 +1' })).toBeInTheDocument()
   })
 
   it('shows a draft ticket without a code as "nháp" rather than blank', () => {
     render(<DupBadge hints={[hint({ code: null })]} />)
-    expect(screen.getByText('nháp')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /nháp/ })).toBeInTheDocument()
   })
 })

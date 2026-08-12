@@ -13,6 +13,8 @@ export interface ToastItem {
   kind: 'ok' | 'err' | 'info'
   text: string
   action?: ToastAction
+  /** Seconds shown ticking down next to the action (e.g. the 5s Undo window). */
+  countdownSecs?: number
 }
 
 type Listener = (items: ToastItem[]) => void
@@ -55,10 +57,13 @@ function push(item: Omit<ToastItem, 'id'>, ttlMs: number): number {
   return id
 }
 
-/** Undo-style toasts hold longer so the action stays reachable. */
+/** Undo-style toasts hold longer so the action stays reachable. When `countdownSecs`
+ *  is given the toast lives exactly that long and ticks the number down (the Undo
+ *  window is server-bounded to 5s, so the count is the real deadline). */
 export const toast = {
   ok: (text: string) => push({ kind: 'ok', text }, 3500),
   err: (text: string) => push({ kind: 'err', text }, 6000),
   info: (text: string) => push({ kind: 'info', text }, 4000),
-  action: (text: string, action: ToastAction) => push({ kind: 'info', text, action }, 7000),
+  action: (text: string, action: ToastAction, countdownSecs?: number) =>
+    push({ kind: 'info', text, action, countdownSecs }, (countdownSecs ?? 7) * 1000),
 }

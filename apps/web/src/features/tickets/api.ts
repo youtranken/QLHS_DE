@@ -87,6 +87,8 @@ export interface TicketDetail {
   /** F8 — clock stopped right now, and why. */
   paused: boolean
   pauseReason: string | null
+  /** The viewer holds this ticket → may stop/restart its SLA clock (F8). */
+  mine: boolean
   route: RouteStation[]
   timeline: TimelineEntry[]
   pauses: PauseEntry[]

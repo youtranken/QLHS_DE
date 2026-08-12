@@ -249,7 +249,7 @@ function columnLabel(role: Role | null, status: TicketStatus): string | undefine
     (role === ROLE.Dcc1 || role === ROLE.Admin) &&
     status === TICKET_STATUS.SubmittedToAccounting
   ) {
-    return 'Chờ ACC'
+    return 'Waiting for ACC'
   }
   return undefined
 }

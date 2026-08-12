@@ -97,6 +97,16 @@
 .field label .req {
   color: var(--sla);
 }
+/* Required field left empty on submit — flag the label + outline the control red
+   (works for both the text-input fallback and the custom Select trigger). */
+.field.bad label {
+  color: var(--sla);
+}
+.field.bad input,
+.field.bad .fsel-trigger {
+  border-color: var(--sla);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sla) 20%, transparent);
+}
 .field input,
 .field select,
 .field textarea {

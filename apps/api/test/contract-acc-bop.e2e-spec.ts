@@ -67,12 +67,12 @@ describe('DCC1 receive-from-ACC & submit BOP (e2e)', () => {
     })
   }
 
-  it('AD-16: Submitted to Accounting shows on BOTH DCC1 "Chờ ACC" and DCC2 lanes', async () => {
+  it('AD-16: Submitted to Accounting shows on BOTH DCC1 "Waiting for ACC" and DCC2 lanes', async () => {
     const { id } = await seed('Submitted to Accounting')
 
     const dcc1 = await login('dcc1-e2e', ['DCC1'])
     const b1: BoardCol[] = (await dcc1.get('/station-board')).body
-    const cho = b1.find((c) => c.label === 'Chờ ACC')
+    const cho = b1.find((c) => c.label === 'Waiting for ACC')
     expect(cho?.cards.map((k) => k.id)).toContain(id)
     expect(cho?.cards[0]?.actions.map((a) => a.event)).toEqual(['receiveFromAcc'])
 
@@ -98,6 +98,17 @@ describe('DCC1 receive-from-ACC & submit BOP (e2e)', () => {
       where: { ticketId: id, action: 'receiveFromAcc' },
     })
     expect((ev.meta as { receivedFromAccAt: string }).receivedFromAccAt).toContain('2026-07-12')
+  })
+
+  it('bulk receive-from-ACC via the generic batch endpoint → Received from ACC (holder set)', async () => {
+    const { id } = await seed('Submitted to Accounting')
+    const dcc1 = await login('dcc1-e2e', ['DCC1'])
+    const res = await dcc1.post('/dcc1/tickets/action').send({ ticketIds: [id], event: 'receiveFromAcc' })
+    expect(res.status).toBe(201)
+    expect(res.body[0]).toMatchObject({ id, ok: true, status: 'Received from ACC' })
+    const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
+    expect(row.status).toBe('Received from ACC')
+    expect(row.currentHolderSub).toBe('dcc1-e2e') // DCC1 now owns it, so Submit-BOP shows
   })
 
   it('AD-17: Received from ACC exposes EXACTLY two actions — Return + Submit BOP', async () => {

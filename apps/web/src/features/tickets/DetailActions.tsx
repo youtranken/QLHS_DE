@@ -2,6 +2,7 @@ import { MoreVertical } from 'lucide-react'
 import { useBoardActions } from '../board/useBoardActions'
 import { BoardActionModals } from '../board/BoardActionModals'
 import { splitActions, primaryLabel } from '../board/primaryAction'
+import { slaActionsFor } from '../board/slaPauseActions'
 import { useDetailsMenu } from '../../shared/useDetailsMenu'
 import type { BoardCard } from '../board/api'
 import type { TicketDetail } from './api'
@@ -10,11 +11,11 @@ import { t } from '../../i18n'
 /**
  * Same action surface as the board card (primary button + ⋯ menu), rendered in the
  * ticket-detail header so a DCC can act on a ticket while viewing it — not only from
- * the board. Actions come from the server-derived `d.actions` (role-scoped, pure
- * state-machine edges: forward step + Return/Reopen; the board-only pseudo-actions —
- * Pool "Nhận", reconcile, SLA pause, seize — stay on the board). Reuses the board's
- * action runner + modals; success refetches the detail. Renders nothing when the
- * viewer has no legal action here.
+ * the board. Actions = the server-derived `d.actions` (role-scoped state-machine
+ * edges: forward step + Return/Reopen) PLUS the SLA clock control (pause/resume) the
+ * holder gets, so the detail ⋯ matches the card. The other board-only pseudo-actions
+ * (Pool "Nhận", reconcile, seize) stay on the board. Reuses the board's runner +
+ * modals; success refetches the detail. Renders nothing when there's no action.
  */
 export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Promise<void> }) {
   const {
@@ -23,18 +24,8 @@ export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Pr
     run, doReceive, doMissing, doSendAcc, doReceiveAcc,
   } = useBoardActions(onDone)
 
-  const { primary, menu } = splitActions(d.actions)
-  const hasActions = primary.length > 0 || menu.length > 0
-  // `present` must track when the ⋯ <details> is actually in the DOM: d.actions can
-  // arrive AFTER mount via a live refetch, so the menu wiring re-attaches then.
-  const { ref: detailsRef, onKeyDown } = useDetailsMenu<HTMLDetailsElement>({
-    menuSelector: '.dactpop button:not([disabled])',
-    summarySelector: '.dactdots',
-    present: menu.length > 0,
-  })
-
   // A card-shaped view of the ticket for the shared runner/modals (they read
-  // id/code/flow; the rest is filler the detail surface never shows).
+  // id/code/flow/mine/paused; the rest is filler the detail surface never shows).
   const card: BoardCard = {
     id: d.id,
     code: d.code,
@@ -49,8 +40,20 @@ export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Pr
     actions: d.actions,
     dupOf: [],
     paused: d.paused,
-    mine: false,
+    mine: d.mine,
   }
+  // Fold in the SLA clock control (holder-only) so the detail ⋯ carries "chờ bổ sung
+  // SLA" / "chạy lại SLA" exactly like the board card at the same station.
+  const { primary, menu } = splitActions([...d.actions, ...slaActionsFor(card)])
+  const hasActions = primary.length > 0 || menu.length > 0
+  // `present` must track when the ⋯ <details> is actually in the DOM: actions can
+  // arrive AFTER mount via a live refetch, so the menu wiring re-attaches then.
+  const { ref: detailsRef, onKeyDown } = useDetailsMenu<HTMLDetailsElement>({
+    menuSelector: '.dactpop button:not([disabled])',
+    summarySelector: '.dactdots',
+    present: menu.length > 0,
+  })
+
   const busy = inFlight.has(d.id)
   const closeMenu = () => detailsRef.current?.removeAttribute('open')
 

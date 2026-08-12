@@ -158,10 +158,11 @@ export function makeCardAction({
       } else {
         // Reversible → run now, then offer a 5s Undo (AD-19 / UX-DR15).
         await actionCard(card.id, action.event)
-        toast.action(t('board.toasts.done'), {
-          label: t('board.toasts.undoButton'),
-          run: () => onUndo(card.id),
-        })
+        toast.action(
+          t('board.toasts.done'),
+          { label: t('board.toasts.undoButton'), run: () => onUndo(card.id) },
+          5, // the server-bounded 5s Undo window, shown ticking down
+        )
       }
     } catch (e) {
       toast.err(messageOf(e, t('board.toasts.actionFailed')))

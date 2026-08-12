@@ -12,6 +12,7 @@ const fixture: Detail = {
   projectTeam: 'Landmark 81', budgetCode: 'B-04', contractor: 'Coteccons',
   amount: '3480500000', currency: 'VND', roundNo: 0, overdueDays: 4, dwellDays: 4,
   isClosed: false,
+  mine: false,
   actions: [],
   route: [
     { status: 'Submitted', phase: 'past', holder: 'An', enteredAt: '2026-06-28T09:20:00Z' },

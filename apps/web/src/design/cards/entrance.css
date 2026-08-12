@@ -149,14 +149,17 @@
   color: var(--accent);
   box-shadow: none;
 }
+/* Secondary forward action (e.g. General "Trình BOP" next to "Sếp duyệt"): still an
+   accent-colored button — just outlined instead of filled, so it reads as an action
+   and not a disabled/neutral control. */
 .tcard .pact.sec {
-  border-color: var(--line);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
   background: none;
-  color: var(--ink-2);
+  color: var(--accent);
 }
 .tcard .pact.sec:hover {
   border-color: var(--accent);
-  color: var(--accent);
-  background: none;
-  box-shadow: none;
+  color: var(--on-accent);
+  background: var(--accent);
+  box-shadow: var(--glow-accent);
 }

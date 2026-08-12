@@ -28,6 +28,10 @@ const GENERIC_ACTION_EVENTS: string[] = [
   TICKET_EVENT.HandoverToDcc2,
   TICKET_EVENT.HandoverToDcc3,
   TICKET_EVENT.SubmitToBop,
+  // Bulk "Nhận về từ ACC": a self-contained DCC1 transition. The dedicated
+  // per-ticket endpoint additionally records the receipt DATE; the bulk path takes
+  // the transition's `now` (a stack received today), which is the sensible default.
+  TICKET_EVENT.ReceiveFromAcc,
 ]
 
 export class TicketActionDto {

@@ -81,11 +81,8 @@ export const board = {
     resumeAction: 'Đã có giấy — chạy lại SLA',
   },
   dup: {
-    tierStrong: 'Trùng Document Type + Contract No + Project/Team (30 ngày)',
-    tierMedium: 'Cùng nhà thầu + số tiền (30 ngày)',
-    badgeAria: '{n} hồ sơ nghi trùng — xem để đối chiếu',
-    head: 'Nghi trùng với {n} hồ sơ',
-    hint: 'Hợp lệ thì cứ tiếp nhận; trùng thật thì Trả lại kèm lý do.',
+    line: 'Nghi trùng hồ sơ {code}',
+    lineMany: 'Nghi trùng hồ sơ {code} +{n}',
   },
   consequence: {
     completed: 'Hoàn tất sẽ đóng hồ sơ và gửi email cho Applicant. Tiếp tục?',
@@ -114,7 +111,7 @@ export const board = {
     completed: 'Đã hoàn tất · {code}.',
     undone: 'Đã hoàn tác.',
     undoFailed: 'Không hoàn tác được (quá 5 giây hoặc trạng thái đã đổi).',
-    undoButton: 'Hoàn tác (5s)',
+    undoButton: 'Hoàn tác',
     codeGenerated: 'Đã sinh mã {code}.',
     resentDcc2: 'Đã bàn giao lại cho DCC2.',
     resentDcc3: 'Đã bàn giao lại cho DCC3.',
@@ -154,6 +151,9 @@ export const board = {
       failToast: 'Chưa gửi được hồ sơ nào — kiểm tra lại.',
       dupInList: 'Trùng số với một dòng khác trong danh sách này.',
       dupBlocked: 'Có số bị trùng — sửa lại rồi mới gửi (chưa gửi hồ sơ nào).',
+      colCode: 'Mã hồ sơ',
+      colContractor: 'Contractor',
+      colAmount: 'Amount',
     },
     sendAccounting: {
       title: 'Gửi Accounting',
