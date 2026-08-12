@@ -37,7 +37,7 @@ export const board = {
     empty: 'Empty',
     noMatch: 'No tickets match the filter',
     countFiltered: '{shown}/{total} match the filter',
-    batchSendBtn: 'Enter numbers & send in bulk',
+    batchSendBtn: 'Enter numbers & send',
   },
   card: {
     openDetail: 'Open ticket detail',
@@ -65,6 +65,9 @@ export const board = {
     selected: '{n} selected',
     clear: 'Clear selection',
     selectAll: 'Select all',
+    // Umbrella label for a mixed Contract + Payment selection at "Submit to VP": each
+    // ticket still routes to its own flow's DCC (DCC2 for Contract, DCC3 for Payment).
+    handoverDcc: 'Hand to DCC',
     confirmTitle: 'Apply to {n} tickets',
     confirmMessage: 'This will apply "{action}" to the {n} selected tickets. The action may be irreversible. Continue?',
     resultOk: 'Applied to {n} tickets.',
@@ -77,7 +80,8 @@ export const board = {
     andyComplete: 'Boss approves → complete',
     andyBop: 'Submit to BOP',
     sendAccounting: 'Send to Accounting…',
-    completeContract: 'Complete contract…',
+    completeContract: 'Complete',
+    submitBop: 'Submit to BOP',
   },
   pause: {
     pauseAction: 'Awaiting supplement (pause SLA)',
@@ -138,7 +142,7 @@ export const board = {
       confirm: 'Confirm',
       dateLabel: 'Date received from DCC1',
       missingConfirm: 'Reporting a missing/wrong hardcopy returns the ticket to DCC1 to re-check (cannot be undone). Continue?',
-      missingButton: 'Missing / Wrong — Return to DCC1',
+      missingButton: 'Return to DCC1',
       missingConfirmBtn: 'Return to DCC1',
     },
     receiveAcc: {
@@ -155,6 +159,8 @@ export const board = {
       sentToast: 'Sent {n} tickets.',
       partialToast: '{ok} sent · {failed} failed (fix and resend).',
       failToast: 'Could not send any ticket — check again.',
+      dupInList: 'Duplicate of another row in this list.',
+      dupBlocked: 'Some numbers are duplicates — fix them before sending (nothing sent yet).',
     },
     sendAccounting: {
       title: 'Send to Accounting',

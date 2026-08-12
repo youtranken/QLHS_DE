@@ -37,7 +37,7 @@ export const board = {
     empty: 'Trống',
     noMatch: 'Không có hồ sơ khớp bộ lọc',
     countFiltered: '{shown}/{total} khớp bộ lọc',
-    batchSendBtn: 'Nhập số & gửi hàng loạt',
+    batchSendBtn: 'Nhập số & gửi nhiều',
   },
   card: {
     openDetail: 'Mở chi tiết hồ sơ',
@@ -65,6 +65,9 @@ export const board = {
     selected: 'Đã chọn {n}',
     clear: 'Bỏ chọn',
     selectAll: 'Chọn tất cả',
+    // Nhãn gộp khi chọn hỗn hợp Contract + Payment ở ga "Trình Sếp": mỗi hồ sơ vẫn
+    // đi đúng DCC của luồng nó (DCC2 cho Contract, DCC3 cho Payment).
+    handoverDcc: 'Chuyển cho DCC',
     confirmTitle: 'Áp dụng cho {n} hồ sơ',
     confirmMessage: 'Sẽ áp dụng "{action}" cho {n} hồ sơ đã chọn. Hành động có thể không hoàn tác. Tiếp tục?',
     resultOk: 'Đã áp dụng cho {n} hồ sơ.',
@@ -77,7 +80,8 @@ export const board = {
     andyComplete: 'Sếp duyệt → hoàn tất',
     andyBop: 'Trình BOP',
     sendAccounting: 'Gửi Kế toán…',
-    completeContract: 'Hoàn tất HĐ…',
+    completeContract: 'Hoàn tất',
+    submitBop: 'Trình BOP',
   },
   pause: {
     pauseAction: 'Chờ bổ sung (dừng SLA)',
@@ -138,7 +142,7 @@ export const board = {
       confirm: 'Xác nhận',
       dateLabel: 'Ngày nhận từ DCC1',
       missingConfirm: 'Báo thiếu/sai sẽ trả hồ sơ về DCC1 kiểm tra lại (không hoàn tác). Tiếp tục?',
-      missingButton: 'Thiếu / Sai — Trả về DCC1',
+      missingButton: 'Trả về DCC1',
       missingConfirmBtn: 'Trả về DCC1',
     },
     receiveAcc: {
@@ -155,6 +159,8 @@ export const board = {
       sentToast: 'Đã gửi {n} hồ sơ.',
       partialToast: '{ok} đã gửi · {failed} lỗi (sửa rồi gửi lại).',
       failToast: 'Chưa gửi được hồ sơ nào — kiểm tra lại.',
+      dupInList: 'Trùng số với một dòng khác trong danh sách này.',
+      dupBlocked: 'Có số bị trùng — sửa lại rồi mới gửi (chưa gửi hồ sơ nào).',
     },
     sendAccounting: {
       title: 'Gửi Accounting',

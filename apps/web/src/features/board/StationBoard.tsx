@@ -162,7 +162,7 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
         <BulkActionBar
           count={selectedCards.length}
           actions={bulkActions}
-          onApply={(action) => doBatch(selectedCards.map((c) => c.id), action, () => setSel(new Set()))}
+          onApply={(action) => doBatch(selectedCards, action, () => setSel(new Set()))}
           onClear={() => setSel(new Set())}
         />
       )}

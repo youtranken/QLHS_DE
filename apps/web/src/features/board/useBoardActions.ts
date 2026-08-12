@@ -14,7 +14,7 @@ import {
   type LegalAction,
 } from './api'
 import { makeCardAction } from './cardAction'
-import { summarizeBatch } from './bulkActions'
+import { summarizeBatch, HANDOVER_DCC, handoverEventOf } from './bulkActions'
 import { primaryLabel } from './primaryAction'
 import type { Ask } from './ask'
 import { toast } from '../../shared/toast'
@@ -133,15 +133,20 @@ export function useBoardActions(load: () => Promise<void>) {
   }
 
   // FR-8 — one Andy decision applied to many tickets. Gated behind a confirm
-  // (Approve→Complete is irreversible); each ticket's result is independent.
-  function doBatch(ids: string[], action: LegalAction, onDone: () => void) {
+  // (Approve→Complete is irreversible); each ticket's result is independent. The
+  // "Chuyển cho DCC" umbrella spans two events (Contract→DCC2, Payment→DCC3), so
+  // it fans out into one batch call per event and merges the results.
+  function doBatch(cards: BoardCard[], action: LegalAction, onDone: () => void) {
     setAsk({
-      title: t('board.bulk.confirmTitle', { n: ids.length }),
-      message: t('board.bulk.confirmMessage', { n: ids.length, action: primaryLabel(action) }),
+      title: t('board.bulk.confirmTitle', { n: cards.length }),
+      message: t('board.bulk.confirmMessage', { n: cards.length, action: primaryLabel(action) }),
       danger: true,
       confirmLabel: action.label,
       onOk: async () => {
-        const results = await batchAction(ids, action.event)
+        const results =
+          action.event === HANDOVER_DCC
+            ? await batchByHandover(cards)
+            : await batchAction(cards.map((c) => c.id), action.event)
         const { ok, failed } = summarizeBatch(results)
         if (ok === 0) toast.err(t('board.bulk.resultFail'))
         else if (failed > 0) toast.info(t('board.bulk.resultPartial', { ok, failed }))
@@ -150,6 +155,18 @@ export function useBoardActions(load: () => Promise<void>) {
         await load()
       },
     })
+  }
+
+  // Route each card to its own flow's handover event (DCC2 vs DCC3), one batch call
+  // per event, then flatten so summarizeBatch tallies the whole selection at once.
+  async function batchByHandover(cards: BoardCard[]) {
+    const groups = new Map<string, string[]>()
+    for (const c of cards) {
+      const ev = handoverEventOf(c)
+      if (ev) groups.set(ev, [...(groups.get(ev) ?? []), c.id])
+    }
+    const parts = await Promise.all([...groups].map(([ev, ids]) => batchAction(ids, ev)))
+    return parts.flat()
   }
 
   return {

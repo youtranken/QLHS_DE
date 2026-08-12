@@ -31,6 +31,7 @@ import { SendAccountingDcc3UseCase } from './application/accounting/send-account
 import { SubmitToAccountingUseCase } from './application/accounting/submit-to-accounting.usecase'
 import { ReceiveFromAccUseCase } from './application/accounting/receive-from-acc.usecase'
 import { CompleteContractUseCase } from './application/accounting/complete-contract.usecase'
+import { CheckDocumentNosUseCase } from './application/accounting/check-document-nos.usecase'
 import { ReturnFromPushbackUseCase } from './application/returns/return-from-pushback.usecase'
 import { UndoActionUseCase } from './application/board/undo-action.usecase'
 import { BatchActionUseCase } from './application/board/batch-action.usecase'
@@ -73,6 +74,7 @@ import { Dcc2Controller } from './http/dcc2/dcc2.controller'
 import { Dcc3Controller } from './http/dcc3/dcc3.controller'
 import { TicketDetailController } from './http/ticket/ticket-detail.controller'
 import { ClosedTicketsController } from './http/dcc-shared/closed-tickets.controller'
+import { DocumentCheckController } from './http/dcc-shared/document-check.controller'
 import { DispatchController } from './http/dispatch/dispatch.controller'
 
 @Module({
@@ -85,6 +87,7 @@ import { DispatchController } from './http/dispatch/dispatch.controller'
     TicketDetailController,
     SlaPauseController,
     ClosedTicketsController,
+    DocumentCheckController,
     DispatchController,
   ],
   providers: [
@@ -119,6 +122,7 @@ import { DispatchController } from './http/dispatch/dispatch.controller'
     SubmitToAccountingUseCase,
     ReceiveFromAccUseCase,
     CompleteContractUseCase,
+    CheckDocumentNosUseCase,
     ReturnFromPushbackUseCase,
     UndoActionUseCase,
     BatchActionUseCase,

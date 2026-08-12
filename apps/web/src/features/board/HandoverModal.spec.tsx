@@ -35,19 +35,19 @@ describe('HandoverModal — 2-phase confirmation (UX-DR8, AC2/AC3)', () => {
     expect(onConfirm.mock.calls[0]?.[0]).toMatch(/^\d{4}-\d{2}-\d{2}$/)
   })
 
-  it('"Thiếu / Sai" is irreversible — asks for confirmation before bouncing', async () => {
+  it('"Trả về DCC1" is irreversible — asks for confirmation before bouncing', async () => {
     const { onMissing } = setup()
-    // Opens the danger ConfirmModal; cancelling it must not bounce.
-    fireEvent.click(screen.getByRole('button', { name: 'Thiếu / Sai — Trả về DCC1' }))
+    // Opens the danger ConfirmModal; cancelling it must not bounce. Only the handover
+    // dialog is open here, so its trigger button is the sole "Trả về DCC1".
+    fireEvent.click(screen.getByRole('button', { name: 'Trả về DCC1' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Hủy' }))
     expect(onMissing).not.toHaveBeenCalled()
 
-    fireEvent.click(screen.getByRole('button', { name: 'Thiếu / Sai — Trả về DCC1' }))
-    // A reason is now required before the bounce is enabled. The confirm dialog is
-    // nested inside the handover dialog, so target the last one.
-    await screen.findByRole('button', { name: 'Trả về DCC1' })
-    const dialogs = screen.getAllByRole('dialog')
-    const confirm = within(dialogs[dialogs.length - 1] as HTMLElement)
+    fireEvent.click(screen.getByRole('button', { name: 'Trả về DCC1' }))
+    // A reason is required before the bounce is enabled. The confirm dialog is nested
+    // inside the handover dialog and its confirm button shares the label, so scope to
+    // the last dialog to disambiguate from the trigger.
+    const confirm = within((await screen.findAllByRole('dialog')).at(-1) as HTMLElement)
     fireEvent.change(confirm.getByRole('textbox'), { target: { value: 'Thiếu trang 3' } })
     fireEvent.click(confirm.getByRole('button', { name: 'Trả về DCC1' }))
     await waitFor(() => expect(onMissing).toHaveBeenCalledWith('Thiếu trang 3'))

@@ -4,7 +4,7 @@ import { useFocusTrap } from '../../shared/useFocusTrap'
 import { useBackdropClose } from '../../shared/useBackdropClose'
 import { ApiClientError } from '../../shared/api-client'
 import { groupAmount } from '../../shared/format'
-import { sendAccounting, sendAccountingDcc3, type BoardCard } from './api'
+import { checkDocumentNos, sendAccounting, sendAccountingDcc3, type BoardCard } from './api'
 import { toast } from '../../shared/toast'
 import { t } from '../../i18n'
 
@@ -20,8 +20,10 @@ export interface BatchSendAccountingModalProps {
  * Enter the Contract No / Payment No for MANY tickets on one screen, then send
  * them all. The number differs per ticket (so a single bulk action can't do it),
  * but typing them one modal-at-a-time is the real drag. Rows left BLANK are simply
- * skipped and stay in the column; a duplicate/failed row keeps its error inline so
- * it can be fixed and re-sent. Uses the existing per-ticket endpoints (no new BE).
+ * skipped and stay in the column. Duplicates are caught BEFORE anything is sent —
+ * the same number typed on two rows is flagged live, and a number already taken on
+ * another ticket is caught by a pre-flight check on submit — so a known clash never
+ * half-sends the batch and strands one hard-to-spot row.
  */
 export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAccountingModalProps) {
   const isPayment = cards[0]?.flow === 'Payment'
@@ -45,9 +47,45 @@ export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAc
   const rows = cards.filter((c) => !done[c.id])
   const filled = rows.filter((c) => (vals[c.id] ?? '').trim())
 
+  // Live intra-batch clash: the same number typed on ≥2 rows. Caught as you type
+  // (before submit) — the send button is disabled while any row is in this set.
+  const listDup = new Set<string>()
+  const byVal = new Map<string, string[]>()
+  for (const c of filled) {
+    const v = (vals[c.id] ?? '').trim()
+    byVal.set(v, [...(byVal.get(v) ?? []), c.id])
+  }
+  for (const ids of byVal.values()) if (ids.length > 1) ids.forEach((id) => listDup.add(id))
+  const rowErr = (id: string): string | undefined =>
+    errs[id] ?? (listDup.has(id) ? t('board.modals.batchAcc.dupInList') : undefined)
+  const blocked = busy || filled.length === 0 || listDup.size > 0
+
   async function submit() {
-    if (busy || filled.length === 0) return
+    if (blocked) return
     setBusy(true)
+    // Pre-flight: catch a Document No already taken on another ticket BEFORE sending
+    // anything, so a known clash never half-sends the batch. Best-effort — if the
+    // check itself fails, fall through to the send (the DB unique index still guards).
+    try {
+      const { existing } = await checkDocumentNos(filled.map((c) => (vals[c.id] ?? '').trim()))
+      if (existing.length > 0) {
+        const taken = new Set(existing)
+        const dupErrs: Record<string, string> = {}
+        for (const c of filled) {
+          const value = (vals[c.id] ?? '').trim()
+          if (taken.has(value)) {
+            dupErrs[c.id] = t('board.modals.sendAccounting.duplicateError', { value, field: docLabel })
+          }
+        }
+        setErrs(dupErrs)
+        setBusy(false)
+        toast.err(t('board.modals.batchAcc.dupBlocked'))
+        return
+      }
+    } catch {
+      // pre-check unavailable → proceed; the per-row send still surfaces any clash.
+    }
+
     const nextDone = { ...done }
     const nextErrs: Record<string, string> = {}
     let ok = 0
@@ -102,7 +140,7 @@ export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAc
           <p>{t('board.modals.batchAcc.hint', { field: docLabel })}</p>
           <div className="batchtbl">
             {rows.map((c) => (
-              <div className={`batchrow${errs[c.id] ? ' bad' : ''}`} key={c.id}>
+              <div className={`batchrow${rowErr(c.id) ? ' bad' : ''}`} key={c.id}>
                 <span className="bc mono">{c.code ?? c.id.slice(0, 8)}</span>
                 <span className="bw" title={c.contractor ?? undefined}>{c.contractor ?? '—'}</span>
                 <span className="ba mono">{c.amount ? groupAmount(c.amount) : ''}</span>
@@ -110,7 +148,7 @@ export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAc
                   className="mono"
                   value={vals[c.id] ?? ''}
                   disabled={busy}
-                  aria-invalid={!!errs[c.id]}
+                  aria-invalid={!!rowErr(c.id)}
                   aria-label={t('board.modals.batchAcc.inputAria', { field: docLabel, code: c.code ?? '' })}
                   placeholder={docLabel}
                   onChange={(e) => {
@@ -123,8 +161,8 @@ export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAc
                     })
                   }}
                 />
-                {errs[c.id] && (
-                  <span className="err batcherr" role="alert">{errs[c.id]}</span>
+                {rowErr(c.id) && (
+                  <span className="err batcherr" role="alert">{rowErr(c.id)}</span>
                 )}
               </div>
             ))}
@@ -138,7 +176,7 @@ export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAc
           <span className="batchcount">
             {t('board.modals.batchAcc.count', { n: filled.length, total: rows.length })}
           </span>
-          <button type="button" className="btn primary" disabled={busy || filled.length === 0} onClick={() => void submit()}>
+          <button type="button" className="btn primary" disabled={blocked} onClick={() => void submit()}>
             {t('board.modals.batchAcc.submit', { n: filled.length })}
           </button>
         </div>

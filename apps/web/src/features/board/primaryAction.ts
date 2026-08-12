@@ -7,6 +7,9 @@ import type { LegalAction } from './api'
 // điều khiển đồng hồ SLA. reasonRequired đã phủ SendBack/Reopen/__return/pause;
 // chỉ còn resume phải liệt kê tay.
 const MENU_ONLY = new Set<string>([PAUSE_EVENT, RESUME_EVENT])
+// Ngoại lệ: SubmitToBop tuy reasonRequired (kèm ghi chú cho BOP) vẫn là bước TIẾN
+// nên lên nút chính — chỉ mở modal nhập lý do như thường, không bị đẩy xuống ⋯.
+const PRIMARY_REASON = new Set<string>([TICKET_EVENT.SubmitToBop])
 // Phòng thủ (allowlist theo đích): mọi hành động dẫn tới trạng thái LÙI/HỦY luôn
 // ở ⋯ — chặn một event tương lai reasonRequired:false-nhưng-phá-huỷ (vd Cancel)
 // tự leo lên nút chính chỉ vì lọt denylist sự-kiện.
@@ -22,7 +25,11 @@ export function splitActions(actions: LegalAction[]): { primary: LegalAction[]; 
   const primary: LegalAction[] = []
   const menu: LegalAction[] = []
   for (const a of actions) {
-    if (a.reasonRequired || MENU_ONLY.has(a.event) || BACK_STATUS.has(a.toStatus)) menu.push(a)
+    const forcedMenu =
+      (a.reasonRequired && !PRIMARY_REASON.has(a.event)) ||
+      MENU_ONLY.has(a.event) ||
+      BACK_STATUS.has(a.toStatus)
+    if (forcedMenu) menu.push(a)
     else primary.push(a)
   }
   return { primary, menu }
@@ -35,6 +42,7 @@ const SHORT: Record<string, () => string> = {
   [TICKET_EVENT.AndyRequireBop]: () => t('board.primary.andyBop'),
   [TICKET_EVENT.SendToAccounting]: () => t('board.primary.sendAccounting'),
   [TICKET_EVENT.CompleteContract]: () => t('board.primary.completeContract'),
+  [TICKET_EVENT.SubmitToBop]: () => t('board.primary.submitBop'),
 }
 
 export const primaryLabel = (a: LegalAction): string => SHORT[a.event]?.() ?? a.label

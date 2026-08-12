@@ -86,6 +86,9 @@ export const resendDcc2 = (id: string) =>
   apiPost<{ ok: true }>(`/dcc1/tickets/${id}/resend-dcc2`)
 export const sendAccounting = (id: string, documentNo: string) =>
   apiPost<{ status: string }>(`/dcc2/tickets/${id}/send-accounting`, { documentNo })
+/** Batch pre-flight: which of these Document Nos are already taken (live tickets). */
+export const checkDocumentNos = (documentNos: string[]) =>
+  apiPost<{ existing: string[] }>('/tickets/check-document-nos', { documentNos })
 export const receiveFromAcc = (id: string, receivedAt?: string) =>
   apiPost<{ status: string }>(
     `/dcc1/tickets/${id}/receive-from-acc`,

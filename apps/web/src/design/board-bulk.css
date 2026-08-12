@@ -196,16 +196,17 @@
   border-color: color-mix(in srgb, var(--sla) 45%, transparent);
 }
 
-/* "Nhập số & gửi hàng loạt" — chip nhỏ ở đầu cột Received-by-DCC2/DCC3. */
+/* "Nhập số & gửi nhiều" — nút ở đầu cột Received-by-DCC2/DCC3. Đủ to để dễ thấy
+   đây là lối vào nhập hàng loạt (không phải chip phụ). */
 .col .ch .colbatch {
-  margin-top: 7px;
-  align-self: flex-start;
-  padding: 4px 9px;
-  font-size: 11px;
+  margin-top: 8px;
+  align-self: stretch;
+  padding: 8px 12px;
+  font-size: 12.5px;
   font-weight: 600;
-  border-radius: 7px;
-  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
-  background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 16%, var(--panel));
   color: var(--accent);
   cursor: pointer;
 }

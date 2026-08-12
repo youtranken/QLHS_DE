@@ -41,7 +41,7 @@ test('Payment: DCC3 missing-paper at receipt → DCC1 supplements and re-hands o
   // Opens the handover modal, then reports missing paper (with a reason) instead
   // of confirming — the ticket stays put and bounces to DCC1's reconcile lane.
   await cardAction(page, 'Kiểm tra bản cứng')
-  await page.getByRole('button', { name: 'Thiếu / Sai — Trả về DCC1' }).click()
+  await page.getByRole('button', { name: 'Trả về DCC1', exact: true }).click()
   const confirm = page.getByRole('dialog').last()
   await confirm.getByRole('textbox').fill('Bản cứng sai — thiếu trang 3')
   await confirm.getByRole('button', { name: 'Trả về DCC1' }).click()

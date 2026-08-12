@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { commonBulkActions, summarizeBatch } from './bulkActions'
+import { commonBulkActions, summarizeBatch, handoverEventOf, HANDOVER_DCC } from './bulkActions'
 import type { BoardCard, LegalAction } from './api'
 
 const act = (event: string, over: Partial<LegalAction> = {}): LegalAction => ({
@@ -28,6 +28,31 @@ describe('commonBulkActions — actions legal for EVERY selected card', () => {
     const a = card([act('andyApproveComplete'), act('sendBack', { reasonRequired: true }), act('__pick')])
     const b = card([act('andyApproveComplete'), act('sendBack', { reasonRequired: true }), act('__pick')])
     expect(commonBulkActions([a, b]).map((x) => x.event)).toEqual(['andyApproveComplete'])
+  })
+
+  it('collapses handoverToDcc2 + handoverToDcc3 into one "Chuyển cho DCC" umbrella', () => {
+    const contract = card([act('handoverToDcc2')])
+    const payment = card([act('handoverToDcc3')])
+    expect(commonBulkActions([contract, payment]).map((x) => x.event)).toEqual([HANDOVER_DCC])
+  })
+
+  it('still uses the umbrella for an all-Contract selection (single button, not the raw event)', () => {
+    const a = card([act('handoverToDcc2')])
+    const b = card([act('handoverToDcc2')])
+    expect(commonBulkActions([a, b]).map((x) => x.event)).toEqual([HANDOVER_DCC])
+  })
+
+  it('never merges a General decision into the handover umbrella', () => {
+    const contract = card([act('handoverToDcc2')])
+    const general = card([act('andyApproveComplete')])
+    expect(commonBulkActions([contract, general])).toEqual([])
+  })
+})
+
+describe('handoverEventOf', () => {
+  it('returns the card own handover event, or undefined', () => {
+    expect(handoverEventOf(card([act('handoverToDcc3')]))).toBe('handoverToDcc3')
+    expect(handoverEventOf(card([act('andyApproveComplete')]))).toBeUndefined()
   })
 })
 

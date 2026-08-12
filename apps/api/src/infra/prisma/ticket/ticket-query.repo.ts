@@ -112,6 +112,22 @@ export class TicketQueryRepo {
     })
   }
 
+  /**
+   * Which of these Document Nos are already taken — the read side of the batch
+   * send-to-Accounting pre-flight so DCC2/DCC3 see a clash BEFORE sending anything
+   * (the DB partial-unique index stays the final TOCTOU guard). Mirrors that index
+   * exactly: a Cancelled ticket releases its number, so it never counts as taken.
+   */
+  async existingDocumentNos(documentNos: string[]): Promise<string[]> {
+    const wanted = [...new Set(documentNos.map((n) => n.trim()).filter(Boolean))]
+    if (wanted.length === 0) return []
+    const rows = await this.prisma.ticket.findMany({
+      where: { documentNo: { in: wanted }, status: { not: TICKET_STATUS.Cancelled } },
+      select: { documentNo: true },
+    })
+    return rows.map((r) => r.documentNo).filter((n): n is string => n !== null)
+  }
+
   listByStatuses(statuses: string[]) {
     return this.prisma.ticket.findMany({
       where: { status: { in: statuses } },

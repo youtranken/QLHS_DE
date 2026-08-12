@@ -27,6 +27,15 @@ describe('splitActions — nút chính vs ⋯', () => {
     expect(menu).toHaveLength(2)
   })
 
+  it('promotes submitToBop to the primary button despite its required comment', () => {
+    const { primary, menu } = splitActions([
+      act({ event: 'submitToBop', reasonRequired: true, toStatus: 'Submitted to BOP' }),
+      act({ event: 'sendBack', reasonRequired: true, toStatus: 'Returned' }),
+    ])
+    expect(primary.map((a) => a.event)).toEqual(['submitToBop'])
+    expect(menu.map((a) => a.event)).toEqual(['sendBack'])
+  })
+
   it('keeps SLA clock controls in the ⋯ menu', () => {
     const { primary, menu } = splitActions([
       act({ event: PAUSE_EVENT, reasonRequired: true }),
@@ -61,7 +70,8 @@ describe('primaryLabel — nhãn nút ngắn', () => {
     expect(primaryLabel(act({ event: 'andyApproveComplete', label: 'Sếp duyệt → hoàn tất' }))).toBe('Sếp duyệt → hoàn tất')
     expect(primaryLabel(act({ event: 'andyRequireBop', label: 'Sếp đã duyệt → trình BOP' }))).toBe('Trình BOP')
     expect(primaryLabel(act({ event: 'sendToAccounting', label: 'Nhập Contract No & gửi Accounting' }))).toBe('Gửi Kế toán…')
-    expect(primaryLabel(act({ event: 'completeContract', label: 'Nhập đường dẫn scan & hoàn tất' }))).toBe('Hoàn tất HĐ…')
+    expect(primaryLabel(act({ event: 'completeContract', label: 'Hoàn tất & đóng hồ sơ' }))).toBe('Hoàn tất')
+    expect(primaryLabel(act({ event: 'submitToBop', label: 'Trình BOP →' }))).toBe('Trình BOP')
   })
 
   it('falls back to the server label for everything else', () => {
