@@ -26,7 +26,9 @@ export function MyTickets({ reloadKey, action }: { reloadKey: number; action?: R
   ]
   const [tickets, setTickets] = useState<TicketView[]>([])
   const [loaded, setLoaded] = useState(false)
-  const [flt, setFlt] = useState<Filter>('all')
+  // Applicants land on "Đang chạy" — the tickets they're actively waiting on — not
+  // the full pile (closed history dominates over time).
+  const [flt, setFlt] = useState<Filter>('running')
   const [openId, setOpenId] = useState<string | null>(null)
   const [detail, setDetail] = useState<TicketDetail | null>(null)
   // Mirror the open row into a ref so the live-refetch callback (captured once by
