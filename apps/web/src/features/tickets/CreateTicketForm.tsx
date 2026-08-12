@@ -62,6 +62,7 @@ export function CreateTicketForm({ onCreated }: { onCreated: () => void }) {
     seedListener = (seed) => {
       setForm(seed)
       setError(null)
+      setInvalid(new Set()) // a cloned draft must not inherit a prior submit's red marks
       setOpen(true)
     }
     return () => {
@@ -103,6 +104,7 @@ export function CreateTicketForm({ onCreated }: { onCreated: () => void }) {
   function openFresh() {
     setForm(EMPTY)
     setError(null)
+    setInvalid(new Set()) // a fresh form starts with no red marks
     setOpen(true)
   }
 

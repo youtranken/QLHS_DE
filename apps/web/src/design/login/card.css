@@ -221,12 +221,6 @@
   color: var(--ink-3);
   cursor: default;
 }
-.footnote {
-  margin-top: 18px;
-  text-align: center;
-  font-size: 11px;
-  color: var(--ink-3);
-}
 
 /* Hàng tiêu đề card login: tiêu đề + toggle ngôn ngữ ở mép phải. */
 .logincard .lc-hd-top {
