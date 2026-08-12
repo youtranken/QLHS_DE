@@ -72,6 +72,12 @@ export function commonBulkActions(cards: BoardCard[]): LegalAction[] {
 export function bulkSelectGroups(
   selectable: BoardCard[],
 ): Array<{ key: 'all' | 'general' | 'handover'; cards: BoardCard[] }> {
+  if (selectable.length === 0) return [{ key: 'all', cards: selectable }]
+  // If the whole selection already shares a bulk action, one "select all" is enough
+  // (e.g. Submitted to BOP, where General + Contract both bopApprove). Only split by
+  // family when mixing them leaves NO common action — the "Submitted to VP Andy"
+  // column, where General's decision and the Contract/Payment handover don't overlap.
+  if (commonBulkActions(selectable).length > 0) return [{ key: 'all', cards: selectable }]
   const general = selectable.filter((c) => c.flow === 'General')
   const handover = selectable.filter((c) => c.flow !== 'General')
   if (general.length > 0 && handover.length > 0) {

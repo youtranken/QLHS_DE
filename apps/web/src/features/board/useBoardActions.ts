@@ -170,7 +170,10 @@ export function useBoardActions(load: () => Promise<void>) {
     if (action.event === 'confirmReceivedByDcc2' || action.event === 'completeContract') {
       const confirmed = await batchDcc2Action(ids, action.event)
       if (!opts.alsoComplete || action.event !== 'confirmReceivedByDcc2') return confirmed
-      const okIds = confirmed.filter((r) => r.ok).map((r) => r.id)
+      // Only chain complete for tickets whose confirm reached Hardcopy (the post-BOP
+      // handover). The FIRST handover's confirm lands at Received-by-DCC2, which
+      // can't be completed — so "Hoàn tất luôn" is a harmless no-op there.
+      const okIds = confirmed.filter((r) => r.ok && r.status === 'Hardcopy').map((r) => r.id)
       if (okIds.length === 0) return confirmed
       const done = await batchDcc2Action(okIds, 'completeContract')
       const doneById = new Map(done.map((d) => [d.id, d]))

@@ -61,20 +61,34 @@ describe('isBulkable', () => {
 })
 
 describe('bulkSelectGroups — split "select all" by bulk family', () => {
-  const c = (id: string, flow: string): BoardCard => ({ id, flow } as unknown as BoardCard)
+  const c = (id: string, flow: string, events: string[]): BoardCard =>
+    ({ id, flow, actions: events.map((e) => act(e)) } as unknown as BoardCard)
 
-  it('single family (all handover: Contract + Payment) → one "all" group', () => {
-    const groups = bulkSelectGroups([c('1', 'Contract'), c('2', 'Payment')])
+  it('single family (all handover: Contract + Payment share the umbrella) → one group', () => {
+    const groups = bulkSelectGroups([c('1', 'Contract', ['handoverToDcc2']), c('2', 'Payment', ['handoverToDcc3'])])
     expect(groups.map((g) => g.key)).toEqual(['all'])
     expect(groups[0]!.cards).toHaveLength(2)
   })
 
-  it('single family (all General) → one "all" group', () => {
-    expect(bulkSelectGroups([c('1', 'General'), c('2', 'General')]).map((g) => g.key)).toEqual(['all'])
+  it('all General sharing andyApproveComplete → one group', () => {
+    expect(
+      bulkSelectGroups([c('1', 'General', ['andyApproveComplete']), c('2', 'General', ['andyApproveComplete'])]).map(
+        (g) => g.key,
+      ),
+    ).toEqual(['all'])
   })
 
-  it('mixed General + Contract/Payment → two groups, each with its own cards', () => {
-    const groups = bulkSelectGroups([c('g1', 'General'), c('c1', 'Contract'), c('p1', 'Payment')])
+  it('General + Contract sharing bopApprove → ONE group (no needless split)', () => {
+    const groups = bulkSelectGroups([c('g', 'General', ['bopApprove']), c('c', 'Contract', ['bopApprove'])])
+    expect(groups.map((g) => g.key)).toEqual(['all'])
+  })
+
+  it('mixed General decision + Contract/Payment handover (no common action) → two groups', () => {
+    const groups = bulkSelectGroups([
+      c('g1', 'General', ['andyApproveComplete']),
+      c('c1', 'Contract', ['handoverToDcc2']),
+      c('p1', 'Payment', ['handoverToDcc3']),
+    ])
     expect(groups.map((g) => g.key)).toEqual(['general', 'handover'])
     expect(groups[0]!.cards.map((x) => x.id)).toEqual(['g1'])
     expect(groups[1]!.cards.map((x) => x.id)).toEqual(['c1', 'p1'])
