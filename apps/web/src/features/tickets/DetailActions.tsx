@@ -1,4 +1,5 @@
 import { MoreVertical } from 'lucide-react'
+import { TICKET_EVENT } from '@qlhs/contracts'
 import { useBoardActions } from '../board/useBoardActions'
 import { BoardActionModals } from '../board/BoardActionModals'
 import { splitActions, primaryLabel } from '../board/primaryAction'
@@ -24,6 +25,11 @@ export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Pr
     run, doReceive, doMissing, doSendAcc, doReceiveAcc,
   } = useBoardActions(onDone)
 
+  // Reopen is closed-lookup-only: it runs its own /reopen endpoint (reopen → sendBack,
+  // fresh round), which the detail's generic /action dispatch can't carry — so a
+  // reopen offered here just 400s. Drop it from the detail surface; a closed ticket is
+  // reopened only from "Tra cứu hồ sơ" (ClosedTickets), which has its own reopen flow.
+  const actions = d.actions.filter((a) => a.event !== TICKET_EVENT.Reopen)
   // A card-shaped view of the ticket for the shared runner/modals (they read
   // id/code/flow/mine/paused; the rest is filler the detail surface never shows).
   const card: BoardCard = {
@@ -37,14 +43,14 @@ export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Pr
     overdueDays: d.overdueDays,
     lockedByMe: false,
     lockedBy: null,
-    actions: d.actions,
+    actions,
     dupOf: [],
     paused: d.paused,
     mine: d.mine,
   }
   // Fold in the SLA clock control (holder-only) so the detail ⋯ carries "chờ bổ sung
   // SLA" / "chạy lại SLA" exactly like the board card at the same station.
-  const { primary, menu } = splitActions([...d.actions, ...slaActionsFor(card)])
+  const { primary, menu } = splitActions([...actions, ...slaActionsFor(card)])
   const hasActions = primary.length > 0 || menu.length > 0
   // `present` must track when the ⋯ <details> is actually in the DOM: actions can
   // arrive AFTER mount via a live refetch, so the menu wiring re-attaches then.
