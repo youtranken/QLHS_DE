@@ -34,6 +34,9 @@ import { ListOptionsUseCase } from '../../application/admin/list-options.usecase
 import { CreateOptionUseCase, UpdateOptionUseCase } from '../../application/admin/mutate-option.usecase'
 import { GetDocumentTypesUseCase } from '../../application/admin/get-document-types.usecase'
 import { AddDocumentTypeUseCase } from '../../application/admin/add-document-type.usecase'
+import { GetAdminDocTypesUseCase } from '../../application/admin/get-admin-doc-types.usecase'
+import { SetDocTypeActiveUseCase } from '../../application/admin/set-doc-type-active.usecase'
+import { DeleteDocTypeUseCase } from '../../application/admin/delete-doc-type.usecase'
 import { SearchDirectoryUseCase } from '../../application/admin/search-directory.usecase'
 import { ListSlaPausesUseCase } from '../../application/sla/list-sla-pauses.usecase'
 import { GetAnalyticsUseCase } from '../../application/admin/get-analytics.usecase'
@@ -83,6 +86,9 @@ import { ProcessedWebhookEventRepo } from '../../infra/prisma/webhook/processed-
     CreateOptionUseCase,
     GetDocumentTypesUseCase,
     AddDocumentTypeUseCase,
+    GetAdminDocTypesUseCase,
+    SetDocTypeActiveUseCase,
+    DeleteDocTypeUseCase,
     UpdateOptionUseCase,
     SearchDirectoryUseCase,
     ListSlaPausesUseCase,

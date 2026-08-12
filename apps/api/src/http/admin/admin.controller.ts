@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Header,
   Param,
@@ -27,12 +28,18 @@ import { SearchAuditUseCase, type AuditPage } from '../../application/admin/sear
 import { ListOptionsUseCase, type OptionView } from '../../application/admin/list-options.usecase'
 import { CreateOptionUseCase, UpdateOptionUseCase } from '../../application/admin/mutate-option.usecase'
 import { AddDocumentTypeUseCase } from '../../application/admin/add-document-type.usecase'
+import {
+  GetAdminDocTypesUseCase,
+  type AdminDocTypeGroup,
+} from '../../application/admin/get-admin-doc-types.usecase'
+import { SetDocTypeActiveUseCase } from '../../application/admin/set-doc-type-active.usecase'
+import { DeleteDocTypeUseCase } from '../../application/admin/delete-doc-type.usecase'
 import { SearchDirectoryUseCase, type DirectoryMatch } from '../../application/admin/search-directory.usecase'
 import { ListSlaPausesUseCase, type SlaPauseReport } from '../../application/sla/list-sla-pauses.usecase'
 import { GetAnalyticsUseCase, type AnalyticsData } from '../../application/admin/get-analytics.usecase'
 import { ExportAnalyticsUseCase } from '../../application/admin/export-analytics.usecase'
 import { isOptionKind, type OptionRow } from '../../infra/prisma/admin/option.repo'
-import { AddDocumentTypeDto, CreateOptionDto, UpdateOptionDto } from './option.dto'
+import { AddDocumentTypeDto, CreateOptionDto, SetDocTypeActiveDto, UpdateOptionDto } from './option.dto'
 import { AnalyticsQueryDto, AnalyticsExportDto } from './analytics-query.dto'
 import { GetCurrentUser, type CurrentUser } from '../auth/current-user'
 import { SetRolesDto } from './set-roles.dto'
@@ -57,6 +64,9 @@ export class AdminController {
     private readonly createOption: CreateOptionUseCase,
     private readonly updateOption: UpdateOptionUseCase,
     private readonly addDocType: AddDocumentTypeUseCase,
+    private readonly getAdminDocTypes: GetAdminDocTypesUseCase,
+    private readonly setDocTypeActive: SetDocTypeActiveUseCase,
+    private readonly deleteDocType: DeleteDocTypeUseCase,
     private readonly searchDirectory: SearchDirectoryUseCase,
     private readonly listPauses: ListSlaPausesUseCase,
     private readonly getAnalytics: GetAnalyticsUseCase,
@@ -80,10 +90,31 @@ export class AdminController {
     return this.createOption.execute(kind, dto.value)
   }
 
-  /** Thêm document type mới (kèm luồng) — chỉ thêm, không sửa/xoá (hồ sơ cũ an toàn). */
+  /** Thêm document type mới (kèm luồng) — chỉ thêm (hồ sơ cũ an toàn). */
   @Post('document-types')
   addDocumentType(@Body() dto: AddDocumentTypeDto): Promise<{ value: string; flow: string }> {
     return this.addDocType.execute(dto.value, dto.flow)
+  }
+
+  /** Danh sách document type cho màn Admin quản lý: gồm cả loại đã ẩn + số hồ sơ dùng. */
+  @Get('document-types')
+  adminDocumentTypes(): Promise<AdminDocTypeGroup[]> {
+    return this.getAdminDocTypes.execute()
+  }
+
+  /** Ẩn / bật lại một document type (mềm, hoàn tác được). */
+  @Patch('document-types/:id')
+  setDocTypeActiveEndpoint(
+    @Param('id') id: string,
+    @Body() dto: SetDocTypeActiveDto,
+  ): Promise<OptionRow> {
+    return this.setDocTypeActive.execute(id, dto.active)
+  }
+
+  /** Xoá HẲN một document type — chỉ khi chưa hồ sơ nào dùng (use-case chặn usedBy>0). */
+  @Delete('document-types/:id')
+  deleteDocTypeEndpoint(@Param('id') id: string): Promise<{ ok: true }> {
+    return this.deleteDocType.execute(id)
   }
 
   @Patch('options/:id')

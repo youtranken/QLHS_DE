@@ -62,9 +62,18 @@ export class OptionRepo {
 
   /** "Đang dùng bởi": tickets whose field equals this value (by kind). */
   usageCount(kind: string, value: string): Promise<number> {
+    if (kind === DOC_TYPE_KIND) return this.prisma.ticket.count({ where: { documentType: value } })
     if (kind === 'projectTeam') return this.prisma.ticket.count({ where: { projectTeam: value } })
     if (kind === 'currency') return this.prisma.ticket.count({ where: { currency: value } })
     return this.prisma.ticket.count({ where: { paymentTerm: value } })
+  }
+
+  /** Số hồ sơ đang dùng từng document type, gộp một truy vấn (cho màn Admin). */
+  async docTypeUsage(): Promise<Record<string, number>> {
+    const rows = await this.prisma.ticket.groupBy({ by: ['documentType'], _count: { _all: true } })
+    const out: Record<string, number> = {}
+    for (const r of rows) if (r.documentType) out[r.documentType] = r._count._all
+    return out
   }
 
   count(kind: string): Promise<number> {
@@ -77,6 +86,20 @@ export class OptionRepo {
       where: { kind: DOC_TYPE_KIND, active: true },
       orderBy: [{ sortOrder: 'asc' }, { value: 'asc' }],
     })
+  }
+
+  /** MỌI document type (kể cả đã ẩn) — chỉ màn Admin quản lý mới cần thấy loại ẩn. */
+  listDocTypes(): Promise<OptionRow[]> {
+    return this.prisma.optionItem.findMany({
+      where: { kind: DOC_TYPE_KIND },
+      orderBy: [{ sortOrder: 'asc' }, { value: 'asc' }],
+    })
+  }
+
+  /** Xoá hẳn một giá trị — chỉ dùng cho document type CHƯA có hồ sơ nào tham chiếu
+   *  (use-case tự chặn usedBy>0); loại đang dùng phải ẩn, không xoá. */
+  async deleteById(id: string): Promise<void> {
+    await this.prisma.optionItem.delete({ where: { id } })
   }
 
   async createDocType(value: string, flow: string): Promise<OptionRow> {

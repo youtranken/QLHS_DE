@@ -30,3 +30,9 @@ export class UpdateOptionDto {
   @IsBoolean()
   active?: boolean
 }
+
+/** Ẩn / bật lại một document type. */
+export class SetDocTypeActiveDto {
+  @IsBoolean()
+  active!: boolean
+}

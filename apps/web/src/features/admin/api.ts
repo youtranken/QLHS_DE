@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPatch, apiPut } from '../../shared/api-client'
+import { apiGet, apiPost, apiPatch, apiPut, apiDelete } from '../../shared/api-client'
 
 export interface AdminOverview {
   users: { total: number; appointed: number; unappointed: number }
@@ -143,9 +143,28 @@ export interface OptionView {
 export const listOptions = (kind: string) => apiGet<OptionView[]>(`/admin/options/${kind}`)
 export const createOption = (kind: string, value: string) =>
   apiPost<{ id: string }>(`/admin/options/${kind}`, { value })
-/** Thêm document type mới (kèm luồng) — chỉ thêm, không sửa/xoá. */
+/** Thêm document type mới (kèm luồng). */
 export const addDocumentType = (value: string, flow: string) =>
   apiPost<{ value: string; flow: string }>('/admin/document-types', { value, flow })
+
+export interface AdminDocType {
+  id: string
+  value: string
+  active: boolean
+  /** Số hồ sơ đang dùng — 0 mới xoá hẳn được, >0 chỉ ẩn được. */
+  usedBy: number
+}
+export interface AdminDocTypeGroup {
+  flow: string
+  types: AdminDocType[]
+}
+/** Danh mục Document Type cho màn Admin: gồm cả loại đã ẩn + số hồ sơ đang dùng. */
+export const getAdminDocTypes = () => apiGet<AdminDocTypeGroup[]>('/admin/document-types')
+/** Ẩn / bật lại một document type (mềm, hoàn tác được). */
+export const setDocTypeActive = (id: string, active: boolean) =>
+  apiPatch<{ id: string }>(`/admin/document-types/${id}`, { active })
+/** Xoá hẳn — chỉ khi chưa hồ sơ nào dùng (BE chặn usedBy>0). */
+export const deleteDocType = (id: string) => apiDelete<{ ok: true }>(`/admin/document-types/${id}`)
 export const updateOption = (id: string, patch: { value?: string; active?: boolean }) =>
   apiPatch<{ id: string }>(`/admin/options/${id}`, patch)
 

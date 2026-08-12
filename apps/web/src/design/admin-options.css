@@ -118,15 +118,31 @@
   min-height: 0;
 }
 
-/* Danh mục › Document Type — thêm mới kèm luồng (chỉ thêm) */
+/* Danh mục › Document Type — thêm mới kèm luồng + ẩn/bật/xoá per-chip */
 .doctypes { margin-top: 0; padding: 16px 18px 18px; }
 .doctypes h2 { font-size: 15px; margin: 0 0 4px; }
-.dt-hint { color: var(--ink-2); font-size: 12.5px; margin: 0 0 14px; }
+.dt-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin: 0 0 14px; }
+.dt-hint { color: var(--ink-2); font-size: 12.5px; margin: 0; }
+.dt-showhidden { display: inline-flex; align-items: center; gap: 6px; flex: 0 0 auto; font-size: 12px; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.dt-showhidden input { accent-color: var(--accent); }
 .dt-empty { color: var(--ink-3); font-size: 12.5px; margin: 4px 0 10px; }
 .dt-group { display: flex; align-items: baseline; gap: 12px; padding: 7px 0; border-top: 1px solid var(--line-soft); }
 .dt-flow { flex: 0 0 84px; font-weight: 700; font-size: 12px; color: var(--ink-2); }
 .dt-vals { display: flex; flex-wrap: wrap; gap: 7px; }
-.dt-chip { background: var(--panel-2); border: 1px solid var(--line-soft); border-radius: 7px; padding: 2px 9px; font-size: 12.5px; }
+.dt-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--panel-2); border: 1px solid var(--line-soft); border-radius: 7px; padding: 2px 4px 2px 9px; font-size: 12.5px; }
+.dt-chip .dt-val { color: var(--ink); }
+.dt-chip .dt-count { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); }
+.dt-chip.off { background: var(--panel); border-style: dashed; opacity: 0.72; }
+.dt-chip.off .dt-val { color: var(--ink-3); text-decoration: line-through; }
+.dt-off-pill { font-size: 9.5px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-3); background: var(--panel-3); border-radius: 99px; padding: 1px 6px; }
+.dt-menu-btn { display: grid; place-items: center; width: 20px; height: 20px; border: 0; background: none; border-radius: 5px; color: var(--ink-3); cursor: pointer; }
+.dt-menu-btn:hover { background: var(--panel-3); color: var(--ink); }
+.dt-menu { min-width: 132px; background: var(--panel); border: 1px solid var(--line); border-radius: 9px; box-shadow: var(--shadow); padding: 4px; z-index: 60; }
+.dt-mi { display: flex; align-items: center; gap: 8px; padding: 7px 9px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--ink-2); cursor: pointer; outline: none; }
+.dt-mi[data-highlighted] { background: var(--panel-2); color: var(--ink); }
+.dt-mi.danger { color: var(--sla); }
+.dt-mi.danger[data-highlighted] { background: var(--sla-bg); color: var(--sla); }
+.dt-mi-note { padding: 7px 9px; font-size: 11px; line-height: 1.35; color: var(--ink-3); }
 .dt-add { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 .dt-add input { flex: 1 1 200px; width: auto; }
 .dt-add .fsel { flex: 0 0 auto; min-width: 132px; }
