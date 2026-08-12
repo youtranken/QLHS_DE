@@ -33,10 +33,10 @@ export const adminAnalytics = {
   },
   dwell: {
     aria: 'Nơi hồ sơ đọng lâu nhất',
-    title: 'Nơi hồ sơ đọng (ngày TB / ga)',
+    title: 'Nơi hồ sơ đọng (ngày TB / trạm)',
     note: 'càng đậm = càng đọng lâu',
     empty: 'Chưa có lượt di chuyển nào để đo.',
-    station: 'Ga',
+    station: 'Trạm',
     cellTitle: '{status} · {flow}: {days} ngày TB · {count} lượt',
     legendLow: 'Ít',
     legendHigh: 'Nhiều · lâu nhất {n} ngày',

@@ -119,7 +119,7 @@ export const board = {
     resentDcc2: 'Đã bàn giao lại cho DCC2.',
     resentDcc3: 'Đã bàn giao lại cho DCC3.',
     returnedToApplicant: 'Đã trả lại Applicant.',
-    slaPaused: 'Đã dừng đồng hồ SLA — hồ sơ vẫn ở ga cũ.',
+    slaPaused: 'Đã dừng đồng hồ SLA — hồ sơ vẫn ở trạm cũ.',
     slaResumed: 'Đã chạy lại đồng hồ SLA.',
     done: 'Đã thực hiện.',
     seized: 'Đã giành quyền xử lý hồ sơ.',

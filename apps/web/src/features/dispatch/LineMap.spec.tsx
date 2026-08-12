@@ -60,7 +60,7 @@ describe('LineMap — bản đồ tuyến metro v3', () => {
   it('click một ga mở drawer chi tiết với hồ sơ ở ga', async () => {
     render(<LineMap />)
     await waitFor(() => expect(screen.getByText('VP Andy')).toBeInTheDocument())
-    fireEvent.click(screen.getByRole('button', { name: /Ga Submitted to VP Andy/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Trạm Submitted to VP Andy/ }))
     await waitFor(() => expect(screen.getByText('GEN-2026-00312')).toBeInTheDocument())
     expect(getStationTickets).toHaveBeenCalledWith('Submitted to VP Andy', 'General')
   })

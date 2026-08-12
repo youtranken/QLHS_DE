@@ -9,7 +9,7 @@ export const adminSla = {
     savedMsg: 'Đã lưu {n} ngưỡng SLA — badge ▲ áp dụng ngay trên toàn hệ thống.',
     saveFail: 'Lưu thất bại — thử lại.',
     sectionAria: 'Ngưỡng SLA {flow}',
-    stationCount: '{n} ga có ngưỡng',
+    stationCount: '{n} trạm có ngưỡng',
     decAria: 'Giảm ngưỡng {flow} {status}',
     incAria: 'Tăng ngưỡng {flow} {status}',
     inputAria: 'Ngưỡng SLA {flow} {status} (ngày)',
@@ -26,7 +26,7 @@ export const adminSla = {
     // Pill thay cho số thứ tự ga ở tab Chung (ngưỡng áp cho mọi luồng).
     stationPill: 'mọi luồng',
     sharedNote:
-      'Ngoài các ga trên, luồng còn tính ngưỡng ở nhóm Chung (Submitted, Andy, Returned…).',
+      'Ngoài các trạm trên, luồng còn tính ngưỡng ở nhóm Chung (Submitted, Andy, Returned…).',
     loading: 'Đang tải cấu hình ngưỡng…',
     loadError: 'Không tải được cấu hình ngưỡng.',
     empty: 'Chưa có ngưỡng SLA nào để cấu hình.',
@@ -37,7 +37,7 @@ export const adminSla = {
     all: 'Chung',
   },
   flowDesc: {
-    all: 'Áp cho mọi luồng — các ga dùng chung ở đầu & khi trả lại.',
+    all: 'Áp cho mọi luồng — các trạm dùng chung ở đầu & khi trả lại.',
     general: 'Tuyến ngắn — DCC1 ôm cả tuyến, không qua DCC2/DCC3.',
     contract: 'Tuyến dài — DCC2 → ACC → BOP → bản cứng.',
     payment: 'Tuyến ngắn nhất — DCC3.',
@@ -77,8 +77,8 @@ export const adminSla = {
     pausedDays: '{n} ngày',
     daysUnit: 'ngày',
     staleTag: 'quá lâu',
-    byStationAria: 'Tần suất pause theo ga',
-    byStationTitle: 'Tần suất theo ga',
+    byStationAria: 'Tần suất pause theo trạm',
+    byStationTitle: 'Tần suất theo trạm',
     windowDays: '{n} ngày gần nhất',
     byStationEmpty: 'Chưa có lần dừng đồng hồ nào trong kỳ.',
     stationMeta: '{pauses} lần · {tickets} hồ sơ · lâu nhất {days} ngày',

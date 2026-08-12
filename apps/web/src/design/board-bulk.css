@@ -151,6 +151,25 @@
   background: color-mix(in srgb, var(--accent) 20%, var(--panel));
 }
 
+/* "Chọn tất cả" per-column: tick every bulk-selectable card in the column at once. */
+.col .ch .colselall {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 7px;
+  align-self: flex-start;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+}
+.col .ch .colselall input {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 /* Bảng nhập số hàng loạt (BatchSendAccountingModal). */
 .batchtbl {
   display: flex;

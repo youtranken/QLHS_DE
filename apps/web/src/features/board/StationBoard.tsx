@@ -6,7 +6,7 @@ import { BoardActionModals } from './BoardActionModals'
 import { StateNotice } from '../../shared/StateNotice'
 import { BoardCardView } from './BoardCardView'
 import { BulkActionBar } from './BulkActionBar'
-import { commonBulkActions, columnHasBulkAction } from './bulkActions'
+import { commonBulkActions, columnHasBulkAction, isBulkable } from './bulkActions'
 import { cardMatches, type BoardFilter } from './boardFilter'
 import { BoardFilterBar } from './BoardFilterBar'
 import { useBoardActions } from './useBoardActions'
@@ -94,6 +94,18 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
       n.has(id) ? n.delete(id) : n.add(id)
       return n
     })
+  // Column "select all": toggle every bulk-selectable card in one column at once.
+  // (The Andy column can hold two kinds — to-DCC handover AND General decisions; the
+  // bulk bar then shows only the action common to the WHOLE selection, so if a column
+  // mixes kinds the user narrows with the flow filter first.)
+  const toggleAll = (cards: BoardCard[]) =>
+    setSel((prev) => {
+      const ids = cards.map((c) => c.id)
+      const allSel = ids.length > 0 && ids.every((id) => prev.has(id))
+      const n = new Set(prev)
+      for (const id of ids) allSel ? n.delete(id) : n.add(id)
+      return n
+    })
   const selectedCards = cols.flatMap((c) => c.cards).filter((c) => sel.has(c.id))
   const bulkActions = commonBulkActions(selectedCards)
 
@@ -175,6 +187,10 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
           // Received-by-DCC2/DCC3 columns: each card needs its own Contract No /
           // Payment No, so offer a batch-entry sheet instead of a one-action bulk.
           const batchCards = shown.filter((c) => c.actions.some((a) => a.event === 'sendToAccounting'))
+          // Cards in this column the DCC1 can bulk-select; drives the "select all" chip.
+          const selectableCards = canManage && !col.reconcile ? shown.filter((c) => c.actions.some(isBulkable)) : []
+          const allSel = selectableCards.length > 0 && selectableCards.every((c) => sel.has(c.id))
+          const someSel = selectableCards.some((c) => sel.has(c.id))
           return (
             <div key={col.reconcile ? 'reconcile' : col.status} className={`col${cls}`}>
               <div className="ch">
@@ -196,6 +212,19 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
                 {/* Reconcile lane: its label already carries the full message, so no
                     second sub-line — normal columns keep the VN status caption. */}
                 {!col.reconcile && <div className="vi">{statusVi(col.status)}</div>}
+                {selectableCards.length > 0 && (
+                  <label className="colselall">
+                    <input
+                      type="checkbox"
+                      checked={allSel}
+                      ref={(el) => {
+                        if (el) el.indeterminate = someSel && !allSel
+                      }}
+                      onChange={() => toggleAll(selectableCards)}
+                    />
+                    {t('board.bulk.selectAll')}
+                  </label>
+                )}
                 {batchCards.length > 0 && (
                   <button type="button" className="colbatch" onClick={() => setBatchSend(batchCards)}>
                     {t('board.column.batchSendBtn')}
