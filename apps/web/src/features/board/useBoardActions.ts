@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { createElement, Fragment, useRef, useState } from 'react'
 import { TICKET_STATUS } from '@qlhs/contracts'
 import {
   batchAction,
@@ -145,11 +145,32 @@ export function useBoardActions(load: () => Promise<void>) {
     onDone: () => void,
     opts: { alsoComplete?: boolean } = {},
   ) {
+    const n = cards.length
+    // Bulk hardcopy actions get their own wording: a bulk confirm reads "Sẽ [Xác
+    // nhận] cho n hồ sơ… ", a complete (or the "Hoàn tất" chain) reads "Hoàn tất sẽ
+    // đóng n hồ sơ và gửi email…". Everything else keeps the generic message.
+    const isConfirm = action.event === 'confirmReceivedByDcc2' || action.event === 'confirmReceivedByDcc3'
+    const isComplete =
+      action.event === 'completeContract' || (action.event === 'confirmReceivedByDcc2' && !!opts.alsoComplete)
+    const { message, confirmLabel } = isComplete
+      ? { message: t('board.bulk.confirmMsgComplete', { n }), confirmLabel: t('board.primary.completeContract') }
+      : isConfirm
+        ? {
+            message: createElement(
+              Fragment,
+              null,
+              t('board.bulk.confirmMsgPre'),
+              createElement('strong', null, t('board.primary.confirmHardcopy')),
+              t('board.bulk.confirmMsgPost', { n }),
+            ),
+            confirmLabel: t('board.primary.confirmHardcopy'),
+          }
+        : { message: t('board.bulk.confirmMessage', { n, action: primaryLabel(action) }), confirmLabel: action.label }
     setAsk({
-      title: t('board.bulk.confirmTitle', { n: cards.length }),
-      message: t('board.bulk.confirmMessage', { n: cards.length, action: primaryLabel(action) }),
+      title: t('board.bulk.confirmTitle', { n }),
+      message,
       danger: true,
-      confirmLabel: action.label,
+      confirmLabel,
       onOk: async () => {
         const results = await runBatch(cards, action, opts)
         const { ok, failed } = summarizeBatch(results)

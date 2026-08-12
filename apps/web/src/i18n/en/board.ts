@@ -68,9 +68,14 @@ export const board = {
     // ticket still routes to its own flow's DCC (DCC2 for Contract, DCC3 for Payment).
     handoverDcc: 'Hand to DCC',
     // DCC2 bulk hardcopy: confirm receipt of many; tick to also complete them.
-    alsoComplete: 'Complete too',
+    alsoComplete: 'Complete',
     confirmTitle: 'Apply to {n} tickets',
     confirmMessage: 'This will apply "{action}" to the {n} selected tickets. The action may be irreversible. Continue?',
+    // Bulk confirm-receipt (DCC2/DCC3): "Will [Confirm] n tickets…" — the word is bold.
+    confirmMsgPre: 'Will ',
+    confirmMsgPost: ' {n} selected tickets. Continue?',
+    // Bulk complete (closes tickets + emails the Applicant).
+    confirmMsgComplete: 'Complete will close {n} selected tickets and email the Applicant. Continue?',
     resultOk: 'Applied to {n} tickets.',
     resultPartial: '{ok} succeeded · {failed} failed (tickets may have changed status).',
     resultFail: 'Could not apply to any ticket — try again.',

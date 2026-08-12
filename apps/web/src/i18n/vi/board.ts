@@ -68,9 +68,15 @@ export const board = {
     // đi đúng DCC của luồng nó (DCC2 cho Contract, DCC3 cho Payment).
     handoverDcc: 'Chuyển cho DCC',
     // DCC2 bulk hardcopy: xác nhận nhận nhiều bản cứng; tick để hoàn tất luôn.
-    alsoComplete: 'Hoàn tất luôn',
+    alsoComplete: 'Hoàn tất',
     confirmTitle: 'Áp dụng cho {n} hồ sơ',
     confirmMessage: 'Sẽ áp dụng "{action}" cho {n} hồ sơ đã chọn. Hành động có thể không hoàn tác. Tiếp tục?',
+    // Bulk xác nhận nhận bản cứng (DCC2/DCC3): "Sẽ [Xác nhận] cho n hồ sơ…". Chữ
+    // "Xác nhận" in đậm (dùng board.primary.confirmHardcopy).
+    confirmMsgPre: 'Sẽ ',
+    confirmMsgPost: ' cho {n} hồ sơ đã chọn. Tiếp tục?',
+    // Bulk hoàn tất (đóng hồ sơ + gửi email cho Applicant).
+    confirmMsgComplete: 'Hoàn tất sẽ đóng {n} hồ sơ đã chọn và gửi email cho Applicant. Tiếp tục?',
     resultOk: 'Đã áp dụng cho {n} hồ sơ.',
     resultPartial: '{ok} thành công · {failed} lỗi (hồ sơ có thể đã đổi trạng thái).',
     resultFail: 'Không áp dụng được cho hồ sơ nào — thử lại.',

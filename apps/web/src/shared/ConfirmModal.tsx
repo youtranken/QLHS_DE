@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { X } from 'lucide-react'
 import { useBackdropClose } from './useBackdropClose'
 import { t } from '../i18n'
@@ -7,7 +7,8 @@ const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabi
 
 export interface ConfirmModalProps {
   title?: string
-  message: string
+  /** Plain string, or a node so a word can be emphasised (bold). */
+  message: ReactNode
   /** Highlighted ticket code shown after the message. */
   code?: string
   /** Show a required reason textarea; the confirm button stays disabled until filled. */
