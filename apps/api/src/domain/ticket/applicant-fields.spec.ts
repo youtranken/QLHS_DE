@@ -20,11 +20,11 @@ describe('cloneFields (FR-3 — clone copies only the 9 fields)', () => {
   })
 
   it('does not carry over code / round / DCC / timeline (they are not fields)', () => {
-    const withExtra = { ...SRC, code: 'CT-2026-0001', roundNo: 3, documentNo: 'X' }
+    const withExtra = { ...SRC, code: 'CT-2026-0001', roundNo: 3, paymentNo: 'X' }
     const cloned = cloneFields(withExtra as ApplicantFields)
     expect('code' in cloned).toBe(false)
     expect('roundNo' in cloned).toBe(false)
-    expect('documentNo' in cloned).toBe(false)
+    expect('paymentNo' in cloned).toBe(false)
     expect(Object.keys(cloned)).toHaveLength(9)
   })
 })

@@ -121,7 +121,7 @@ describe('Reopen / request-reopen / undo (e2e)', () => {
     const id = (await applicant.post('/tickets').send(FIELDS)).body.id as string
     await dcc.post(`/dcc1/pool/${id}/pick`)
     await dcc.post(`/dcc1/pool/${id}/confirm`)
-    expect((await dcc.post(`/dcc1/tickets/${id}/action`).send({ event: 'andyRequireBop' })).body.status).toBe(
+    expect((await dcc.post(`/dcc1/tickets/${id}/action`).send({ event: 'andyRequireBop', reason: 'Sếp yêu cầu trình BOP' })).body.status).toBe(
       'Submitted to BOP',
     )
     const undo = await dcc.post(`/dcc1/tickets/${id}/undo`)
@@ -140,7 +140,7 @@ describe('Reopen / request-reopen / undo (e2e)', () => {
     const id = (await applicant.post('/tickets').send(FIELDS)).body.id as string
     await dcc.post(`/dcc1/pool/${id}/pick`)
     await dcc.post(`/dcc1/pool/${id}/confirm`)
-    await dcc.post(`/dcc1/tickets/${id}/action`).send({ event: 'andyRequireBop' })
+    await dcc.post(`/dcc1/tickets/${id}/action`).send({ event: 'andyRequireBop', reason: 'Sếp yêu cầu trình BOP' })
     // A priority change lands AFTER the reversible move (a non-transition note).
     await dcc.patch(`/dcc1/tickets/${id}/priority`).send({ priority: 'urgent' })
 

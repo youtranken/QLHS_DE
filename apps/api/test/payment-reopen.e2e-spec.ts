@@ -55,7 +55,7 @@ describe('Payment reopen from Sent to Accounting (e2e)', () => {
         currentHolderSub: null,
         priority: 'normal',
         code,
-        documentNo: `26-CC-${code.slice(-3)}-CT`,
+        paymentNo: `26-CC-${code.slice(-3)}-CT`,
         roundNo: 0,
         statusEnteredAt: new Date('2020-01-01'), // old closure — no time limit (PRD §6)
       },
@@ -74,7 +74,7 @@ describe('Payment reopen from Sent to Accounting (e2e)', () => {
     expect(row.roundNo).toBe(1) // heavy path (past ACC) counts a round (AC3)
     expect(row.currentHolderSub).toBe('app-e2e') // custody handed back to Applicant (AC5)
     expect(row.code).toBe('CT-2026-0301') // immutable (AD-5)
-    expect(row.documentNo).toBe('26-CC-301-CT') // data preserved
+    expect(row.paymentNo).toBe('26-CC-301-CT') // data preserved
     // Append-only: both chained events recorded, old audit intact (AD-4).
     const actions = (await admin.ticketEvent.findMany({ where: { ticketId: id } })).map((e) => e.action)
     expect(actions).toContain('reopen')

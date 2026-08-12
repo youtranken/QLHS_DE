@@ -85,6 +85,25 @@ describe('transition (AD-2 — the single status writer)', () => {
     ).toThrow(ReasonRequiredError)
   })
 
+  it('requires a reason for andyRequireBop (DCC1 records Andy\'s note to BOP)', () => {
+    const t = ticketAt(TICKET_STATUS.SubmittedToVpAndy, { currentHolderSub: 'dcc1-a' })
+    expect(() =>
+      transition(t, { event: TICKET_EVENT.AndyRequireBop, actor: DCC1, now: NOW }),
+    ).toThrow(ReasonRequiredError)
+  })
+
+  it('andyRequireBop with a note advances to Submitted to BOP and records it', () => {
+    const t = ticketAt(TICKET_STATUS.SubmittedToVpAndy, { currentHolderSub: 'dcc1-a' })
+    const { ticket, event } = transition(t, {
+      event: TICKET_EVENT.AndyRequireBop,
+      actor: DCC1,
+      now: NOW,
+      reason: 'Sếp yêu cầu trình BOP',
+    })
+    expect(ticket.status).toBe(TICKET_STATUS.SubmittedToBop)
+    expect(event.reason).toBe('Sếp yêu cầu trình BOP')
+  })
+
   it('sendBack hands custody back to the applicant and records the reason', () => {
     const t = ticketAt(TICKET_STATUS.SubmittedToVpAndy, { currentHolderSub: 'dcc1-a' })
     const { ticket, event } = transition(t, {

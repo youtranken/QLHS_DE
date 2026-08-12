@@ -57,7 +57,13 @@ export const board = {
   bulk: {
     selected: '{n} selected',
     clear: 'Clear selection',
-    selectAll: 'Select all',
+    // One "select all" per action family; the "Submit to VP" column splits General
+    // vs Contract/Payment so a mixed pick never empties the bulk-action bar.
+    selectAll: {
+      all: 'Select all',
+      general: 'Select all · General',
+      handover: 'Select all · Contract/Payment',
+    },
     // Umbrella label for a mixed Contract + Payment selection at "Submit to VP": each
     // ticket still routes to its own flow's DCC (DCC2 for Contract, DCC3 for Payment).
     handoverDcc: 'Hand to DCC',

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
-import { TICKET_EVENT, type Flow, type TicketStatus } from '@qlhs/contracts'
+import { FLOW, TICKET_EVENT, type Flow, type TicketStatus } from '@qlhs/contracts'
 import { PrismaService } from '../prisma.service'
 import { DocumentNoDuplicateError, ReconcileStateError } from '../../../application/core/ticket-errors'
 import { TicketNotFoundError } from '../../../domain/errors'
@@ -56,16 +56,23 @@ export class AccountingRepo {
           roundNo: row.round_no,
           statusEnteredAt: row.status_entered_at,
         }
+        // The number lands in the flow's own column: DCC2 writes the Contract No
+        // (Contract, normalised UPPERCASE), DCC3 writes the Payment No (Payment). A
+        // Payment's existing contract_no (the Applicant's reference) is untouched.
+        // The audit meta records the SAME (stored) value so the log matches the DB.
+        const storedNumber = state.flow === FLOW.Payment ? documentNo : documentNo.toUpperCase()
         const out = transition(state, {
           event: TICKET_EVENT.SendToAccounting,
           actor,
           now,
-          meta: { documentNo, sentToAccountingAt: now.toISOString() },
+          meta: { documentNo: storedNumber, sentToAccountingAt: now.toISOString() },
         })
+        const numberColumn =
+          state.flow === FLOW.Payment ? { paymentNo: storedNumber } : { contractNo: storedNumber }
         await tx.ticket.update({
           where: { id: ticketId },
           data: {
-            documentNo,
+            ...numberColumn,
             status: out.ticket.status,
             currentHolderSub: out.ticket.currentHolderSub,
             roundNo: out.ticket.roundNo,
@@ -87,14 +94,14 @@ export class AccountingRepo {
         return { status: out.ticket.status }
       })
     } catch (e) {
-      // Only the document_no partial-unique maps to a duplicate — don't mask an
-      // unrelated unique violation as a Document No clash (code-review #4).
+      // Only a contract_no / payment_no partial-unique maps to a duplicate — don't
+      // mask an unrelated unique violation as a number clash (code-review #4).
       if (
         e instanceof Prisma.PrismaClientKnownRequestError &&
         e.code === 'P2002' &&
-        String(e.meta?.target ?? '').includes('document_no')
+        /contract_no|payment_no/.test(String(e.meta?.target ?? ''))
       ) {
-        throw new DocumentNoDuplicateError(`Document No "${documentNo}" đã tồn tại`)
+        throw new DocumentNoDuplicateError(`Số "${documentNo}" đã tồn tại`)
       }
       throw e
     }

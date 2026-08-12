@@ -86,9 +86,10 @@ export const resendDcc2 = (id: string) =>
   apiPost<{ ok: true }>(`/dcc1/tickets/${id}/resend-dcc2`)
 export const sendAccounting = (id: string, documentNo: string) =>
   apiPost<{ status: string }>(`/dcc2/tickets/${id}/send-accounting`, { documentNo })
-/** Batch pre-flight: which of these Document Nos are already taken (live tickets). */
-export const checkDocumentNos = (documentNos: string[]) =>
-  apiPost<{ existing: string[] }>('/tickets/check-document-nos', { documentNos })
+/** Batch pre-flight: which of these numbers are already taken (live tickets),
+ *  scoped to the flow entering them (Contract → contract_no, Payment → payment_no). */
+export const checkDocumentNos = (documentNos: string[], flow: string) =>
+  apiPost<{ existing: string[] }>('/tickets/check-document-nos', { documentNos, flow })
 export const receiveFromAcc = (id: string, receivedAt?: string) =>
   apiPost<{ status: string }>(
     `/dcc1/tickets/${id}/receive-from-acc`,

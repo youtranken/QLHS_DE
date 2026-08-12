@@ -111,14 +111,18 @@ model Ticket {
 
   // 9 Applicant fields (PRD §3.1). Nullable at the DB; presence is enforced by
   // the create DTO. Amount is an integer in the currency's smallest unit.
-  // Document No (contract number) entered by DCC2/DCC3 (FR-11/FR-13). Distinct
-  // from `code`. Global partial-unique excluding Cancelled — the index is defined
-  // in migration SQL (Prisma can't express the WHERE); M5, AD-20.
-  documentNo   String? @map("document_no")
+  // Payment No — the final number DCC3 enters before sending a Payment file to
+  // Accounting (FR-13). Contract No lives in `contractNo` below. Both carry
+  // per-flow partial-unique indexes defined in migration SQL (Prisma can't
+  // express the WHERE); M5, AD-20.
+  paymentNo    String? @map("payment_no")
 
   documentType String? @map("document_type")
   description  String?
   paymentTerm  String? @map("payment_term")
+  // Contract No. Contract flow: DCC2 enters it at send-to-Accounting (FR-11).
+  // Payment flow: the Applicant enters it at creation as the reference to the
+  // contract being paid (1 contract → 1 payment). General: 'N/A'.
   contractNo   String? @map("contract_no")
   projectTeam  String? @map("project_team")
   currency     String?

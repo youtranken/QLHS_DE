@@ -16,6 +16,8 @@ export interface SendAccountingModalProps {
   /** Payment closes irreversibly at `Sent to Accounting` (H5), so gate the send
    *  behind a "close ticket?" confirm. No scary warning paragraph — just the gate. */
   confirmClose?: boolean
+  /** Contract No is normalised to uppercase as you type (DCC2); Payment No isn't. */
+  uppercase?: boolean
 }
 
 /**
@@ -29,6 +31,7 @@ export function SendAccountingModal({
   onSubmit,
   onClose,
   confirmClose = false,
+  uppercase = false,
   // Default keeps standalone usage sensible; StationBoard overrides it per flow.
   docLabel = t('board.modals.sendAccounting.docNoLabel'),
 }: SendAccountingModalProps) {
@@ -104,7 +107,7 @@ export function SendAccountingModal({
               id="send-acc-docno"
               value={documentNo}
               onChange={(e) => {
-                setDocumentNo(e.target.value)
+                setDocumentNo(uppercase ? e.target.value.toUpperCase() : e.target.value)
                 if (error) setError(null)
               }}
               aria-required="true"

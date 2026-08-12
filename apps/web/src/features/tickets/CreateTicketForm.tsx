@@ -99,13 +99,22 @@ export function CreateTicketForm({ onCreated }: { onCreated: () => void }) {
     }
   }
 
-  // Fresh open resets any leftover input (e.g. after a clone was closed without
-  // submitting) so the next ticket doesn't inherit stale/duplicate data.
-  function openFresh() {
+  // Reopen the form KEEPING any draft: a form dismissed by an accidental backdrop
+  // click / Esc / ✕ is restored so the user never re-types (they only blank it via
+  // an explicit "Hủy", or after a successful create). Just clears the transient
+  // error/red-mark state from the previous attempt.
+  function openForm() {
+    setError(null)
+    setInvalid(new Set())
+    setOpen(true)
+  }
+
+  // Explicit discard (the "Hủy" button): blank the draft and close.
+  function discard() {
     setForm(EMPTY)
     setError(null)
-    setInvalid(new Set()) // a fresh form starts with no red marks
-    setOpen(true)
+    setInvalid(new Set())
+    setOpen(false)
   }
 
   async function submit(e: React.FormEvent) {
@@ -144,7 +153,7 @@ export function CreateTicketForm({ onCreated }: { onCreated: () => void }) {
 
   return (
     <>
-      <button type="button" className="btn primary" onClick={openFresh}>
+      <button type="button" className="btn primary" onClick={openForm}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden="true">
           <path d="M12 5v14M5 12h14" />
         </svg>
@@ -203,7 +212,7 @@ export function CreateTicketForm({ onCreated }: { onCreated: () => void }) {
               )}
             </div>
             <div className="mf">
-              <button type="button" className="btn ghost" onClick={() => setOpen(false)}>
+              <button type="button" className="btn ghost" onClick={discard}>
                 {t('tickets.createForm.cancelBtn')}
               </button>
               <span className="sp" />

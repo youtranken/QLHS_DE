@@ -49,15 +49,19 @@ describe('duplicate gate (e2e — F12)', () => {
     return agent
   }
 
+  // Payment flow: the Applicant enters a real Contract No reference (Contract flow
+  // locks it to 'N/A' — DCC2 assigns later), and that reference is NOT unique
+  // (many payments per contract), so two tickets can legitimately share it — the
+  // exact shape F12 inspects at reception.
   function ticket(over: Record<string, unknown> = {}) {
     return admin.ticket.create({
       data: {
         status: TICKET_STATUS.Submitted,
-        flow: FLOW.Contract,
+        flow: FLOW.Payment,
         applicantSub: 'a',
         priority: 'normal',
         // The gate matches on Document Type + Contract No + Project/Team (within a month).
-        documentType: 'Contract Payment',
+        documentType: 'Payment',
         contractNo: 'HĐ-2026/ABC',
         projectTeam: 'Team Alpha',
         contractor: 'Công ty ABC',

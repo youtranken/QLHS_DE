@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { TICKET_EVENT, TICKET_STATUS, TERMINAL_STATUSES } from '@qlhs/contracts'
+import { FLOW, TICKET_EVENT, TICKET_STATUS, TERMINAL_STATUSES } from '@qlhs/contracts'
 import { PrismaService } from '../prisma.service'
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -113,19 +113,32 @@ export class TicketQueryRepo {
   }
 
   /**
-   * Which of these Document Nos are already taken — the read side of the batch
+   * Which of these numbers are already taken — the read side of the batch
    * send-to-Accounting pre-flight so DCC2/DCC3 see a clash BEFORE sending anything
-   * (the DB partial-unique index stays the final TOCTOU guard). Mirrors that index
-   * exactly: a Cancelled ticket releases its number, so it never counts as taken.
+   * (the DB partial-unique index stays the final TOCTOU guard). Scoped to the flow
+   * that is entering: DCC2 (Contract) tests contract_no; DCC3 (Payment) tests
+   * payment_no. Mirrors the per-flow unique index — a Cancelled ticket releases its
+   * number, so it never counts as taken.
    */
-  async existingDocumentNos(documentNos: string[]): Promise<string[]> {
-    const wanted = [...new Set(documentNos.map((n) => n.trim()).filter(Boolean))]
-    if (wanted.length === 0) return []
+  async existingDocumentNos(documentNos: string[], flow: string): Promise<string[]> {
+    const trimmed = [...new Set(documentNos.map((n) => n.trim()).filter(Boolean))]
+    if (trimmed.length === 0) return []
+    const notCancelled = { not: TICKET_STATUS.Cancelled }
+    if (flow === FLOW.Payment) {
+      const rows = await this.prisma.ticket.findMany({
+        where: { flow, status: notCancelled, paymentNo: { in: trimmed } },
+        select: { paymentNo: true },
+      })
+      return rows.map((r) => r.paymentNo).filter((n): n is string => n !== null)
+    }
+    // Contract No is stored uppercase, so probe uppercase to mirror the write path +
+    // the unique index (a non-FE client may send mixed case).
+    const wanted = trimmed.map((n) => n.toUpperCase())
     const rows = await this.prisma.ticket.findMany({
-      where: { documentNo: { in: wanted }, status: { not: TICKET_STATUS.Cancelled } },
-      select: { documentNo: true },
+      where: { flow, status: notCancelled, contractNo: { in: wanted } },
+      select: { contractNo: true },
     })
-    return rows.map((r) => r.documentNo).filter((n): n is string => n !== null)
+    return rows.map((r) => r.contractNo).filter((n): n is string => n !== null)
   }
 
   listByStatuses(statuses: string[]) {

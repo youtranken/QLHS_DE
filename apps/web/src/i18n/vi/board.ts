@@ -57,7 +57,13 @@ export const board = {
   bulk: {
     selected: 'Đã chọn {n}',
     clear: 'Bỏ chọn',
-    selectAll: 'Chọn tất cả',
+    // Một ô "Chọn tất cả" cho mỗi họ action; ga "Trình Sếp" tách General vs
+    // Contract/Payment để chọn hỗn hợp không làm mất nút hành-động-hàng-loạt.
+    selectAll: {
+      all: 'Chọn tất cả',
+      general: 'Chọn tất cả · General',
+      handover: 'Chọn tất cả · Contract/Payment',
+    },
     // Nhãn gộp khi chọn hỗn hợp Contract + Payment ở ga "Trình Sếp": mỗi hồ sơ vẫn
     // đi đúng DCC của luồng nó (DCC2 cho Contract, DCC3 cho Payment).
     handoverDcc: 'Chuyển cho DCC',

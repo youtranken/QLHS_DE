@@ -72,9 +72,11 @@ export interface TicketDetail {
   documentType: string | null
   description: string | null
   paymentTerm: string | null
+  /** Contract No. Contract: DCC2-assigned; Payment: Applicant's contract reference;
+   *  General: 'N/A'. */
   contractNo: string | null
-  /** DCC2/DCC3-entered number sent to Accounting (Contract No / Payment No). */
-  documentNo: string | null
+  /** Payment No — DCC3-assigned on the Payment flow (else null). */
+  paymentNo: string | null
   projectTeam: string | null
   budgetCode: string | null
   contractor: string | null

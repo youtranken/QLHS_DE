@@ -59,6 +59,28 @@ export function commonBulkActions(cards: BoardCard[]): LegalAction[] {
   return out
 }
 
+/**
+ * "Select all" groups for a column. The "Submitted to VP Andy" column mixes two
+ * bulk families whose actions never overlap — General decisions vs the Contract/
+ * Payment handover-to-DCC — so one blanket "select all" would pick a mix that has
+ * no common bulk action (the bar goes empty). Split it into a per-family checkbox
+ * so each selection stays actionable. Every other column is single-family → one
+ * plain "select all".
+ */
+export function bulkSelectGroups(
+  selectable: BoardCard[],
+): Array<{ key: 'all' | 'general' | 'handover'; cards: BoardCard[] }> {
+  const general = selectable.filter((c) => c.flow === 'General')
+  const handover = selectable.filter((c) => c.flow !== 'General')
+  if (general.length > 0 && handover.length > 0) {
+    return [
+      { key: 'general', cards: general },
+      { key: 'handover', cards: handover },
+    ]
+  }
+  return [{ key: 'all', cards: selectable }]
+}
+
 export interface BatchOutcome {
   ok: number
   failed: number

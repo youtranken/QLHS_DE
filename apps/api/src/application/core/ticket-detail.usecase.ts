@@ -52,9 +52,11 @@ export interface TicketDetail {
   documentType: string | null
   description: string | null
   paymentTerm: string | null
+  /** Contract No — Contract flow: DCC2-assigned; Payment flow: Applicant's
+   *  reference to the paid contract; General: 'N/A'. */
   contractNo: string | null
-  /** DCC2/DCC3-entered number sent to Accounting (Contract No / Payment No). */
-  documentNo: string | null
+  /** Payment No — DCC3-assigned on the Payment flow (else null). */
+  paymentNo: string | null
   projectTeam: string | null
   budgetCode: string | null
   contractor: string | null
@@ -156,7 +158,7 @@ export class TicketDetailUseCase {
       description: t.description,
       paymentTerm: t.paymentTerm,
       contractNo: t.contractNo,
-      documentNo: t.documentNo,
+      paymentNo: t.paymentNo,
       projectTeam: t.projectTeam,
       budgetCode: t.budgetCode,
       contractor: t.contractor,

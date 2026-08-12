@@ -12,7 +12,7 @@ import { TicketQueryRepo } from '../../infra/prisma/ticket/ticket-query.repo'
 export class CheckDocumentNosUseCase {
   constructor(private readonly tickets: TicketQueryRepo) {}
 
-  execute(documentNos: string[]): Promise<string[]> {
-    return this.tickets.existingDocumentNos(documentNos)
+  execute(documentNos: string[], flow: string): Promise<string[]> {
+    return this.tickets.existingDocumentNos(documentNos, flow)
   }
 }

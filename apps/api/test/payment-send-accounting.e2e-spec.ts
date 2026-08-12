@@ -71,7 +71,7 @@ describe('Payment send to Accounting = closed at Sent to Accounting (e2e)', () =
     expect(res.body.status).toBe('Sent to Accounting')
 
     const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
-    expect(row.documentNo).toBe('26-CC-201-CT')
+    expect(row.paymentNo).toBe('26-CC-201-CT')
     expect(row.currentHolderSub).toBeNull() // terminal → no holder (AC5)
     const ev = await admin.ticketEvent.findFirstOrThrow({
       where: { ticketId: id, action: 'sendToAccounting' },

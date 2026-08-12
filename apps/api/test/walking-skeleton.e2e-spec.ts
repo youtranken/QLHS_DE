@@ -84,7 +84,7 @@ describe('General walking skeleton (e2e) — create → pick → confirm → And
   it('supports the Andy→BOP→Completed branch (General only)', async () => {
     const dcc = await login('dcc1-e2e', ['DCC1'])
     const id = await createSubmittedToAndy(dcc)
-    expect((await dcc.post(`/dcc1/tickets/${id}/action`).send({ event: 'andyRequireBop' })).body.status).toBe(
+    expect((await dcc.post(`/dcc1/tickets/${id}/action`).send({ event: 'andyRequireBop', reason: 'Sếp yêu cầu trình BOP' })).body.status).toBe(
       'Submitted to BOP',
     )
     expect((await dcc.post(`/dcc1/tickets/${id}/action`).send({ event: 'bopApprove' })).body.status).toBe(

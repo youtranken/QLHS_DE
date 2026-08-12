@@ -27,10 +27,13 @@ export interface BatchSendAccountingModalProps {
  */
 export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAccountingModalProps) {
   const isPayment = cards[0]?.flow === 'Payment'
+  const flow = isPayment ? 'Payment' : 'Contract'
   const docLabel = isPayment
     ? t('board.modals.sendAccounting.payNoLabel')
     : t('board.modals.sendAccounting.docNoLabel')
   const send = isPayment ? sendAccountingDcc3 : sendAccounting
+  // Contract No is normalised to uppercase; Payment No keeps the typed casing.
+  const norm = (v: string) => (isPayment ? v : v.toUpperCase())
 
   const [vals, setVals] = useState<Record<string, string>>({})
   const [errs, setErrs] = useState<Record<string, string>>({})
@@ -67,7 +70,7 @@ export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAc
     // anything, so a known clash never half-sends the batch. Best-effort — if the
     // check itself fails, fall through to the send (the DB unique index still guards).
     try {
-      const { existing } = await checkDocumentNos(filled.map((c) => (vals[c.id] ?? '').trim()))
+      const { existing } = await checkDocumentNos(filled.map((c) => (vals[c.id] ?? '').trim()), flow)
       if (existing.length > 0) {
         const taken = new Set(existing)
         const dupErrs: Record<string, string> = {}
@@ -158,7 +161,7 @@ export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAc
                   aria-label={t('board.modals.batchAcc.inputAria', { field: docLabel, code: c.code ?? '' })}
                   placeholder={docLabel}
                   onChange={(e) => {
-                    const v = e.target.value
+                    const v = norm(e.target.value)
                     setVals((prev) => ({ ...prev, [c.id]: v }))
                     if (errs[c.id]) setErrs((prev) => {
                       const n = { ...prev }

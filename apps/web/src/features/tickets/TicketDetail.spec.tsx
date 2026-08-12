@@ -8,7 +8,7 @@ import { TicketDetail } from './TicketDetail'
 
 const fixture: Detail = {
   id: 't1', code: 'CT-2026-0042', status: 'Received from ACC', flow: 'Contract', documentType: 'Contract',
-  description: 'Thanh toán đợt 4/8', paymentTerm: 'Net 30', contractNo: 'HD-118', documentNo: null,
+  description: 'Thanh toán đợt 4/8', paymentTerm: 'Net 30', contractNo: 'HD-118', paymentNo: null,
   projectTeam: 'Landmark 81', budgetCode: 'B-04', contractor: 'Coteccons',
   amount: '3480500000', currency: 'VND', roundNo: 0, overdueDays: 4, dwellDays: 4,
   isClosed: false,
@@ -71,26 +71,24 @@ describe('TicketDetail — read-only deep-link page', () => {
     expect(screen.getByText('Hệ thống')).toBeInTheDocument()
   })
 
-  it('Contract flow: "Contract No" shows the DCC2 documentNo, not the Applicant placeholder', async () => {
-    // fixture.contractNo = 'HD-118' (Applicant placeholder). DCC2 assigned 'CT-ACC-42'.
-    vi.mocked(getTicketDetail).mockResolvedValue({ ...fixture, documentType: 'Contract', contractNo: 'HD-118', documentNo: 'CT-ACC-42' })
+  it('Contract flow: "Contract No" shows the contractNo column (DCC2-assigned)', async () => {
+    // Contract flow: contractNo IS the Contract No (DCC2 fills it at send-to-Accounting).
+    vi.mocked(getTicketDetail).mockResolvedValue({ ...fixture, documentType: 'Contract', contractNo: 'CT-ACC-42', paymentNo: null })
     render(<TicketDetail ticketId="t1" />)
     await waitFor(() => expect(screen.getByText('CT-ACC-42')).toBeInTheDocument())
     expect(screen.getByText('Contract No')).toBeInTheDocument()
-    // The Applicant's placeholder is not shown as a second Contract-No field.
-    expect(screen.queryByText('HD-118')).not.toBeInTheDocument()
     expect(screen.queryByText('Payment No')).not.toBeInTheDocument()
   })
 
-  it('Contract flow: falls back to the Applicant contractNo until DCC assigns one', async () => {
-    vi.mocked(getTicketDetail).mockResolvedValue({ ...fixture, documentType: 'Contract', contractNo: 'HD-118', documentNo: null })
+  it('Contract flow: shows "N/A" before DCC2 assigns the Contract No', async () => {
+    vi.mocked(getTicketDetail).mockResolvedValue({ ...fixture, documentType: 'Contract', contractNo: 'N/A', paymentNo: null })
     render(<TicketDetail ticketId="t1" />)
-    await waitFor(() => expect(screen.getByText('HD-118')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('N/A')).toBeInTheDocument())
     expect(screen.getByText('Contract No')).toBeInTheDocument()
   })
 
-  it('Payment flow: Applicant contractNo = "Contract No", DCC3 documentNo = "Payment No"', async () => {
-    vi.mocked(getTicketDetail).mockResolvedValue({ ...fixture, flow: 'Payment', documentType: 'Payment', contractNo: 'HD-777', documentNo: 'PN-2026-9' })
+  it('Payment flow: Applicant contractNo = "Contract No", DCC3 paymentNo = "Payment No"', async () => {
+    vi.mocked(getTicketDetail).mockResolvedValue({ ...fixture, flow: 'Payment', documentType: 'Payment', contractNo: 'HD-777', paymentNo: 'PN-2026-9' })
     render(<TicketDetail ticketId="t1" />)
     await waitFor(() => expect(screen.getByText('PN-2026-9')).toBeInTheDocument())
     expect(screen.getByText('Payment No')).toBeInTheDocument()
@@ -98,8 +96,8 @@ describe('TicketDetail — read-only deep-link page', () => {
     expect(screen.getByText('Contract No.')).toBeInTheDocument() // Applicant field keeps the period
   })
 
-  it('Payment flow: no "Payment No" field until DCC3 enters it (documentNo null)', async () => {
-    vi.mocked(getTicketDetail).mockResolvedValue({ ...fixture, flow: 'Payment', documentType: 'Payment', documentNo: null })
+  it('Payment flow: no "Payment No" field until DCC3 enters it (paymentNo null)', async () => {
+    vi.mocked(getTicketDetail).mockResolvedValue({ ...fixture, flow: 'Payment', documentType: 'Payment', paymentNo: null })
     render(<TicketDetail ticketId="t1" />)
     await waitFor(() => expect(screen.getByText('CT-2026-0042')).toBeInTheDocument())
     expect(screen.queryByText('Payment No')).not.toBeInTheDocument()

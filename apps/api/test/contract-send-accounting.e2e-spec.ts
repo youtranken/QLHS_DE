@@ -70,7 +70,7 @@ describe('Contract Document No + send to Accounting (e2e)', () => {
     expect(res.body.status).toBe('Submitted to Accounting')
 
     const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
-    expect(row.documentNo).toBe('26-CC-01-CT')
+    expect(row.contractNo).toBe('26-CC-01-CT')
     // Submitted to Accounting is a DCC1-owned "Chờ ACC" queue; sent BY DCC2 →
     // no single holder until DCC1 receives it back (AD-16, role-aware holder).
     expect(row.currentHolderSub).toBeNull()
@@ -86,7 +86,7 @@ describe('Contract Document No + send to Accounting (e2e)', () => {
     const res = await dcc2.post(`/dcc2/tickets/${id}/send-accounting`).send({ documentNo: 'HD-2026/ABC-123' })
     expect(res.status).toBe(201)
     const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
-    expect(row.documentNo).toBe('HD-2026/ABC-123')
+    expect(row.contractNo).toBe('HD-2026/ABC-123')
   })
 
   it('rejects an empty Document No (400) before touching the DB', async () => {
@@ -121,7 +121,7 @@ describe('Contract Document No + send to Accounting (e2e)', () => {
         applicantSub: 'app-e2e',
         priority: 'normal',
         code: 'CT-2026-0005',
-        documentNo: '26-CC-55-CT',
+        contractNo: '26-CC-55-CT',
       },
     })
     const id = await receivedByDcc2('CT-2026-0006')

@@ -36,6 +36,16 @@ describe('splitActions — nút chính vs ⋯', () => {
     expect(menu.map((a) => a.event)).toEqual(['sendBack'])
   })
 
+  it('promotes andyRequireBop to the primary button despite its required comment (General)', () => {
+    const { primary, menu } = splitActions([
+      act({ event: 'andyApproveComplete' }),
+      act({ event: 'andyRequireBop', reasonRequired: true, toStatus: 'Submitted to BOP' }),
+      act({ event: 'sendBack', reasonRequired: true, toStatus: 'Returned' }),
+    ])
+    expect(primary.map((a) => a.event)).toEqual(['andyApproveComplete', 'andyRequireBop'])
+    expect(menu.map((a) => a.event)).toEqual(['sendBack'])
+  })
+
   it('keeps SLA clock controls in the ⋯ menu', () => {
     const { primary, menu } = splitActions([
       act({ event: PAUSE_EVENT, reasonRequired: true }),

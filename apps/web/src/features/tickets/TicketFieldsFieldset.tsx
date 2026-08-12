@@ -20,11 +20,22 @@ export function TicketFieldsFieldset({
   form,
   set,
   invalid,
+  lock,
 }: {
   form: CreateTicketBody
   set: (k: keyof CreateTicketBody, v: string) => void
   /** Keys the parent flagged empty on submit — the field is outlined red. */
   invalid?: ReadonlySet<string>
+  /** Present at Return-fixing (code already minted → flow is immutable): pins the
+   *  Document Type to the ticket's own flow family, and shows the DCC-entered
+   *  numbers read-only. Absent on the create/pool forms (full freedom). */
+  lock?: {
+    flow: string
+    /** DCC2-assigned Contract No (Contract flow) — read-only when present. */
+    contractNo: string | null
+    /** DCC3-assigned Payment No (Payment flow) — read-only when present. */
+    paymentNo: string | null
+  }
 }) {
   const bad = (k: string) => (invalid?.has(k) ? ' bad' : '')
   const [payTerms, setPayTerms] = useState<string[]>([])
@@ -80,18 +91,26 @@ export function TicketFieldsFieldset({
     docGroups.length > 0
       ? docGroups
       : DOCUMENT_TYPE_GROUPS.map((g) => ({ flow: g.flow, types: [...g.types] }))
-  const docOptions: SelectOption[] = docSource.flatMap((g) => [
+  // Return-fixing (lock): the code is minted so the flow can't change — offer only
+  // this flow's own Document Types (#2). General has a single type → the dropdown
+  // locks entirely; Contract/Payment still switch among their family (VO/Annex…).
+  const optionSource = lock ? docSource.filter((g) => g.flow === lock.flow) : docSource
+  const docOptions: SelectOption[] = optionSource.flatMap((g) => [
     { value: `__h-${g.flow}`, label: g.flow, header: true },
     ...g.types.map((d) => ({ value: d, label: d, indent: true })),
   ])
+  const docTypeLocked = !!lock && optionSource.flatMap((g) => g.types).length <= 1
 
   // Contract flow: the real Contract No is assigned by DCC2 at send-to-Accounting,
-  // so the Applicant must NOT fill it — lock the field to "N/A" (backend requires
-  // non-empty). Payment/General keep it editable + required.
-  const selectedFlow = docSource.find((g) => g.types.includes(form.documentType))?.flow
+  // so on the CREATE form the Applicant must NOT fill it — lock to "N/A" (backend
+  // requires non-empty). Payment/General keep it editable + required. At
+  // Return-fixing (lock) the value is authoritative from the ticket, so we never
+  // auto-rewrite it here.
+  const selectedFlow = lock ? lock.flow : docSource.find((g) => g.types.includes(form.documentType))?.flow
   const contractLocked = selectedFlow === 'Contract'
   const wasLocked = useRef(contractLocked)
   useEffect(() => {
+    if (lock) return // authoritative value seeded by the parent — don't touch it
     if (contractLocked) {
       if (form.contractNo !== 'N/A') set('contractNo', 'N/A')
     } else if (wasLocked.current) {
@@ -100,6 +119,9 @@ export function TicketFieldsFieldset({
     wasLocked.current = contractLocked
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contractLocked])
+  // Contract No is normalised to uppercase as the Applicant types (Payment/General
+  // editable field); the Contract-flow field is read-only anyway.
+  const setContractNo = (v: string) => set('contractNo', v.toUpperCase())
 
   return (
     <>
@@ -118,6 +140,7 @@ export function TicketFieldsFieldset({
           onChange={(v) => set('documentType', v)}
           options={docOptions}
           ariaLabel="Document Type"
+          disabled={docTypeLocked}
         />
       </div>
       <div className="field">
@@ -136,10 +159,21 @@ export function TicketFieldsFieldset({
           className="mono"
           required={!contractLocked}
           disabled={contractLocked}
-          value={contractLocked ? 'N/A' : form.contractNo}
-          onChange={(e) => set('contractNo', e.target.value)}
+          // Contract flow: DCC2's number once assigned (from `lock`), else 'N/A'.
+          value={contractLocked ? (lock ? form.contractNo || 'N/A' : 'N/A') : form.contractNo}
+          onChange={(e) => setContractNo(e.target.value)}
         />
       </div>
+      {/* Payment flow at Return-fixing: DCC3's Payment No, shown read-only — the
+          Applicant fixes other fields but never this number (it is DCC-owned). */}
+      {lock?.flow === 'Payment' && lock.paymentNo && (
+        <div className="field">
+          <label htmlFor={id('paymentNo')} lang="en">
+            Payment No
+          </label>
+          <input id={id('paymentNo')} className="mono" disabled value={lock.paymentNo} />
+        </div>
+      )}
       <div className={`field${bad('projectTeam')}`}>
         <label htmlFor={id('projectTeam')} lang="en">
           Project/Team <span className="req">*</span>

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { Prisma } from '@prisma/client'
 import {
   TICKET_EVENT,
   TICKET_STATUS,
@@ -8,11 +9,33 @@ import {
 } from '@qlhs/contracts'
 import { PrismaService } from '../prisma.service'
 import {
+  DocumentNoDuplicateError,
   FieldsLockedError,
   PriorityLockedError,
 } from '../../../application/core/ticket-errors'
 import { TicketNotFoundError } from '../../../domain/errors'
 import { diffFields, type ApplicantFields } from '../../../domain/ticket/applicant-fields'
+
+/** Contract No is stored UPPERCASE everywhere it is entered. */
+const upperContractNo = (f: ApplicantFields): ApplicantFields => ({
+  ...f,
+  contractNo: f.contractNo.toUpperCase(),
+})
+
+/** The Contract No partial-unique index (Contract flow) is the final guard, so
+ *  create and field edits translate its P2002 into a friendly duplicate error
+ *  instead of a 500. (Payment references are NOT unique — many payments per
+ *  contract — so this only fires on a genuine Contract-No clash.) */
+function asContractNoDuplicate(e: unknown, contractNo: string): never {
+  if (
+    e instanceof Prisma.PrismaClientKnownRequestError &&
+    e.code === 'P2002' &&
+    /contract_no|payment_no/.test(String(e.meta?.target ?? ''))
+  ) {
+    throw new DocumentNoDuplicateError(`Contract No "${contractNo}" đã tồn tại`)
+  }
+  throw e
+}
 
 export interface CreateTicketInput {
   applicantSub: string
@@ -31,7 +54,11 @@ export class TicketWriteRepo {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(input: CreateTicketInput): Promise<{ id: string }> {
-    const f = input.fields
+    const f = upperContractNo(input.fields)
+    return this.createTx(input, f).catch((e) => asContractNoDuplicate(e, f.contractNo))
+  }
+
+  private createTx(input: CreateTicketInput, f: ApplicantFields): Promise<{ id: string }> {
     return this.prisma.$transaction(async (tx) => {
       const t = await tx.ticket.create({
         data: {
@@ -83,13 +110,22 @@ export class TicketWriteRepo {
    * (`Return-fixing`). Each changed field appends one `field_changed` TicketEvent
    * (B6); status/code are never touched here.
    */
-  async updateFields(id: string, actorSub: string, next: ApplicantFields, resolvedFlow: Flow): Promise<void> {
+  async updateFields(id: string, actorSub: string, rawNext: ApplicantFields, resolvedFlow: Flow): Promise<void> {
+    const next = upperContractNo(rawNext)
     await this.prisma.$transaction(async (tx) => {
       const t = await tx.ticket.findFirst({ where: { id, applicantSub: actorSub } })
       if (!t) throw new TicketNotFoundError(id)
       const editable: string[] = [TICKET_STATUS.Submitted, TICKET_STATUS.ReturnFixing]
       if (!editable.includes(t.status)) {
         throw new FieldsLockedError('Chỉ sửa được khi hồ sơ ở Pool (Submitted) hoặc Return-fixing')
+      }
+      // Once a code is minted the flow is immutable (it's encoded in the code), so
+      // the Document Type may only move WITHIN its own flow family. Crossing to
+      // another flow's type (e.g. General → a Contract type at Return-fixing) would
+      // desync code↔flow↔documentType — the UI already restricts the dropdown; this
+      // is the server-side guard behind it.
+      if (t.code !== null && resolvedFlow !== t.flow) {
+        throw new FieldsLockedError('Không đổi được loại hồ sơ sang luồng khác sau khi đã cấp mã')
       }
       // DB columns are nullable, but the 9 fields are non-empty once created;
       // coerce defensively so the diff compares like-for-like strings.
@@ -149,7 +185,7 @@ export class TicketWriteRepo {
           },
         })
       }
-    })
+    }).catch((e) => asContractNoDuplicate(e, next.contractNo))
   }
 
   private async writePriority(

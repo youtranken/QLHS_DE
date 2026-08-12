@@ -63,12 +63,14 @@ export function legalActionsFor(status: TicketStatus, role: Role, flow: Flow): L
       label: labelFor(event, flow),
       toStatus: edge?.to ?? status,
       reversible: edge?.reversible ?? false,
-      // Reopen chains into a sendBack, which mandates a reason. SubmitToBop takes a
-      // required comment (DCC1's note to BOP), shown in the handover log.
+      // Reopen chains into a sendBack, which mandates a reason. SubmitToBop and
+      // AndyRequireBop take a required comment (DCC1's / Andy's note to BOP), shown
+      // in the handover log.
       reasonRequired:
         event === TICKET_EVENT.SendBack ||
         event === TICKET_EVENT.Reopen ||
-        event === TICKET_EVENT.SubmitToBop,
+        event === TICKET_EVENT.SubmitToBop ||
+        event === TICKET_EVENT.AndyRequireBop,
     }
   })
 }

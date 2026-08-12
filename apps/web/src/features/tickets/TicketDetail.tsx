@@ -89,22 +89,21 @@ export function TicketDetail({ ticketId, embedded = false }: { ticketId: string;
   const log = mergeLog(d.timeline, d.pauses)
   // Built per render (not module-level) so a future locale switch re-evaluates.
   // "Contract No" vs "Payment No" depends on the flow (business rule):
-  //  • Payment: the Applicant's contractNo IS the real, required contract number
-  //    ("Contract No"); the DCC3-entered documentNo is a separate "Payment No".
-  //  • Contract: the Applicant usually leaves contractNo = N/A — the real Contract No
-  //    is the documentNo DCC2 assigns at send-to-Accounting (fall back to the
-  //    Applicant value until DCC fills it).
+  //  • Payment: contractNo IS the Applicant's contract reference ("Contract No");
+  //    paymentNo is the separate DCC3-assigned "Payment No" (shown once entered).
+  //  • Contract: contractNo IS the Contract No — DCC2 assigns it at
+  //    send-to-Accounting; before that it reads 'N/A'.
   //  • General: just the Applicant's contractNo.
   const numberFields: Array<[keyof Detail, string, boolean]> =
     flow === 'Payment'
       ? [
           ['contractNo', t('tickets.detail.fieldContractNo'), true],
-          ...(d.documentNo
-            ? [['documentNo', t('tickets.detail.fieldPaymentNo'), true] as [keyof Detail, string, boolean]]
+          ...(d.paymentNo
+            ? [['paymentNo', t('tickets.detail.fieldPaymentNo'), true] as [keyof Detail, string, boolean]]
             : []),
         ]
       : flow === 'Contract'
-        ? [[d.documentNo ? 'documentNo' : 'contractNo', t('tickets.detail.fieldContractNoAcc'), true]]
+        ? [['contractNo', t('tickets.detail.fieldContractNoAcc'), true]]
         : [['contractNo', t('tickets.detail.fieldContractNo'), true]]
 
   // Same order as the create form (Subject → Document Type → Contractor → Contract

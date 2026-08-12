@@ -30,4 +30,32 @@ describe('CreateTicketForm — required dropdowns are validated (UX M1)', () => 
     )
     expect(createTicket).not.toHaveBeenCalled()
   })
+
+  it('keeps the draft on an accidental backdrop close, restores it on reopen', async () => {
+    render(<CreateTicketForm onCreated={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Tạo hồ sơ mới' }))
+    await screen.findByRole('dialog')
+    fireEvent.change(screen.getByLabelText(/Subject/i), { target: { value: 'Hồ sơ đang gõ dở' } })
+    // Accidental dismiss: mousedown+click on the overlay backdrop.
+    const overlay = document.querySelector('.overlay')!
+    fireEvent.mouseDown(overlay)
+    fireEvent.click(overlay)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    // Reopen → the typed Subject is still there (no re-typing).
+    fireEvent.click(screen.getByRole('button', { name: 'Tạo hồ sơ mới' }))
+    await screen.findByRole('dialog')
+    expect(screen.getByDisplayValue('Hồ sơ đang gõ dở')).toBeInTheDocument()
+  })
+
+  it('discards the draft on an explicit "Hủy"', async () => {
+    render(<CreateTicketForm onCreated={vi.fn()} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Tạo hồ sơ mới' }))
+    await screen.findByRole('dialog')
+    fireEvent.change(screen.getByLabelText(/Subject/i), { target: { value: 'Bỏ đi' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Huỷ' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Tạo hồ sơ mới' }))
+    await screen.findByRole('dialog')
+    expect(screen.queryByDisplayValue('Bỏ đi')).not.toBeInTheDocument()
+  })
 })

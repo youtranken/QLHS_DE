@@ -16,7 +16,10 @@ function toBody(d: TicketDetail): CreateTicketBody {
     documentType: d.documentType ?? 'General',
     description: d.description ?? '',
     paymentTerm: d.paymentTerm ?? '',
-    contractNo: d.contractNo ?? '',
+    // Contract flow shows a read-only 'N/A' until DCC2 assigns the number; coerce an
+    // empty/legacy value to 'N/A' so what's shown matches what resubmit posts (the
+    // backend rejects an empty Contract No).
+    contractNo: d.contractNo || (d.flow === 'Contract' ? 'N/A' : ''),
     projectTeam: d.projectTeam ?? '',
     currency: d.currency ?? 'VND',
     amount: d.amount ?? '',
@@ -106,7 +109,13 @@ export function ReturnPanel({ detail, onDone }: { detail: TicketDetail; onDone: 
 
       {detail.status === 'Return-fixing' && (
         <form onSubmit={saveAndResubmit} className="fg">
-          <TicketFieldsFieldset form={form} set={set} />
+          {/* Code is minted at Return-fixing → flow is fixed: pin Document Type to
+              this flow and show the DCC-entered Contract No / Payment No read-only. */}
+          <TicketFieldsFieldset
+            form={form}
+            set={set}
+            lock={{ flow: detail.flow, contractNo: detail.contractNo, paymentNo: detail.paymentNo }}
+          />
           <div className="field full">
             <button type="submit" className="btn primary" disabled={busy}>
               {busy ? t('tickets.returnPanel.resubmitting') : t('tickets.returnPanel.resubmitBtn')}

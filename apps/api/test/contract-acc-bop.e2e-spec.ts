@@ -61,7 +61,7 @@ describe('DCC1 receive-from-ACC & submit BOP (e2e)', () => {
         currentHolderSub: status === 'Received from ACC' ? 'dcc1-e2e' : null,
         priority: 'normal',
         code: `CT-2026-${n}`,
-        documentNo: `26-CC-${n}-CT`,
+        contractNo: `26-CC-${n}-CT`,
         roundNo,
       },
     })

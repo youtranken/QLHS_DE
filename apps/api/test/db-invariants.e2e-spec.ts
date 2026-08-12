@@ -42,7 +42,8 @@ describe('SQL-only DB invariants survive migrate (db push guardrail)', () => {
       SELECT indexname FROM pg_indexes WHERE schemaname = 'public'`
     const names = new Set(rows.map((r) => r.indexname))
     for (const idx of [
-      'ticket_document_no_active_key', // one active document_no (excl. Cancelled)
+      'ticket_contract_no_contract_key', // one active Contract No per Contract ticket
+      'ticket_payment_no_active_key', // one active Payment No per Payment ticket
       'ticket_sla_pause_one_open', // at most one open pause per ticket
       'notification_escalation_uq', // hourly escalation idempotency
     ]) {

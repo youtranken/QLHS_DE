@@ -55,7 +55,7 @@ describe('Contract BOP → Hardcopy → Completed (e2e)', () => {
         currentHolderSub: null,
         priority: 'normal',
         code: `CT-2026-${n}`,
-        documentNo: `26-CC-${n}-CT`,
+        contractNo: `26-CC-${n}-CT`,
         roundNo: 0,
         ...extra,
       },

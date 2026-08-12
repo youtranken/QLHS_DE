@@ -44,9 +44,10 @@ describe('Document No pre-flight check (e2e)', () => {
     return agent
   }
 
-  async function seed(status: string, code: string, documentNo: string): Promise<void> {
+  async function seed(status: string, code: string, number: string, flow = 'Contract'): Promise<void> {
+    const numberColumn = flow === 'Payment' ? { paymentNo: number } : { contractNo: number }
     await admin.ticket.create({
-      data: { status, flow: 'Contract', applicantSub: 'app-e2e', priority: 'normal', code, documentNo, roundNo: 0 },
+      data: { status, flow, applicantSub: 'app-e2e', priority: 'normal', code, ...numberColumn, roundNo: 0 },
     })
   }
 
@@ -57,7 +58,7 @@ describe('Document No pre-flight check (e2e)', () => {
     const dcc2 = await login('dcc2-e2e', ['DCC2'])
     const res = await dcc2
       .post('/tickets/check-document-nos')
-      .send({ documentNos: ['DUP-1', 'CANCELLED-1', 'FRESH-1', '  DUP-1  '] })
+      .send({ documentNos: ['DUP-1', 'CANCELLED-1', 'FRESH-1', '  DUP-1  '], flow: 'Contract' })
 
     expect(res.status).toBe(200)
     expect([...res.body.existing].sort()).toEqual(['DUP-1'])
@@ -65,15 +66,15 @@ describe('Document No pre-flight check (e2e)', () => {
 
   it('empty input → empty result (no DB hit needed)', async () => {
     const dcc3 = await login('dcc3-e2e', ['DCC3'])
-    const res = await dcc3.post('/tickets/check-document-nos').send({ documentNos: [] })
+    const res = await dcc3.post('/tickets/check-document-nos').send({ documentNos: [], flow: 'Payment' })
     expect(res.status).toBe(200)
     expect(res.body.existing).toEqual([])
   })
 
-  it('DCC3 (Payment enterer) may also probe — uniqueness is global', async () => {
-    await seed('Sent to Accounting', 'PM-2026-0001', 'PAY-9')
+  it('DCC3 (Payment enterer) probes Payment No — scoped to its own flow', async () => {
+    await seed('Sent to Accounting', 'PM-2026-0001', 'PAY-9', 'Payment')
     const dcc3 = await login('dcc3-e2e', ['DCC3'])
-    const res = await dcc3.post('/tickets/check-document-nos').send({ documentNos: ['PAY-9', 'PAY-X'] })
+    const res = await dcc3.post('/tickets/check-document-nos').send({ documentNos: ['PAY-9', 'PAY-X'], flow: 'Payment' })
     expect(res.status).toBe(200)
     expect(res.body.existing).toEqual(['PAY-9'])
   })
@@ -81,7 +82,7 @@ describe('Document No pre-flight check (e2e)', () => {
   it('Admin may probe too (both boards)', async () => {
     await seed('Submitted to Accounting', 'CT-2026-0010', 'ADM-1')
     const adminAgent = await login('admin-e2e', ['Admin'])
-    const res = await adminAgent.post('/tickets/check-document-nos').send({ documentNos: ['ADM-1', 'ADM-2'] })
+    const res = await adminAgent.post('/tickets/check-document-nos').send({ documentNos: ['ADM-1', 'ADM-2'], flow: 'Contract' })
     expect(res.status).toBe(200)
     expect(res.body.existing).toEqual(['ADM-1'])
   })
@@ -89,13 +90,13 @@ describe('Document No pre-flight check (e2e)', () => {
   it('rejects an over-cap array (>500) at the DTO (400)', async () => {
     const dcc2 = await login('dcc2-e2e', ['DCC2'])
     const tooMany = Array.from({ length: 501 }, (_, i) => `N-${i}`)
-    const res = await dcc2.post('/tickets/check-document-nos').send({ documentNos: tooMany })
+    const res = await dcc2.post('/tickets/check-document-nos').send({ documentNos: tooMany, flow: 'Contract' })
     expect(res.status).toBe(400)
   })
 
   it('an Applicant cannot probe Document Nos (403)', async () => {
     const applicant = await login('app-e2e', ['Applicant'])
-    const res = await applicant.post('/tickets/check-document-nos').send({ documentNos: ['DUP-1'] })
+    const res = await applicant.post('/tickets/check-document-nos').send({ documentNos: ['DUP-1'], flow: 'Contract' })
     expect(res.status).toBe(403)
   })
 })

@@ -53,6 +53,7 @@ export function BoardActionModals({
               : t('board.modals.sendAccounting.docNoLabel')
           }
           confirmClose={sendAcc.flow === 'Payment'}
+          uppercase={sendAcc.flow !== 'Payment'}
           onSubmit={(docNo) => doSendAcc(sendAcc, docNo)}
           onClose={() => setSendAcc(null)}
         />

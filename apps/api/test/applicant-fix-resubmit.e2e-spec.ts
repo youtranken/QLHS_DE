@@ -93,16 +93,21 @@ describe('Applicant fix & resubmit (e2e)', () => {
     expect(row.flow).toBe('Payment') // recomputed, not stale 'General'
   })
 
-  it('editing documentType at Return-fixing does NOT change flow (code already minted)', async () => {
+  it('editing documentType to another flow at Return-fixing is REJECTED (code minted → flow immutable)', async () => {
     const { id, applicant } = await returnedTicket() // General, code minted, Returned
     expect((await applicant.post(`/tickets/${id}/confirm-return-receipt`)).status).toBe(201)
     const before = await admin.ticket.findUniqueOrThrow({ where: { id } })
     expect(before.flow).toBe('General')
     expect(before.code).not.toBeNull()
-    await applicant.patch(`/tickets/${id}`).send({ ...FIELDS, documentType: 'Payment' })
+    // Cross-flow Document Type change is refused once the code is minted — the code
+    // encodes the flow (AD-5), so the type may only move within its own family (#2).
+    // Prevents the General→Payment desync seen in the field (Image #28).
+    const res = await applicant.patch(`/tickets/${id}`).send({ ...FIELDS, documentType: 'Payment' })
+    expect(res.status).toBe(409)
+    expect(res.body.code).toBe('FieldsLocked')
     const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
-    expect(row.documentType).toBe('Payment')
-    expect(row.flow).toBe('General') // unchanged — code is immutable and encodes the flow
+    expect(row.documentType).toBe('General') // unchanged — the edit was refused
+    expect(row.flow).toBe('General')
   })
 
   it('confirm receipt → Return-fixing → edit (audited) → resubmit → Submitted', async () => {
