@@ -1,15 +1,8 @@
 import { t, statusVi, kindMessage, applyVp } from '../../i18n'
+import { RETURN_STATES } from '../tickets/ticketStates'
 import { type Block, type TicketRowVM } from './api'
 
 const FLOW_CLS: Record<string, string> = { General: 'general', Contract: 'contract', Payment: 'payment' }
-
-/** Canonical flow → localized name via the i18n catalog (mirrors admin flowVi) so
- *  the assistant doesn't render Vietnamese flow names while the UI is in English. */
-function flowLabel(flow: string): string {
-  const key = `adminAnalytics.flows.${flow}` as const
-  const s = t(key)
-  return s === key ? flow : s
-}
 
 function Code({ code, onOpen }: { code: string | null; onOpen: (c: string) => void }) {
   if (!code) return <span className="asst-code muted">—</span>
@@ -21,7 +14,9 @@ function Code({ code, onOpen }: { code: string | null; onOpen: (c: string) => vo
 }
 
 function Flow({ flow }: { flow: string }) {
-  return <span className={`asst-flow ${FLOW_CLS[flow] ?? ''}`}>{flowLabel(flow)}</span>
+  // Canonical flow name is already English (General/Contract/Payment) — show it as-is
+  // (the chatbot's Document Type column reads in English, matching its EN headers).
+  return <span className={`asst-flow ${FLOW_CLS[flow] ?? ''}`}>{flow}</span>
 }
 
 /** Pill SLA cho một dòng danh sách: chỉ hiện khi có dữ liệu (không bịa "trong hạn"). */
@@ -63,7 +58,9 @@ export function AnswerCard({ block, onOpen }: { block: Block; onOpen: (code: str
                   <td>
                     <Flow flow={r.flow} />
                   </td>
-                  <td>{statusVi(r.status)}</td>
+                  <td className={RETURN_STATES.has(r.status) ? 'asst-status return' : undefined}>
+                    {statusVi(r.status)}
+                  </td>
                   <td className="right">{rowPill(r)}</td>
                 </tr>
               ))}

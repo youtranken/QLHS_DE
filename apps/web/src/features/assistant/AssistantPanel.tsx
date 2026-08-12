@@ -94,7 +94,7 @@ export function AssistantPanel({ activeRole = null, userName }: { activeRole?: R
         >
           <Trash2 size={16} strokeWidth={2} aria-hidden />
         </button>
-        <button type="button" className="asst-iconbtn" aria-label={t('assistant.close')} onClick={() => setOpen(false)}>
+        <button type="button" className="asst-iconbtn" aria-label={t('assistant.close')} title={t('assistant.close')} onClick={() => setOpen(false)}>
           <X size={17} strokeWidth={2} aria-hidden />
         </button>
       </header>

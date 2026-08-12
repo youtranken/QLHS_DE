@@ -26,9 +26,9 @@ export const assistant = {
     myOpen: 'Hồ sơ đang mở',
   },
   card: {
-    thCode: 'Mã',
-    thFlow: 'Luồng',
-    thStatus: 'Trạng thái',
+    thCode: 'Code',
+    thFlow: 'Document Type',
+    thStatus: 'Status',
     thType: 'Loại',
     nextStep: 'Bước tiếp theo cho',
     late: 'trễ {n}n',

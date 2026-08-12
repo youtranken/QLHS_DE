@@ -27,7 +27,7 @@ export const assistant = {
   },
   card: {
     thCode: 'Code',
-    thFlow: 'Flow',
+    thFlow: 'Document Type',
     thStatus: 'Status',
     thType: 'Type',
     nextStep: 'Next step for',

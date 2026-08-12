@@ -37,7 +37,9 @@
   letter-spacing: 0.01em;
   text-transform: none;
   color: var(--ink-2);
-  text-align: left;
+  /* Header + value are centred per column (Amount stays right, actions stay right)
+     so short values sit under the middle of their label. */
+  text-align: center;
   padding: 8px 8px;
   border-bottom: 1px solid var(--line);
   background: var(--panel-2);
@@ -47,6 +49,7 @@
   padding: 7px 8px;
   border-bottom: 1px solid var(--line-soft);
   vertical-align: middle;
+  text-align: center;
   /* Subject is the wide column; every other cell stays on one line so the row
      reads compact and the horizontal budget goes to Subject. */
   white-space: nowrap;
@@ -64,6 +67,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--ink);
+}
+/* Subject is long free text — keep it LEFT (header + value) for readability even
+   though the other columns centre. */
+.tbl .subj {
+  text-align: left;
 }
 /* flow identity dot on the Document Type cell (replaces the separate Flow column) */
 .tbl .fdot {
@@ -237,6 +245,8 @@
   color: var(--ink-3);
   background: var(--bg-2);
   padding: 7px 14px;
+  /* Section label ("ĐANG CHẠY (n)") stays left — only the data columns centre. */
+  text-align: left;
 }
 .grouphd.warn td {
   color: var(--sla);

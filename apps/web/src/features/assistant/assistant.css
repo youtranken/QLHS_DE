@@ -138,6 +138,8 @@
 }
 .asst-card td { padding: 7px 9px; border-top: 1px solid var(--line-soft); vertical-align: middle; }
 .asst-card td.right { text-align: right; }
+/* Trả về (Returned / Return-fixing) tô đỏ để applicant thấy ngay việc cần xử lý. */
+.asst-card td.asst-status.return { color: var(--sla); font-weight: 600; }
 .asst-code { font-family: var(--mono); font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; font-size: var(--fs-xs); }
 .asst-code.muted { color: var(--ink-3); cursor: default; }
 .asst-flow { display: inline-flex; align-items: center; gap: 5px; }

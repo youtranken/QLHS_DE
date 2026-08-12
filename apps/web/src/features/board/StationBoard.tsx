@@ -212,7 +212,7 @@ export function StationBoard({ canManage = false }: { canManage?: boolean } = {}
                 {/* Reconcile lane: its label already carries the full message, so no
                     second sub-line — normal columns keep the VN status caption. */}
                 {!col.reconcile && <div className="vi">{statusVi(col.status)}</div>}
-                {selGroups.map((g) => {
+                {selectableCards.length > 0 && selGroups.map((g) => {
                   const allSel = g.cards.length > 0 && g.cards.every((c) => sel.has(c.id))
                   const someSel = g.cards.some((c) => sel.has(c.id))
                   return (

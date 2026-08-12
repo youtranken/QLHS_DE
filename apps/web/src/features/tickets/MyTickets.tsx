@@ -224,7 +224,7 @@ export function MyTickets({ reloadKey, action }: { reloadKey: number; action?: R
               <tr>
                 <th scope="col" className="seq">{t('tickets.myList.colSeq')}</th>
                 <th scope="col">{t('tickets.myList.colCode')}</th>
-                <th scope="col">{t('tickets.myList.colSubject')}</th>
+                <th scope="col" className="subj">{t('tickets.myList.colSubject')}</th>
                 <th scope="col">{t('tickets.myList.colDocType')}</th>
                 <th scope="col">{t('tickets.myList.colContractor')}</th>
                 <th scope="col">{t('tickets.myList.colContractNo')}</th>
