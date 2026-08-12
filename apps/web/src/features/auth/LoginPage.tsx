@@ -169,7 +169,6 @@ export function LoginPage({
       <button className="btn primary" type="submit" disabled={busy || identifier.trim() === ''}>
         {busy ? t('auth.login.checking') : t('auth.login.continue')}
       </button>
-      <p className="footnote">{t('auth.login.footnote')}</p>
     </form>
   )
 }
