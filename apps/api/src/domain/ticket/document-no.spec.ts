@@ -18,4 +18,10 @@ describe('Document No (FR-11, free-form — non-empty only)', () => {
     expect(isValidDocumentNo('x'.repeat(200))).toBe(true)
     expect(isValidDocumentNo('x'.repeat(201))).toBe(false)
   })
+
+  it("rejects the reserved 'N/A' sentinel (any case) so it can't dodge the unique index", () => {
+    for (const bad of ['N/A', 'n/a', ' N/a ']) {
+      expect(isValidDocumentNo(bad)).toBe(false)
+    }
+  })
 })

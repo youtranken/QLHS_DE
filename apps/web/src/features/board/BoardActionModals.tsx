@@ -55,7 +55,7 @@ export function BoardActionModals({
           }
           confirmClose={sendAcc.flow === 'Payment'}
           uppercase
-          allowSkip={sendAcc.flow !== 'Payment'}
+          allowSkip={sendAcc.flow !== 'Payment' && sendAcc.roundNo === 0}
           onSubmit={(docNo) => doSendAcc(sendAcc, docNo)}
           onSkip={(docNo) => doSkip(sendAcc, docNo)}
           onClose={() => setSendAcc(null)}

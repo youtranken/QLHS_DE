@@ -4,6 +4,7 @@ import {
   FLOW,
   SYSTEM_SUB,
   TICKET_EVENT,
+  TICKET_STATUS,
   type Flow,
   type TicketEvent,
   type TicketStatus,
@@ -69,6 +70,15 @@ export class SkipToCompletedRepo {
         }
         if (row.flow !== FLOW.Contract) {
           throw new IllegalTransitionError('Skip Completed chỉ áp dụng cho luồng Contract')
+        }
+        // Start-status guard (belt-and-braces on top of transition()'s edge check).
+        if (row.status !== TICKET_STATUS.ReceivedByDcc2) {
+          throw new IllegalTransitionError('Skip chỉ dùng ở bước "Received by DCC2"')
+        }
+        // Round-0 only: a re-entered ticket (heavy return) already carries a real
+        // Contract No from a prior round — a blank skip would overwrite it with N/A.
+        if (row.round_no !== 0) {
+          throw new IllegalTransitionError('Skip chỉ dùng cho hồ sơ vòng đầu (hồ sơ đã quay lại đã có số)')
         }
 
         let state: TicketState = {

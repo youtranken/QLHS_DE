@@ -40,6 +40,7 @@ export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Pr
     priority: 'normal',
     flow: d.flow,
     status: d.status,
+    roundNo: d.roundNo,
     overdueDays: d.overdueDays,
     lockedByMe: false,
     lockedBy: null,

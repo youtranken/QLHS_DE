@@ -8,7 +8,17 @@
  */
 export const DOCUMENT_NO_MAX = 200
 
+/** Reserved "no number" sentinel: the partial-unique indexes exclude it, so it must
+ *  NOT be accepted as a typed value on the manual send path (else two tickets could
+ *  both close with 'N/A' and dodge the 1-1 guard). The Skip-to-Completed path sets
+ *  'N/A' deliberately for a numberless close and never goes through this check. */
+export const DOCUMENT_NO_NA = 'N/A'
+
 export function isValidDocumentNo(value: string): boolean {
   const trimmed = value.trim()
-  return trimmed.length > 0 && trimmed.length <= DOCUMENT_NO_MAX
+  return (
+    trimmed.length > 0 &&
+    trimmed.length <= DOCUMENT_NO_MAX &&
+    trimmed.toUpperCase() !== DOCUMENT_NO_NA
+  )
 }

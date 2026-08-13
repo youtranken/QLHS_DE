@@ -1,5 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { FLOW, isTerminal, ROLE, type Flow, type Role, type TicketStatus } from '@qlhs/contracts'
+import {
+  FLOW,
+  isTerminal,
+  ROLE,
+  TICKET_EVENT,
+  TICKET_STATUS,
+  type Flow,
+  type Role,
+  type TicketStatus,
+} from '@qlhs/contracts'
 import { TicketQueryRepo } from '../../infra/prisma/ticket/ticket-query.repo'
 import { SlaRepo } from '../../infra/prisma/sla/sla.repo'
 import { TicketViewRepo } from '../../infra/prisma/ticket/ticket-view.repo'
@@ -79,6 +88,26 @@ export interface TicketDetail {
   route: RouteStationView[]
   /** AD-12 directory: sub → display name for every actor/holder shown here. */
   directory: Record<string, string>
+}
+
+// The DCC1 sendBack on the handover-waiting states (a Contract/Payment sitting in a
+// DCC2/DCC3 inbox before receipt) is RECONCILE-ONLY: it's meant to be driven from the
+// reconcile lane after the receiver reports missing paper, and HandoverRepo enforces
+// that by requiring reconcile_flag. The board already curates it away; without the
+// same curation the ticket-detail actionbar would leak a live "Trả lại" that bypasses
+// the gate (contract.ts invariant). Drop it unless the flag is set.
+const HANDOVER_WAITING: ReadonlySet<TicketStatus> = new Set<TicketStatus>([
+  TICKET_STATUS.SubmittedToDcc2,
+  TICKET_STATUS.SubmittedToDcc2Hardcopy,
+  TICKET_STATUS.SubmittedToDcc3,
+])
+function curateDetailActions(
+  actions: LegalAction[],
+  status: TicketStatus,
+  reconcileFlag: boolean,
+): LegalAction[] {
+  if (reconcileFlag || !HANDOVER_WAITING.has(status)) return actions
+  return actions.filter((a) => a.event !== TICKET_EVENT.SendBack)
 }
 
 @Injectable()
@@ -176,7 +205,11 @@ export class TicketDetailUseCase {
       // SLA clock (F8), same rule the board card uses.
       mine: t.currentHolderSub === viewer.sub,
       actions: viewer.role
-        ? legalActionsFor(t.status as TicketStatus, viewer.role, t.flow as Flow)
+        ? curateDetailActions(
+            legalActionsFor(t.status as TicketStatus, viewer.role, t.flow as Flow),
+            t.status as TicketStatus,
+            t.reconcileFlag,
+          )
         : [],
       timeline,
       pauses: pauseRows.map((p) => ({

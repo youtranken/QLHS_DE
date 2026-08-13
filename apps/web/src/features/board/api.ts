@@ -27,6 +27,10 @@ export interface BoardCard {
   priority: string
   flow: string
   status: string
+  /** Round counter (0 = first pass). "Skip to Completed" is offered only on round 0.
+   *  Optional on the client: the board always sends it; a synthesized card (detail)
+   *  may omit it, in which case skip stays hidden (safe default). */
+  roundNo?: number
   overdueDays: number
   lockedByMe: boolean
   lockedBy: string | null

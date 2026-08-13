@@ -34,7 +34,11 @@ function toBody(d: TicketDetail): CreateTicketBody {
  * opens the 9-field edit form + resubmit. Anti-double-submit via a busy flag.
  */
 export function ReturnPanel({ detail, onDone }: { detail: TicketDetail; onDone: () => void }) {
-  const lastReturn = [...detail.timeline].reverse().find((e) => e.action === 'sendBack')
+  // Both a manual sendBack and an auto-return (overdue in Pool) land the ticket in a
+  // return state with a stamped reason — surface either so the Applicant sees WHY.
+  const lastReturn = [...detail.timeline]
+    .reverse()
+    .find((e) => e.action === 'sendBack' || e.action === 'auto_return')
   const [form, setForm] = useState<CreateTicketBody>(() => toBody(detail))
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)

@@ -9,7 +9,7 @@ import { transition } from '../../domain/ticket/transition'
 import { NOTIFICATION_KIND } from '../../domain/notify/email-template'
 
 /** Stamped as the Return reason so the Applicant sees WHY it came back (F15). */
-const AUTO_RETURN_REASON = 'Tự động trả lại: quá hạn tiếp nhận ở Pool (chưa có DCC1 nào bốc hồ sơ).'
+const AUTO_RETURN_REASON = 'Tự động trả lại: quá hạn tiếp nhận ở Pool (chưa có DCC1 nào nhận hồ sơ).'
 
 /**
  * Auto-returns a Pool ticket that has sat at `Submitted` (un-picked) longer than

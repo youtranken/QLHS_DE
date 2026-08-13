@@ -25,6 +25,10 @@ export interface BoardCard {
   priority: string
   flow: string
   status: string
+  /** Round counter — 0 on the first pass; a heavy return bumps it. The DCC2
+   *  "Skip to Completed" is offered only on round 0 (a re-entered Contract already
+   *  carries a real Contract No a blank skip would clobber). */
+  roundNo: number
   overdueDays: number
   lockedByMe: boolean
   lockedBy: string | null
@@ -203,6 +207,7 @@ export class StationBoardUseCase {
       priority: r.priority,
       flow: r.flow,
       status,
+      roundNo: r.roundNo,
       overdueDays: overdueDays(startOf(clock, r), threshold, now),
       paused: clock.get(r.id)?.paused ?? false,
       mine: r.currentHolderSub === viewerSub,
