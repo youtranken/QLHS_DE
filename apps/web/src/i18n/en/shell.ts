@@ -9,6 +9,14 @@ export const shell = {
     brandSuffix: '· Tickets',
     logout: 'Sign out',
   },
+  // Role label shown under the name in the user card (Admin sidebar + board header).
+  roleLabel: {
+    Admin: 'Administrator',
+    Applicant: 'Staff',
+    DCC1: 'Admin1',
+    DCC2: 'Admin2',
+    DCC3: 'Admin3',
+  },
   // Split around <b> — keep the leading/trailing spacing bytes intact.
   roleWarn: {
     prefix: 'Your account ',

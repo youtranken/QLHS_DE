@@ -9,6 +9,14 @@ export const shell = {
     brandSuffix: '· Hồ sơ',
     logout: 'Thoát',
   },
+  // Nhãn vai hiển thị dưới tên trong card người dùng (sidebar Admin + header board).
+  roleLabel: {
+    Admin: 'Quản trị viên',
+    Applicant: 'Nhân viên',
+    DCC1: 'Admin1',
+    DCC2: 'Admin2',
+    DCC3: 'Admin3',
+  },
   // Split around <b> — keep the leading/trailing spacing bytes intact.
   roleWarn: {
     prefix: 'Tài khoản của bạn ',

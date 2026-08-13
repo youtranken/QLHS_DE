@@ -13,6 +13,7 @@ import { useIdleLogout } from './shared/useIdleLogout'
 import { useLocaleVersion } from './i18n/locale'
 import { useCurrentUser } from './features/auth/useCurrentUser'
 import { RoleSwitcher } from './features/auth/RoleSwitcher'
+import { roleLabel } from './features/auth/roleLabel'
 import { NotificationBell } from './features/notifications/NotificationBell'
 import { TicketDetail } from './features/tickets/TicketDetail'
 import { LoginPage } from './features/auth/LoginPage'
@@ -157,8 +158,13 @@ export function App() {
           <LocaleToggle />
           <ThemeToggle />
           <div className="me">
-            {/* Chỉ tên — vai đã hiện ở RoleSwitcher, tránh lặp "tên · Vai". */}
-            <span>{name}</span>
+            {/* Tên + nhãn vai (Admin1/2/3 · Nhân viên · Quản trị viên) như QLTS. */}
+            <span className="who">
+              <span className="nm">{name}</span>
+              {roleLabel(user.activeRole) && (
+                <span className="rl">{roleLabel(user.activeRole)}</span>
+              )}
+            </span>
             <span className="av" aria-hidden>
               {initials(name)}
             </span>

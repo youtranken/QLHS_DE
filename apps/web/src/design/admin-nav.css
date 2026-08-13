@@ -214,6 +214,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Role sub-line under the name (Quản trị viên / Admin1… ) — QLTS-style. */
+.sb-userbtn .rl {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--ink-3);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 /* account menu (hiện khi bấm tên) */
 .sb-actions {
   display: flex;

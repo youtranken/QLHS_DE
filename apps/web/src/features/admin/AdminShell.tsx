@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Menu, Moon, Sun, Globe, LogOut } from 'lucide-react'
 import type { Role } from '@qlhs/contracts'
 import { t } from '../../i18n'
+import { roleLabel } from '../auth/roleLabel'
 import { adminSectionOf, openAdminSection } from '../../shared/route'
 import { currentLocale, switchLocale } from '../../i18n/locale'
 import { RoleSwitcher } from '../auth/RoleSwitcher'
@@ -272,6 +273,7 @@ export function AdminShell({
               <span className="av" aria-hidden>{initials(userName)}</span>
               <span className="who">
                 <span className="nm">{userName}</span>
+                {roleLabel(activeRole) && <span className="rl">{roleLabel(activeRole)}</span>}
               </span>
             </button>
           </div>
