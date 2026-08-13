@@ -132,8 +132,10 @@ services:
     volumes:
       - ./pmh.com.vn:/certs:ro
     ports:
-      - '18080:80' # on-prem HTTP
-      - '5173:5173' # local HTTPS (reuses the SSO redirect)
+      # Loopback-only (khớp postgres/api/mailpit ở trên). Prod đi qua EDGE :8443 nên
+      # host port này chỉ để dev truy cập localhost — KHÔNG mở ra 0.0.0.0/LAN.
+      - '127.0.0.1:18080:80' # on-prem HTTP
+      - '127.0.0.1:5173:5173' # local HTTPS (reuses the SSO redirect)
 
 volumes:
   qlhs-pg:
