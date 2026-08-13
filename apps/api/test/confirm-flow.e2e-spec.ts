@@ -68,8 +68,9 @@ describe('DCC1 confirm-flow + code mint (e2e — AD-5/AD-14)', () => {
     const now = new Date()
     const [ra, rb] = await Promise.all([confirm.confirm(a, dcc1, now), confirm.confirm(b, dcc1, now)])
     const codes = [ra.code, rb.code].sort()
-    expect(codes[0]).toMatch(/-0001$/)
-    expect(codes[1]).toMatch(/-0002$/)
+    // Code format is `G-0001-2026` (seq then year) — assert the dash-delimited seq.
+    expect(codes[0]).toMatch(/-0001-/)
+    expect(codes[1]).toMatch(/-0002-/)
     expect(new Set(codes).size).toBe(2)
   })
 
@@ -81,7 +82,7 @@ describe('DCC1 confirm-flow + code mint (e2e — AD-5/AD-14)', () => {
     ).rejects.toThrow()
     // Next real confirm must still be ...0001 (the failed mint did not consume a number).
     const ok = await confirm.confirm(id, dcc1, new Date())
-    expect(ok.code).toMatch(/-0001$/)
+    expect(ok.code).toMatch(/-0001-/)
   })
 
   it('HTTP: DCC1 pick then confirm returns the code; applicant is forbidden', async () => {
