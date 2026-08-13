@@ -88,11 +88,14 @@ export class SkipToCompletedRepo {
         // step-1 meta. Only the FINAL row state is observable, so the ticket row is
         // written once after the chain (each step still appends its own audit row).
         for (const step of SKIP_TO_COMPLETED_STEPS) {
+          // The skip note lands only on the final step so the timeline shows it once;
+          // the intermediate SYSTEM steps carry no note (submitToBop's normally
+          // mandatory reason is waived for SYSTEM in transition()).
           const out = transition(state, {
             event: step.event,
             actor: { sub: SYSTEM_SUB, activeRole: step.role },
             now,
-            reason: SKIP_COMPLETED_REASON,
+            reason: step.event === TICKET_EVENT.CompleteContract ? SKIP_COMPLETED_REASON : undefined,
             meta: metaFor(step.event, storedNumber, now, actorSub),
           })
           await tx.ticketEvent.create({

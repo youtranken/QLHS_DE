@@ -7,14 +7,15 @@ import { ROLE, TICKET_EVENT, type Role, type TicketEvent } from '@qlhs/contracts
  * not a single jump. It deliberately crosses roles: the orchestrating repo runs
  * each step with a per-step system actor whose role matches the edge, relaxing
  * AD-2's owner check for this one path (a business decision — see the popup's
- * "Skip Completed" checkbox). Every step carries the same skip note shown in detail.
+ * "Skip Completed" checkbox). The skip note is recorded only on the FINAL step
+ * (Completed) so the timeline shows it once, not on every intermediate station.
  */
 export interface SkipStep {
   event: TicketEvent
   role: Role
 }
 
-export const SKIP_COMPLETED_REASON = 'Skip completed (Hồ sơ không cần trình Acc)'
+export const SKIP_COMPLETED_REASON = 'Skip to Completed'
 
 /** Ordered chain `Received by DCC2` → … → `Completed`. Kept as data (not inlined in
  *  the repo) so a pure test can walk it through the state-machine and prove it is a

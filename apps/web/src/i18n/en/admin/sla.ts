@@ -39,7 +39,7 @@ export const adminSla = {
   flowDesc: {
     all: 'Applies to all flows — the stations shared at the start and on return.',
     general: 'Short route — DCC1 handles the whole route, skipping DCC2/DCC3.',
-    contract: 'Long route — DCC2 → ACC → BOP → hardcopy.',
+    contract: 'Long route — DCC2 → Accounting → BOP → hardcopy.',
     payment: 'Shortest route — DCC3.',
   },
   /** EN subtitle per canonical EN status (AD-13 — presentation only). */

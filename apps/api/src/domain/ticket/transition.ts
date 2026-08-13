@@ -1,4 +1,12 @@
-import { isTerminal, ROLE, type Flow, type Role, type TicketEvent, type TicketStatus } from '@qlhs/contracts'
+import {
+  isTerminal,
+  ROLE,
+  SYSTEM_SUB,
+  type Flow,
+  type Role,
+  type TicketEvent,
+  type TicketStatus,
+} from '@qlhs/contracts'
 import { findEdge } from './state-machine/index'
 import { stateOwner } from './state-machine/state-owner'
 import { DomainError } from '../errors'
@@ -44,7 +52,9 @@ export class ReasonRequiredError extends DomainError {
 
 // sendBack always needs a reason; submitToBop + andyRequireBop carry DCC1's
 // mandatory note (Andy's decision to route to BOP / DCC1's note to BOP) — enforced
-// server-side, not just in the UI, so the handover log always has it.
+// server-side, not just in the UI, so the handover log always has it. The SYSTEM
+// actor is exempt: an automated step (e.g. the Skip Completed fast-forward) has no
+// human note to record, and forcing one would spam the log.
 const REASON_REQUIRED: ReadonlySet<TicketEvent> = new Set<TicketEvent>([
   'sendBack',
   'submitToBop',
@@ -71,7 +81,11 @@ export function transition(ticket: TicketState, input: TransitionInput): Transit
       `Role ${input.actor.activeRole} may not ${input.event} from ${ticket.status}`,
     )
   }
-  if (REASON_REQUIRED.has(input.event) && !input.reason?.trim()) {
+  if (
+    REASON_REQUIRED.has(input.event) &&
+    !input.reason?.trim() &&
+    input.actor.sub !== SYSTEM_SUB
+  ) {
     throw new ReasonRequiredError(`Event ${input.event} requires a reason`)
   }
 

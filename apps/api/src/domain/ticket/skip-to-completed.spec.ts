@@ -29,6 +29,6 @@ describe('SKIP_TO_COMPLETED_STEPS', () => {
   })
 
   it('ghi chú skip khớp chuỗi người dùng yêu cầu', () => {
-    expect(SKIP_COMPLETED_REASON).toBe('Skip completed (Hồ sơ không cần trình Acc)')
+    expect(SKIP_COMPLETED_REASON).toBe('Skip to Completed')
   })
 })

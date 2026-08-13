@@ -39,7 +39,7 @@ export const adminSla = {
   flowDesc: {
     all: 'Áp cho mọi luồng — các trạm dùng chung ở đầu & khi trả lại.',
     general: 'Tuyến ngắn — DCC1 ôm cả tuyến, không qua DCC2/DCC3.',
-    contract: 'Tuyến dài — DCC2 → ACC → BOP → bản cứng.',
+    contract: 'Tuyến dài — DCC2 → Accounting → BOP → bản cứng.',
     payment: 'Tuyến ngắn nhất — DCC3.',
   },
   /** VI subtitle per canonical EN status (AD-13 — presentation only). */
@@ -50,8 +50,8 @@ export const adminSla = {
     'Submitted to DCC3': 'DCC1 đã bàn giao, chờ DCC3 nhận',
     'Received by DCC3': 'DCC3 đã nhận, đang xử lý',
     'Submitted to VP Andy': 'Đã trình VP Andy phê duyệt',
-    'Submitted to Accounting': 'Đã gửi kế toán, chờ kết quả',
-    'Received from ACC': 'Kế toán trả kết quả, chờ bước sau',
+    'Submitted to Accounting': 'Đã gửi Accounting, chờ kết quả',
+    'Received from ACC': 'Accounting trả kết quả, chờ bước sau',
     'Submitted to BOP': 'Đã trình BOP ký duyệt',
     Hardcopy: 'Chờ nộp / đối chiếu bản cứng',
     'Submitted to DCC2 (Hardcopy)': 'Bàn giao bản cứng cho DCC2',

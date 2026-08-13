@@ -183,8 +183,8 @@ export const board = {
       confirmSubmit: 'Gửi Accounting & đóng hồ sơ',
       confirmMessage: 'Gửi Accounting sẽ đóng hồ sơ Payment ở "Sent to Accounting".',
       skipLabel: 'Skip to Completed',
-      skipSubmit: 'Hoàn tất luôn',
-      skipConfirmTitle: 'Hoàn tất luôn hồ sơ?',
+      skipSubmit: 'Hoàn tất',
+      skipConfirmTitle: 'Hoàn tất hồ sơ?',
       skipConfirmMessage:
         'Bỏ qua chốt Accounting và phê duyệt BOP, tự động chạy tới "Completed". Hành động KHÔNG thể hoàn tác.',
       skipConfirmSubmit: 'Xác nhận hoàn tất',

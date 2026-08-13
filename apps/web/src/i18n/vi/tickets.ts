@@ -182,7 +182,7 @@ export const tickets = {
     sendToDcc3: 'chuyển DCC3',
     confirmReceivedByDcc2: 'DCC2 nhận bản cứng',
     confirmReceivedByDcc3: 'DCC3 nhận bản cứng',
-    sendToAccounting: 'gửi Kế toán',
+    sendToAccounting: 'gửi Accounting',
     receiveFromAcc: 'nhận lại từ Accounting',
     submitToBop: 'trình BOP',
     sendToBop: 'trình BOP',

@@ -182,7 +182,7 @@ export const board = {
       confirmSubmit: 'Send to Accounting & close ticket',
       confirmMessage: 'Sending to Accounting closes the Payment ticket at "Sent to Accounting".',
       skipLabel: 'Skip to Completed',
-      skipSubmit: 'Complete now',
+      skipSubmit: 'Complete',
       skipConfirmTitle: 'Complete this ticket now?',
       skipConfirmMessage:
         'Skips the Accounting checkpoint and BOP approval, auto-advancing to "Completed". This CANNOT be undone.',

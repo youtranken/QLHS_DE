@@ -110,10 +110,9 @@ test('Contract: "Skip to Completed" fast-forwards past ACC/BOP', async ({ page }
 
   // Blank number → N/A, and the whole chain is on the append-only log as the system.
   expect(await contractNoByCode(code!)).toBe('N/A')
-  const skipEvents = (await eventsByCode(code!)).filter((e) =>
-    e.reason?.includes('Skip completed'),
-  )
-  expect(skipEvents.map((e) => e.action)).toEqual([
+  const evs = await eventsByCode(code!)
+  const systemSteps = evs.filter((e) => e.actorSub === 'system').map((e) => e.action)
+  expect(systemSteps).toEqual([
     'sendToAccounting',
     'receiveFromAcc',
     'submitToBop',
@@ -121,5 +120,7 @@ test('Contract: "Skip to Completed" fast-forwards past ACC/BOP', async ({ page }
     'confirmReceivedByDcc2',
     'completeContract',
   ])
-  expect(skipEvents.every((e) => e.actorSub === 'system')).toBe(true)
+  // The skip note is recorded once, only on the final Completed step.
+  const noted = evs.filter((e) => e.reason === 'Skip to Completed')
+  expect(noted.map((e) => e.action)).toEqual(['completeContract'])
 })

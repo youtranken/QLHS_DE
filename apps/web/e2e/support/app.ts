@@ -122,7 +122,7 @@ export async function skipToCompleted(page: Page, documentNo?: string): Promise<
   await expect(dialog).toBeVisible()
   if (documentNo) await dialog.locator('input.mono').first().fill(documentNo)
   await dialog.locator('label.skipbox').click()
-  await dialog.getByRole('button', { name: 'Hoàn tất luôn' }).click()
+  await dialog.getByRole('button', { name: 'Hoàn tất' }).click()
   // Irreversible-action confirm gate (bypasses ACC + BOP).
   await page.getByRole('button', { name: 'Xác nhận hoàn tất' }).click()
   await expect(page.getByRole('dialog')).toHaveCount(0)

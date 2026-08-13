@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { FLOW, ROLE, TICKET_EVENT, TICKET_STATUS } from '@qlhs/contracts'
+import { FLOW, ROLE, SYSTEM_SUB, TICKET_EVENT, TICKET_STATUS } from '@qlhs/contracts'
 import {
   transition,
   IllegalTransitionError,
@@ -90,6 +90,20 @@ describe('transition (AD-2 — the single status writer)', () => {
     expect(() =>
       transition(t, { event: TICKET_EVENT.AndyRequireBop, actor: DCC1, now: NOW }),
     ).toThrow(ReasonRequiredError)
+  })
+
+  it('waives the mandatory reason for the SYSTEM actor (Skip Completed fast-forward)', () => {
+    const t = ticketAt(TICKET_STATUS.ReceivedFromAcc, {
+      flow: FLOW.Contract,
+      currentHolderSub: 'dcc1-a',
+    })
+    const { ticket, event } = transition(t, {
+      event: TICKET_EVENT.SubmitToBop,
+      actor: { sub: SYSTEM_SUB, activeRole: ROLE.Dcc1 },
+      now: NOW,
+    })
+    expect(ticket.status).toBe(TICKET_STATUS.SubmittedToBop)
+    expect(event.reason).toBeUndefined()
   })
 
   it('andyRequireBop with a note advances to Submitted to BOP and records it', () => {

@@ -51,7 +51,7 @@ describe('SendAccountingModal (FR-11 — Document No)', () => {
     )
     // Tick the checkbox — Contract No left blank (optional on the skip path).
     fireEvent.click(screen.getByRole('checkbox'))
-    fireEvent.click(screen.getByRole('button', { name: 'Hoàn tất luôn' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Hoàn tất' }))
     // First click only opens the confirm — nothing posted yet.
     expect(onSkip).not.toHaveBeenCalled()
     expect(onSubmit).not.toHaveBeenCalled()
