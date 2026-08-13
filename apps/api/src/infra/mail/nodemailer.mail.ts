@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import nodemailer, { type Transporter } from 'nodemailer'
 import { MailPort, type Mail } from '../../domain/ports/mail.port'
 import { SmtpResolver, smtpFingerprint, type EffectiveSmtp } from './smtp-resolver'
+import { parseSuppressList, isSuppressed } from './suppress-list'
 
 /** SMTP implementation of MailPort (AD-12). Config comes from the DB (admin UI)
  *  with an env fallback, resolved per send; the transport is cached by config
@@ -9,15 +10,23 @@ import { SmtpResolver, smtpFingerprint, type EffectiveSmtp } from './smtp-resolv
  *  dispatcher never imports nodemailer — only this adapter does. */
 @Injectable()
 export class NodemailerMailPort extends MailPort {
+  private readonly log = new Logger(NodemailerMailPort.name)
   private transport: Transporter | null = null
   private fp = ''
   private from = process.env.SMTP_FROM ?? 'qlhs@pmh.com.vn'
+  private readonly suppress = parseSuppressList(process.env.QLHS_MAIL_SUPPRESS)
 
   constructor(private readonly smtp: SmtpResolver) {
     super()
   }
 
   async send(mail: Mail): Promise<void> {
+    // Bỏ qua trong im lặng (không throw) để dispatcher đánh dấu đã xử lý,
+    // không retry mãi các địa chỉ chủ đích không nhận mail.
+    if (isSuppressed(mail.to, this.suppress)) {
+      this.log.debug(`suppressed mail to ${mail.to} (${mail.subject})`)
+      return
+    }
     const tx = await this.transporter()
     await tx.sendMail({
       from: this.from,
