@@ -29,4 +29,21 @@ describe('mail suppress-list', () => {
     const list = parseSuppressList('a@x.com,, ,b@x.com')
     expect(list.size).toBe(2)
   })
+
+  it('bóc địa chỉ từ dạng "Tên <email>"', () => {
+    const list = parseSuppressList(undefined)
+    expect(isSuppressed('Admin Một <admin1@pmh.com.vn>', list)).toBe(true)
+  })
+
+  it('nhiều người nhận: chỉ chặn khi TẤT CẢ đều bị chặn', () => {
+    const list = parseSuppressList(undefined)
+    expect(isSuppressed('admin1@pmh.com.vn, admin2@pmh.com.vn', list)).toBe(true)
+    // Một người nhận hợp lệ → không bỏ (không nuốt mail của người khác).
+    expect(isSuppressed('admin1@pmh.com.vn, user@pmh.com.vn', list)).toBe(false)
+  })
+
+  it('chuỗi rỗng → không chặn', () => {
+    const list = parseSuppressList(undefined)
+    expect(isSuppressed('', list)).toBe(false)
+  })
 })

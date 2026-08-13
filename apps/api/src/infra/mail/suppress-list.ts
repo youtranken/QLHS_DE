@@ -16,6 +16,21 @@ export function parseSuppressList(raw: string | undefined): Set<string> {
   )
 }
 
+/** Pull the bare address(es) out of a header value that may be wrapped as
+ *  "Name <email>" and may list several comma-separated recipients. */
+export function extractAddresses(to: string): string[] {
+  return to
+    .split(',')
+    .map((part) => {
+      const angled = part.match(/<([^>]+)>/)
+      return (angled ? angled[1]! : part).trim().toLowerCase()
+    })
+    .filter(Boolean)
+}
+
+/** Suppress a send only when it HAS recipients and every one is on the list — a
+ *  mixed send is never silently dropped just because one co-recipient is blocked. */
 export function isSuppressed(to: string, list: Set<string>): boolean {
-  return list.has(to.trim().toLowerCase())
+  const addrs = extractAddresses(to)
+  return addrs.length > 0 && addrs.every((a) => list.has(a))
 }
