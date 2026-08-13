@@ -133,7 +133,7 @@ describe('Applicant fix & resubmit (e2e)', () => {
     expect((await applicant.post(`/tickets/${id}/resubmit`)).status).toBe(201)
     row = await admin.ticket.findUniqueOrThrow({ where: { id } })
     expect(row.status).toBe('Submitted')
-    expect(row.code).toMatch(/^G-\d{4}-0001$/) // mã giữ nguyên (AD-5)
+    expect(row.code).toMatch(/^G-0001-\d{4}$/) // mã giữ nguyên (AD-5)
 
     // Timeline continues — the old sendBack row is still there (append-only).
     const actions = (await admin.ticketEvent.findMany({ where: { ticketId: id } })).map((e) => e.action)

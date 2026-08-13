@@ -72,7 +72,7 @@ describe('General walking skeleton (e2e) — create → pick → confirm → And
 
     const detail = await dcc.get(`/ticket/${id}`)
     expect(detail.body.isClosed).toBe(true)
-    expect(detail.body.code).toMatch(/^G-\d{4}-0001$/)
+    expect(detail.body.code).toMatch(/^G-0001-\d{4}$/)
     expect(detail.body.timeline.map((e: { action: string }) => e.action)).toEqual([
       'created',
       'pool_picked',

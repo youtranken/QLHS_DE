@@ -93,7 +93,7 @@ describe('Reopen / request-reopen / undo (e2e)', () => {
     const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
     expect(row.roundNo).toBe(1)
     expect(row.currentHolderSub).toBe('app-e2e')
-    expect(row.code).toMatch(/^G-\d{4}-0001$/)
+    expect(row.code).toMatch(/^G-0001-\d{4}$/)
     const actions = (await admin.ticketEvent.findMany({ where: { ticketId: id } })).map((e) => e.action)
     expect(actions).toContain('reopen')
     expect(actions).toContain('sendBack')

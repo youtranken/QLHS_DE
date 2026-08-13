@@ -13,11 +13,11 @@ describe('prefixForFlow (PRD §3.3)', () => {
 })
 
 describe('formatCode', () => {
-  it('zero-pads to 4 digits', () => {
-    expect(formatCode('G', 2026, 1)).toBe('G-2026-0001')
-    expect(formatCode('CT', 2026, 42)).toBe('CT-2026-0042')
+  it('zero-pads the sequence to 4 digits, year last', () => {
+    expect(formatCode('G', 2026, 1)).toBe('G-0001-2026')
+    expect(formatCode('CT', 2026, 42)).toBe('CT-0042-2026')
   })
-  it('does not truncate past 4 digits', () => {
-    expect(formatCode('G', 2026, 12345)).toBe('G-2026-12345')
+  it('does not truncate the sequence past 4 digits', () => {
+    expect(formatCode('G', 2026, 12345)).toBe('G-12345-2026')
   })
 })

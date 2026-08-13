@@ -56,7 +56,7 @@ describe('DCC1 confirm-flow + code mint (e2e — AD-5/AD-14)', () => {
   it('mints a code and moves to Submitted to VP Andy', async () => {
     const id = await seedSubmitted()
     const res = await confirm.confirm(id, dcc1, new Date())
-    expect(res.code).toMatch(/^G-\d{4}-0001$/)
+    expect(res.code).toMatch(/^G-0001-\d{4}$/)
     expect(res.status).toBe(TICKET_STATUS.SubmittedToVpAndy)
     const t = await admin.ticket.findUniqueOrThrow({ where: { id } })
     expect(t.code).toBe(res.code)
@@ -91,7 +91,7 @@ describe('DCC1 confirm-flow + code mint (e2e — AD-5/AD-14)', () => {
     await agent.post(`/dcc1/pool/${id}/pick`)
     const res = await agent.post(`/dcc1/pool/${id}/confirm`)
     expect(res.status).toBe(201)
-    expect(res.body.code).toMatch(/^G-\d{4}-0001$/)
+    expect(res.body.code).toMatch(/^G-0001-\d{4}$/)
 
     const other = await seedSubmitted()
     const applicant = request.agent(app.getHttpServer())

@@ -8,9 +8,10 @@ export function prefixForFlow(flow: Flow): string {
   return flow === FLOW.General ? 'G' : 'CT'
 }
 
-/** `G-2026-0001` — 4-digit zero-padded, but never truncated past 4 digits. */
+/** `G-0001-2026` — sequence (4-digit zero-padded, never truncated past 4) then the
+ *  year. Per-(prefix,year) counter, so the year still identifies the run. */
 export function formatCode(prefix: string, year: number, seq: number): string {
-  return `${prefix}-${year}-${String(seq).padStart(4, '0')}`
+  return `${prefix}-${String(seq).padStart(4, '0')}-${year}`
 }
 
 /**

@@ -69,7 +69,7 @@ describe('DCC station board (e2e — AD-17 actions + scope)', () => {
     const dcc1 = await login('d1', ['DCC1'])
     const res = await dcc1.post(`/dcc1/pool/${t.id}/confirm`).expect(201)
     expect(res.body.status).toBe(TICKET_STATUS.SubmittedToVpAndy)
-    expect(res.body.code).toMatch(/^G-\d{4}-\d+$/) // General flow mints a G-<year>-<seq> code
+    expect(res.body.code).toMatch(/^G-\d+-\d{4}$/) // General flow mints a G-<seq>-<year> code
     const after = await admin.ticket.findUnique({ where: { id: t.id } })
     expect(after?.status).toBe(TICKET_STATUS.SubmittedToVpAndy)
     expect(after?.code).toBe(res.body.code)
