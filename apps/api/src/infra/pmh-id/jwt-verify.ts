@@ -31,7 +31,10 @@ export function claimsToUser(payload: JWTPayload): AuthenticatedUser {
   const groups = Array.isArray(payload['groups'])
     ? (payload['groups'] as unknown[]).filter((g): g is string => typeof g === 'string')
     : []
-  const name = payload['name']
+  // PMH ID carries the person's full name under `full_name`; the standard OIDC
+  // `name` claim is a fallback (kept for other IdPs / tokens). Without this the
+  // display name is empty and the UI falls back to the email local-part.
+  const name = payload['full_name'] ?? payload['name']
   const email = payload['email']
   return {
     sub,

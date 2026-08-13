@@ -69,4 +69,13 @@ describe('claimsToUser', () => {
   it('defaults groups to empty when absent', () => {
     expect(claimsToUser({ sub: 'x' }).groups).toEqual([])
   })
+  it('reads the PMH ID full name from `full_name`', () => {
+    expect(claimsToUser({ sub: 'x', full_name: 'Nguyễn Văn A' }).displayName).toBe('Nguyễn Văn A')
+  })
+  it('falls back to the standard `name` claim when `full_name` is absent', () => {
+    expect(claimsToUser({ sub: 'x', name: 'Std Name' }).displayName).toBe('Std Name')
+  })
+  it('prefers `full_name` over `name`', () => {
+    expect(claimsToUser({ sub: 'x', full_name: 'Full', name: 'Std' }).displayName).toBe('Full')
+  })
 })
