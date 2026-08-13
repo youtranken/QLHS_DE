@@ -22,7 +22,7 @@ describe('DetailActions — board actions on the ticket detail', () => {
   it('renders the forward action as the primary button and opens its modal', async () => {
     const d = detail([
       act({ event: 'confirmReceivedByDcc2', label: 'Kiểm tra bản cứng' }),
-      act({ event: 'sendBack', label: 'Trả lại (Return)', reasonRequired: true, toStatus: 'Returned' }),
+      act({ event: 'sendBack', label: 'Trả lại', reasonRequired: true, toStatus: 'Returned' }),
     ])
     render(<DetailActions d={d} onDone={vi.fn().mockResolvedValue(undefined)} />)
 

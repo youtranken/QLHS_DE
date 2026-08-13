@@ -34,7 +34,7 @@ export const closed = {
   csvFilename: 'ho-so-da-dong.csv',
   reopenDone: 'Đã mở lại — hồ sơ trở về Applicant.',
   reopenFailed: 'Mở lại thất bại.',
-  reopenBtnTitle: 'Mở lại sẽ trả hồ sơ về Applicant để đi lại từ đầu — không hoàn tác được.',
+  reopenBtnTitle: 'Mở lại sẽ trả hồ sơ về Applicant để đi vòng mới — không hoàn tác được.',
   reopenBtn: 'Mở lại…',
   reopenModalTitle: 'Mở lại hồ sơ đã đóng',
   reopenModalMessage: 'Mở lại sẽ trả hồ sơ về Applicant đi vòng mới. Không thể hoàn tác. Nêu lý do:',

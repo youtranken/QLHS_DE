@@ -77,11 +77,11 @@ describe('splitActions — nút chính vs ⋯', () => {
 describe('primaryLabel — nhãn nút ngắn', () => {
   it('shortens the long/renamed forward labels', () => {
     expect(primaryLabel(act({ event: '__pick', label: 'Bốc & xử lý' }))).toBe('Nhận')
-    expect(primaryLabel(act({ event: 'andyApproveComplete', label: 'Sếp duyệt → hoàn tất' }))).toBe('Sếp duyệt → hoàn tất')
-    expect(primaryLabel(act({ event: 'andyRequireBop', label: 'Sếp đã duyệt → trình BOP' }))).toBe('Trình BOP')
-    expect(primaryLabel(act({ event: 'sendToAccounting', label: 'Nhập Contract No & gửi Accounting' }))).toBe('Gửi Kế toán…')
+    expect(primaryLabel(act({ event: 'andyApproveComplete', label: 'VP duyệt → hoàn tất' }))).toBe('VP duyệt → hoàn tất')
+    expect(primaryLabel(act({ event: 'andyRequireBop', label: 'Sếp duyệt → trình BOP' }))).toBe('Trình BOP…')
+    expect(primaryLabel(act({ event: 'sendToAccounting', label: 'Nhập Contract No & gửi Accounting' }))).toBe('Gửi Accounting…')
     expect(primaryLabel(act({ event: 'completeContract', label: 'Hoàn tất & đóng hồ sơ' }))).toBe('Hoàn tất')
-    expect(primaryLabel(act({ event: 'submitToBop', label: 'Trình BOP →' }))).toBe('Trình BOP')
+    expect(primaryLabel(act({ event: 'submitToBop', label: 'Trình BOP →' }))).toBe('Trình BOP…')
   })
 
   it('falls back to the server label for everything else', () => {

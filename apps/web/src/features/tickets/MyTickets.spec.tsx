@@ -33,7 +33,7 @@ describe('MyTickets — unseen >24h signal (Story 5.3, UX-DR14)', () => {
     render(<MyTickets reloadKey={0} />)
     await waitFor(() => expect(screen.getByText('G-2026-0001')).toBeInTheDocument())
     // Exactly one row carries the unseen dot; the seen row has none.
-    const dots = screen.getAllByLabelText('Chưa xem quá 24 giờ')
+    const dots = screen.getAllByLabelText('Chưa xem trong hơn 24 giờ')
     expect(dots).toHaveLength(1)
   })
 })

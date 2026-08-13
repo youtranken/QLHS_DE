@@ -53,7 +53,7 @@ export const board = {
     seize: 'Seize',
     priorityHead: 'Change priority (DCC1)',
   },
-  // FR-8 — select multiple tickets at the "Submitted to VP Andy" station to record the Boss's decision at once.
+  // FR-8 — select multiple tickets at the "Submitted to VP Andy" station to record the VP's decision at once.
   bulk: {
     selected: '{n} selected',
     clear: 'Clear selection',
@@ -83,12 +83,12 @@ export const board = {
   // SHORT labels for the primary action button on the card (the ⋯ menu still uses full labels).
   primary: {
     pick: 'Receive',
-    andyComplete: 'Boss approves → complete',
-    andyBop: 'Submit to BOP',
+    andyComplete: 'VP approves → complete',
+    andyBop: 'Submit to BOP…',
     sendAccounting: 'Send to Accounting…',
     confirmHardcopy: 'Confirm',
     completeContract: 'Complete',
-    submitBop: 'Submit to BOP',
+    submitBop: 'Submit to BOP…',
   },
   pause: {
     pauseAction: 'Awaiting supplement (pause SLA)',
@@ -119,9 +119,10 @@ export const board = {
     confirmFailed: 'Could not confirm — the ticket may have changed status.',
     missingReported: 'Missing paperwork reported — ticket returned to DCC1 to reconcile.',
     actionFailed: 'Action failed — the ticket may have changed status.',
-    sentAccPaymentClosed: 'Sent to ACC — Payment ticket closed.',
-    sentAcc: 'Sent to ACC.',
-    receivedFromAcc: 'Received back from ACC.',
+    sentAccPaymentClosed: 'Sent to Accounting — Payment ticket closed.',
+    sentAcc: 'Sent to Accounting.',
+    skippedCompleted: 'Completed now — skipped Accounting/BOP.',
+    receivedFromAcc: 'Received back from Accounting.',
     completed: 'Completed · {code}.',
     undone: 'Undone.',
     undoFailed: 'Could not undo (over 5 seconds or status already changed).',
@@ -150,9 +151,9 @@ export const board = {
       missingConfirmBtn: 'Return to DCC1',
     },
     receiveAcc: {
-      title: 'Receive back from ACC',
-      confirm: 'Received back from ACC',
-      dateLabel: 'Date received from ACC',
+      title: 'Receive back from Accounting',
+      confirm: 'Received back from Accounting',
+      dateLabel: 'Date received from Accounting',
     },
     batchAcc: {
       title: 'Send in bulk — enter {field}',
@@ -175,11 +176,17 @@ export const board = {
       payNoLabel: 'Payment No',
       emptyError: 'Please enter {field}.',
       duplicateError: '{field} "{value}" already exists — enter a different code.',
-      failError: 'Failed to send to ACC — try again.',
-      submit: 'Send to ACC',
+      failError: 'Failed to send to Accounting — try again.',
+      submit: 'Send to Accounting',
       confirmTitle: 'Close Payment ticket?',
-      confirmSubmit: 'Send to ACC & close ticket',
-      confirmMessage: 'Sending to ACC closes the Payment ticket at "Sent to Accounting".',
+      confirmSubmit: 'Send to Accounting & close ticket',
+      confirmMessage: 'Sending to Accounting closes the Payment ticket at "Sent to Accounting".',
+      skipLabel: 'Skip to Completed',
+      skipSubmit: 'Complete now',
+      skipConfirmTitle: 'Complete this ticket now?',
+      skipConfirmMessage:
+        'Skips the Accounting checkpoint and BOP approval, auto-advancing to "Completed". This CANNOT be undone.',
+      skipConfirmSubmit: 'Confirm complete',
     },
   },
 } as const

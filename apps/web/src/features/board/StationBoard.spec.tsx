@@ -48,7 +48,7 @@ const board: BoardColumn[] = [
         lockedByMe: false,
         lockedBy: null,
         actions: [
-          { event: 'sendBack', label: 'Trả lại (Return)', toStatus: 'Returned', reversible: false, reasonRequired: true },
+          { event: 'sendBack', label: 'Trả lại', toStatus: 'Returned', reversible: false, reasonRequired: true },
         ],
       },
     ],
@@ -64,18 +64,18 @@ describe('StationBoard — Return requires a reason (AC1)', () => {
 
   it('aborts the Return when no reason is given (confirm disabled, no API call)', async () => {
     render(<StationBoard />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Trả lại (Return)' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Trả lại' }))
     const dialog = await screen.findByRole('dialog')
-    expect(within(dialog).getByRole('button', { name: 'Trả lại (Return)' })).toBeDisabled()
+    expect(within(dialog).getByRole('button', { name: 'Trả lại' })).toBeDisabled()
     expect(actionCard).not.toHaveBeenCalled()
   })
 
   it('sends the reason to the action endpoint when provided', async () => {
     render(<StationBoard />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Trả lại (Return)' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Trả lại' }))
     const dialog = await screen.findByRole('dialog')
     fireEvent.change(within(dialog).getByRole('textbox'), { target: { value: 'Thiếu chữ ký' } })
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Trả lại (Return)' }))
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Trả lại' }))
     await waitFor(() =>
       expect(actionCard).toHaveBeenCalledWith('t1', 'sendBack', 'Thiếu chữ ký'),
     )
@@ -176,7 +176,7 @@ const choAccBoard: BoardColumn[] = [
         actions: [
           {
             event: 'receiveFromAcc',
-            label: 'Nhận về từ ACC',
+            label: 'Nhận về từ Accounting',
             toStatus: 'Received from ACC',
             reversible: false,
             reasonRequired: false,
@@ -194,9 +194,9 @@ describe('StationBoard — DCC1 Chờ ACC (Story 3.3)', () => {
   it('renders the "Chờ ACC" label and opens the dated receipt modal', async () => {
     render(<StationBoard />)
     expect(await screen.findByText('Chờ ACC')).toBeInTheDocument()
-    fireEvent.click(await screen.findByRole('button', { name: 'Nhận về từ ACC' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Nhận về từ Accounting' }))
     const dialog = await screen.findByRole('dialog')
-    expect(dialog).toHaveTextContent('Nhận về từ ACC')
+    expect(dialog).toHaveTextContent('Nhận về từ Accounting')
   })
 })
 
@@ -326,15 +326,15 @@ describe('StationBoard — Payment send ACC closes at Sent to Accounting (Story 
   it('opens the Document No modal (with H5 note) and routes to the DCC3 endpoint', async () => {
     vi.mocked(sendAccountingDcc3).mockResolvedValue({ status: 'Sent to Accounting' })
     render(<StationBoard />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Gửi Kế toán…' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Gửi Accounting…' }))
     const dialog = await screen.findByRole('dialog')
     // Payment (DCC3) field is labelled "Payment No"; the old warning text is gone.
     expect(dialog).toHaveTextContent('Payment No')
     expect(dialog).not.toHaveTextContent('không email Applicant')
     fireEvent.change(within(dialog).getByRole('textbox'), { target: { value: '26-CC-9-CT' } })
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Gửi ACC' }))
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Gửi Accounting' }))
     // Payment is irreversible → a danger confirm gate appears before the POST.
-    fireEvent.click(await screen.findByRole('button', { name: 'Gửi ACC & đóng hồ sơ' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Gửi Accounting & đóng hồ sơ' }))
     await waitFor(() => expect(sendAccountingDcc3).toHaveBeenCalledWith('p3', '26-CC-9-CT'))
   })
 })

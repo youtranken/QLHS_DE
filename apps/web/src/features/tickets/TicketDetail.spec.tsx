@@ -63,7 +63,7 @@ describe('TicketDetail — read-only deep-link page', () => {
     // Raw technical event keys must never leak to the reader.
     expect(screen.queryByText(/field_changed|missing_paper_cleared|auto_return/)).not.toBeInTheDocument()
     expect(screen.getByText('sửa dữ liệu hồ sơ')).toBeInTheDocument()
-    expect(screen.getByText('đã bàn giao lại (đủ giấy)')).toBeInTheDocument()
+    expect(screen.getByText('đã bàn giao lại (đủ bản cứng)')).toBeInTheDocument()
     // Reopen marks a new round; the auto-return reason is highlighted; system actor named.
     expect(screen.getByText('Bắt đầu vòng mới')).toBeInTheDocument()
     expect(screen.getByText('Lý do trả lại:')).toBeInTheDocument()

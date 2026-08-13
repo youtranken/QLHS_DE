@@ -20,7 +20,7 @@ export const assistant = {
     adminStats: 'Statistics',
     adminPaused: 'SLA paused',
     dccMine: 'My work',
-    dccMap: 'Route map',
+    dccMap: 'Line map',
     unread: 'Unread notifications',
     myTickets: 'My tickets',
     myOpen: 'My open tickets',

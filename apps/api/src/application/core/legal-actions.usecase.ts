@@ -7,16 +7,16 @@ import type { Flow, TicketStatus } from '@qlhs/contracts'
 
 /** VI labels for the actionbar (AD-17 — labels travel with the derived actions). */
 const LABEL: Partial<Record<TicketEvent, string>> = {
-  [TICKET_EVENT.SubmitToAndy]: 'Trình Sếp',
-  [TICKET_EVENT.AndyApproveComplete]: 'Sếp duyệt → hoàn tất',
-  [TICKET_EVENT.AndyRequireBop]: 'Sếp đã duyệt → trình BOP',
+  [TICKET_EVENT.SubmitToAndy]: 'Trình VP',
+  [TICKET_EVENT.AndyApproveComplete]: 'VP duyệt → hoàn tất',
+  [TICKET_EVENT.AndyRequireBop]: 'VP duyệt → trình BOP',
   // BopApprove routes differently per flow (Contract → back to DCC2, General →
   // Completed), so its label is resolved flow-aware in labelFor(), not here.
-  [TICKET_EVENT.SendBack]: 'Trả lại (Return)',
+  [TICKET_EVENT.SendBack]: 'Trả lại',
   [TICKET_EVENT.Cancel]: 'Thu hồi',
-  [TICKET_EVENT.ConfirmReturnReceipt]: 'Xác nhận đã nhận lại',
+  [TICKET_EVENT.ConfirmReturnReceipt]: 'Xác nhận đã nhận lại bản cứng',
   [TICKET_EVENT.Resubmit]: 'Nộp lại',
-  [TICKET_EVENT.Reopen]: 'Mở lại (Reopen)',
+  [TICKET_EVENT.Reopen]: 'Mở lại',
   [TICKET_EVENT.HandoverToDcc2]: 'Chuyển cho DCC2 →',
   // Neutral label: the click opens a check modal where DCC2/DCC3 either confirms
   // receipt OR reports a missing/wrong hardcopy — not a blind "received".
@@ -25,7 +25,7 @@ const LABEL: Partial<Record<TicketEvent, string>> = {
   [TICKET_EVENT.ConfirmReceivedByDcc3]: 'Kiểm tra bản cứng',
   // Flow-aware in labelFor() — this fallback is the Contract wording.
   [TICKET_EVENT.SendToAccounting]: 'Nhập Contract No & gửi Accounting',
-  [TICKET_EVENT.ReceiveFromAcc]: 'Nhận về từ ACC',
+  [TICKET_EVENT.ReceiveFromAcc]: 'Nhận về từ Accounting',
   [TICKET_EVENT.SubmitToBop]: 'Trình BOP →',
   [TICKET_EVENT.CompleteContract]: 'Hoàn tất & đóng hồ sơ',
 }
@@ -48,7 +48,7 @@ function labelFor(event: TicketEvent, flow: Flow): string {
   // so the action label names the right thing per flow.
   if (event === TICKET_EVENT.SendToAccounting) {
     return flow === FLOW.Payment
-      ? 'Nhập Payment number & gửi ACC'
+      ? 'Nhập Payment No & gửi Accounting'
       : 'Nhập Contract No & gửi Accounting'
   }
   return LABEL[event] ?? event

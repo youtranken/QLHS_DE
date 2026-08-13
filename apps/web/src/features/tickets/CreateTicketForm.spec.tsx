@@ -52,7 +52,7 @@ describe('CreateTicketForm — required dropdowns are validated (UX M1)', () => 
     fireEvent.click(screen.getByRole('button', { name: 'Tạo hồ sơ mới' }))
     await screen.findByRole('dialog')
     fireEvent.change(screen.getByLabelText(/Subject/i), { target: { value: 'Bỏ đi' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Huỷ' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Hủy' }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Tạo hồ sơ mới' }))
     await screen.findByRole('dialog')
