@@ -110,8 +110,22 @@ export async function sendToAccounting(page: Page, documentNo: string): Promise<
   const dialog = page.getByRole('dialog')
   await expect(dialog).toBeVisible()
   await dialog.locator('input').first().fill(documentNo)
-  await dialog.getByRole('button', { name: 'Gửi ACC' }).click()
+  await dialog.getByRole('button', { name: 'Gửi Accounting' }).click()
   await expect(dialog).toBeHidden()
+}
+
+/** SendAccountingModal + "Skip to Completed": tick the checkbox and fast-forward
+ *  straight to Completed. documentNo optional — blank stores N/A. Toggling is done
+ *  by clicking the label (the native checkbox is visually hidden). */
+export async function skipToCompleted(page: Page, documentNo?: string): Promise<void> {
+  const dialog = page.getByRole('dialog')
+  await expect(dialog).toBeVisible()
+  if (documentNo) await dialog.locator('input.mono').first().fill(documentNo)
+  await dialog.locator('label.skipbox').click()
+  await dialog.getByRole('button', { name: 'Hoàn tất luôn' }).click()
+  // Irreversible-action confirm gate (bypasses ACC + BOP).
+  await page.getByRole('button', { name: 'Xác nhận hoàn tất' }).click()
+  await expect(page.getByRole('dialog')).toHaveCount(0)
 }
 
 /** Complete a Contract: no scan path anymore — just approve the danger confirm gate

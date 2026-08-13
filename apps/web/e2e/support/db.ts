@@ -47,6 +47,34 @@ export function statusByCode(code: string): Promise<string | null> {
   })
 }
 
+/** Stored contract_no of a ticket by code — a skip with a blank number stores 'N/A'. */
+export function contractNoByCode(code: string): Promise<string | null> {
+  return withClient(async (c) => {
+    const r = await c.query<{ contract_no: string | null }>(
+      'SELECT contract_no FROM ticket WHERE code = $1',
+      [code],
+    )
+    return r.rows[0]?.contract_no ?? null
+  })
+}
+
+/** Audit rows for a ticket, oldest first — used to prove the Skip Completed chain
+ *  wrote every step (append-only, AD-4) attributed to the system. */
+export function eventsByCode(
+  code: string,
+): Promise<{ action: string; actorSub: string; reason: string | null }[]> {
+  return withClient(async (c) => {
+    const r = await c.query<{ action: string; actor_sub: string; reason: string | null }>(
+      `SELECT e.action, e.actor_sub, e.reason
+         FROM ticket_event e JOIN ticket t ON t.id = e.ticket_id
+        WHERE t.code = $1
+        ORDER BY e.occurred_at, e.id`,
+      [code],
+    )
+    return r.rows.map((x) => ({ action: x.action, actorSub: x.actor_sub, reason: x.reason }))
+  })
+}
+
 export function ticketCount(): Promise<number> {
   return withClient(async (c) => {
     const r = await c.query<{ n: string }>('SELECT count(*)::text AS n FROM ticket')

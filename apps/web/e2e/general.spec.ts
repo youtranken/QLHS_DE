@@ -34,9 +34,9 @@ test('General: create → pool pick → confirm → Andy complete', async ({ pag
   await expectStatus(code!, 'Submitted to VP Andy')
 
   // DCC1 records Andy's approval → Completed (irreversible → confirm dialog).
-  await cardAction(page, 'Sếp duyệt → hoàn tất')
+  await cardAction(page, 'VP duyệt → hoàn tất')
   const dialog = page.getByRole('dialog')
-  await dialog.getByRole('button', { name: 'Sếp duyệt → hoàn tất' }).click()
+  await dialog.getByRole('button', { name: 'VP duyệt → hoàn tất' }).click()
   await expect(page.getByRole('status').filter({ hasText: 'Đã thực hiện' })).toBeVisible()
 
   await expectStatus(code!, 'Completed')
