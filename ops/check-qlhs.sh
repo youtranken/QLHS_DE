@@ -103,8 +103,13 @@ else
   wn "$QLHS không phải git repo?"
 fi
 
-hdr "11) Cert cụm"
-if [ -f "$QLHS/pmh.com.vn/fullchain.pem" ]; then ok "pmh.com.vn/fullchain.pem có"; else wn "thiếu pmh.com.vn/fullchain.pem"; fi
+hdr "11) TLS: dựa vào EDGE chung, không cần cert riêng"
+# Model cụm: edge nginx lo TLS bằng cert chung *.pmh.com.vn → QLHS KHÔNG bundle cert.
+# prod.yml đặt NODE_EXTRA_CA_CERTS='' để api tin CA hệ thống. (mục 7 đã xác nhận
+# TLS edge chạy: /api/health qua :8443 = 200.)
+extra=$(docker exec "$(cid api)" printenv NODE_EXTRA_CA_CERTS 2>/dev/null || true)
+if [ -z "$extra" ]; then ok "api không dùng cert riêng (tin CA hệ thống/edge) — đúng model cụm"
+else wn "api NODE_EXTRA_CA_CERTS=$extra (đang bundle cert kiểu máy-lẻ?)"; fi
 
 hdr "12) Đĩa trống (tham khảo)"
 df -h "$QLHS" | awk 'NR==2{printf "  %s trống / %s (dùng %s)\n",$4,$2,$5}'
