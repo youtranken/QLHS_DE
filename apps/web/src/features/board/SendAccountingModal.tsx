@@ -61,7 +61,9 @@ export function SendAccountingModal({
     if (!busy) onClose()
   })
 
-  const skipping = allowSkip && skip
+  // Guard on onSkip too: allowSkip without an onSkip handler must not enter the
+  // skip path (else the confirm's onConfirm would no-op and leave the dialog stuck).
+  const skipping = allowSkip && !!onSkip && skip
 
   function submit() {
     if (busy) return
@@ -142,7 +144,7 @@ export function SendAccountingModal({
               className="mono"
             />
           </div>
-          {allowSkip && (
+          {allowSkip && onSkip && (
             <label className={`skipbox${skip ? ' on' : ''}`}>
               <input
                 type="checkbox"

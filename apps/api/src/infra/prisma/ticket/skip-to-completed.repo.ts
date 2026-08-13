@@ -1,6 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
-import { FLOW, TICKET_EVENT, type Flow, type TicketEvent, type TicketStatus } from '@qlhs/contracts'
+import {
+  FLOW,
+  SYSTEM_SUB,
+  TICKET_EVENT,
+  type Flow,
+  type TicketEvent,
+  type TicketStatus,
+} from '@qlhs/contracts'
 import { PrismaService } from '../prisma.service'
 import {
   DocumentNoDuplicateError,
@@ -74,25 +81,19 @@ export class SkipToCompletedRepo {
           statusEnteredAt: row.status_entered_at,
         }
 
+        // Every step runs as the system (SYSTEM_SUB, shown as "Hệ thống"): the
+        // caller triggers the skip but does not personally perform the ACC/BOP
+        // steps, so the append-only audit must not attribute them to a named user
+        // (AD-4). The triggering DCC2 user is kept as a `skippedBy` breadcrumb in
+        // step-1 meta. Only the FINAL row state is observable, so the ticket row is
+        // written once after the chain (each step still appends its own audit row).
         for (const step of SKIP_TO_COMPLETED_STEPS) {
           const out = transition(state, {
             event: step.event,
-            actor: { sub: actorSub, activeRole: step.role },
+            actor: { sub: SYSTEM_SUB, activeRole: step.role },
             now,
             reason: SKIP_COMPLETED_REASON,
-            meta: metaFor(step.event, storedNumber, now),
-          })
-          const numberColumn =
-            step.event === TICKET_EVENT.SendToAccounting ? { contractNo: storedNumber } : {}
-          await tx.ticket.update({
-            where: { id: ticketId },
-            data: {
-              ...numberColumn,
-              status: out.ticket.status,
-              currentHolderSub: out.ticket.currentHolderSub,
-              roundNo: out.ticket.roundNo,
-              statusEnteredAt: out.ticket.statusEnteredAt,
-            },
+            meta: metaFor(step.event, storedNumber, now, actorSub),
           })
           await tx.ticketEvent.create({
             data: {
@@ -117,6 +118,16 @@ export class SkipToCompletedRepo {
           })
           state = out.ticket
         }
+        await tx.ticket.update({
+          where: { id: ticketId },
+          data: {
+            contractNo: storedNumber,
+            status: state.status,
+            currentHolderSub: state.currentHolderSub,
+            roundNo: state.roundNo,
+            statusEnteredAt: state.statusEnteredAt,
+          },
+        })
         return { status: state.status }
       })
     } catch (e) {
@@ -139,9 +150,12 @@ function metaFor(
   event: TicketEvent,
   storedNumber: string,
   now: Date,
+  skippedBy: string,
 ): Record<string, unknown> | undefined {
   if (event === TICKET_EVENT.SendToAccounting) {
-    return { documentNo: storedNumber, sentToAccountingAt: now.toISOString() }
+    // `skippedBy` = the DCC2 user who triggered the fast-forward (the audit actor
+    // is SYSTEM_SUB; this keeps a trace of who initiated it).
+    return { documentNo: storedNumber, sentToAccountingAt: now.toISOString(), skippedBy }
   }
   if (event === TICKET_EVENT.ReceiveFromAcc) {
     return { receivedFromAccAt: now.toISOString() }
