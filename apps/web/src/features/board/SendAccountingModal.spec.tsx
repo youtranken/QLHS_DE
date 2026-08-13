@@ -16,7 +16,7 @@ describe('SendAccountingModal (FR-11 — Document No)', () => {
     const { onSubmit } = setup()
     // Free-form now — only an empty/whitespace value is rejected.
     fireEvent.change(screen.getByRole('textbox'), { target: { value: '   ' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Gửi ACC' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Gửi Accounting' }))
     expect(onSubmit).not.toHaveBeenCalled()
     expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true')
     expect(screen.getByRole('alert')).toBeInTheDocument()
@@ -25,7 +25,7 @@ describe('SendAccountingModal (FR-11 — Document No)', () => {
   it('submits any non-empty Document No (free-form)', async () => {
     const { onSubmit } = setup()
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'HD-2026/123' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Gửi ACC' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Gửi Accounting' }))
     await waitFor(() => expect(onSubmit).toHaveBeenCalledWith('HD-2026/123'))
   })
 
@@ -33,8 +33,36 @@ describe('SendAccountingModal (FR-11 — Document No)', () => {
     const onSubmit = vi.fn().mockRejectedValue(new ApiClientError(409, 'DocumentNoDuplicate', 'dup'))
     setup(onSubmit)
     fireEvent.change(screen.getByRole('textbox'), { target: { value: '26-CC-99-CT' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Gửi ACC' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Gửi Accounting' }))
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('đã tồn tại'))
+  })
+
+  it('allowSkip: ticking "Skip Completed" gates onSkip behind a danger confirm; empty is allowed', async () => {
+    const onSkip = vi.fn().mockResolvedValue(undefined)
+    const onSubmit = vi.fn().mockResolvedValue(undefined)
+    render(
+      <SendAccountingModal
+        code="CT-2026-0003"
+        allowSkip
+        onSkip={onSkip}
+        onSubmit={onSubmit}
+        onClose={vi.fn()}
+      />,
+    )
+    // Tick the checkbox — Contract No left blank (optional on the skip path).
+    fireEvent.click(screen.getByRole('checkbox'))
+    fireEvent.click(screen.getByRole('button', { name: 'Hoàn tất luôn' }))
+    // First click only opens the confirm — nothing posted yet.
+    expect(onSkip).not.toHaveBeenCalled()
+    expect(onSubmit).not.toHaveBeenCalled()
+    fireEvent.click(await screen.findByRole('button', { name: 'Xác nhận hoàn tất' }))
+    await waitFor(() => expect(onSkip).toHaveBeenCalledWith(''))
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('no Skip checkbox unless allowSkip (Payment/DCC3 never sees it)', () => {
+    setup()
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument()
   })
 
   it('confirmClose (Payment) gates the POST behind a danger confirm (H5), no scary note', async () => {
@@ -53,10 +81,10 @@ describe('SendAccountingModal (FR-11 — Document No)', () => {
     expect(screen.getByText('Payment No')).toBeInTheDocument()
     expect(screen.queryByText(/không thể hoàn tác|không email Applicant/)).not.toBeInTheDocument()
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'PN-2026-02' } })
-    fireEvent.click(screen.getByRole('button', { name: 'Gửi ACC' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Gửi Accounting' }))
     // First click only opens the confirm — no POST yet.
     expect(onSubmit).not.toHaveBeenCalled()
-    fireEvent.click(await screen.findByRole('button', { name: 'Gửi ACC & đóng hồ sơ' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Gửi Accounting & đóng hồ sơ' }))
     await waitFor(() => expect(onSubmit).toHaveBeenCalledWith('PN-2026-02'))
   })
 })

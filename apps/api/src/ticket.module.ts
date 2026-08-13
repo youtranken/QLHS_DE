@@ -31,6 +31,7 @@ import { SendAccountingDcc3UseCase } from './application/accounting/send-account
 import { SubmitToAccountingUseCase } from './application/accounting/submit-to-accounting.usecase'
 import { ReceiveFromAccUseCase } from './application/accounting/receive-from-acc.usecase'
 import { CompleteContractUseCase } from './application/accounting/complete-contract.usecase'
+import { SkipToCompletedUseCase } from './application/accounting/skip-to-completed.usecase'
 import { CheckDocumentNosUseCase } from './application/accounting/check-document-nos.usecase'
 import { ReturnFromPushbackUseCase } from './application/returns/return-from-pushback.usecase'
 import { UndoActionUseCase } from './application/board/undo-action.usecase'
@@ -53,6 +54,7 @@ import { UserRoleRepo } from './infra/prisma/users/user-role.repo'
 import { HandoverRepo } from './infra/prisma/ticket/handover.repo'
 import { AccountingRepo } from './infra/prisma/ticket/accounting.repo'
 import { CompleteContractRepo } from './infra/prisma/ticket/complete-contract.repo'
+import { SkipToCompletedRepo } from './infra/prisma/ticket/skip-to-completed.repo'
 import { LockRepo } from './infra/prisma/ticket/lock.repo'
 import { SlaRepo } from './infra/prisma/sla/sla.repo'
 import { ConfirmFlowRepo } from './infra/prisma/ticket/confirm-flow.repo'
@@ -124,6 +126,7 @@ import { DispatchController } from './http/dispatch/dispatch.controller'
     SubmitToAccountingUseCase,
     ReceiveFromAccUseCase,
     CompleteContractUseCase,
+    SkipToCompletedUseCase,
     CheckDocumentNosUseCase,
     ReturnFromPushbackUseCase,
     UndoActionUseCase,
@@ -147,6 +150,7 @@ import { DispatchController } from './http/dispatch/dispatch.controller'
     HandoverRepo,
     AccountingRepo,
     CompleteContractRepo,
+    SkipToCompletedRepo,
     LockRepo,
     SlaRepo,
     ConfirmFlowRepo,

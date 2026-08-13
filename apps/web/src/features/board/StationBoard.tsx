@@ -85,7 +85,7 @@ export function StationBoard({
   const {
     handover, sendAcc, receiveAcc, ask, inFlight,
     setHandover, setSendAcc, setReceiveAcc, setAsk,
-    run, doSeize, doReceive, doMissing, doSendAcc, doReceiveAcc,
+    run, doSeize, doReceive, doMissing, doSendAcc, doSkip, doReceiveAcc,
     doBatch,
   } = useBoardActions(load)
 
@@ -303,6 +303,7 @@ export function StationBoard({
         doReceive={doReceive}
         doMissing={doMissing}
         doSendAcc={doSendAcc}
+        doSkip={doSkip}
         doReceiveAcc={doReceiveAcc}
         onReload={load}
       />

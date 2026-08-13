@@ -105,6 +105,13 @@ export const receiveFromAcc = (id: string, receivedAt?: string) =>
   )
 export const completeContract = (id: string) =>
   apiPost<{ status: string }>(`/dcc2/tickets/${id}/complete`)
+/** DCC2 "Skip Completed" (Contract): fast-forward straight to Completed, running
+ *  ACC + BOP steps server-side. Contract No optional — blank stores N/A. */
+export const skipToCompleted = (id: string, documentNo?: string) =>
+  apiPost<{ status: string }>(
+    `/dcc2/tickets/${id}/skip-to-completed`,
+    documentNo ? { documentNo } : {},
+  )
 export const returnPushback = (id: string, reason: string) =>
   apiPost<{ status: string }>(`/dcc1/tickets/${id}/return-pushback`, { reason })
 

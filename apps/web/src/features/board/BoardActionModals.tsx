@@ -18,6 +18,7 @@ export interface BoardActionModalsProps {
   doReceive: (c: BoardCard, receivedAt: string) => Promise<void>
   doMissing: (c: BoardCard, reason: string) => Promise<void>
   doSendAcc: (c: BoardCard, documentNo: string) => Promise<void>
+  doSkip: (c: BoardCard, documentNo: string) => Promise<void>
   doReceiveAcc: (c: BoardCard, receivedAt: string) => Promise<void>
   /** Refetch after a failed confirm so the surface reflects the true state. */
   onReload: () => Promise<void>
@@ -32,7 +33,7 @@ export interface BoardActionModalsProps {
 export function BoardActionModals({
   handover, sendAcc, receiveAcc, ask,
   setHandover, setSendAcc, setReceiveAcc, setAsk,
-  doReceive, doMissing, doSendAcc, doReceiveAcc, onReload,
+  doReceive, doMissing, doSendAcc, doSkip, doReceiveAcc, onReload,
 }: BoardActionModalsProps) {
   return (
     <>
@@ -54,7 +55,9 @@ export function BoardActionModals({
           }
           confirmClose={sendAcc.flow === 'Payment'}
           uppercase
+          allowSkip={sendAcc.flow !== 'Payment'}
           onSubmit={(docNo) => doSendAcc(sendAcc, docNo)}
+          onSkip={(docNo) => doSkip(sendAcc, docNo)}
           onClose={() => setSendAcc(null)}
         />
       )}

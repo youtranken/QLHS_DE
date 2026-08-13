@@ -12,6 +12,7 @@ import {
   seizeCard,
   sendAccounting,
   sendAccountingDcc3,
+  skipToCompleted,
   undoCard,
   type BoardCard,
   type LegalAction,
@@ -121,6 +122,15 @@ export function useBoardActions(load: () => Promise<void>) {
     await (card.flow === 'Payment' ? sendAccountingDcc3 : sendAccounting)(card.id, documentNo)
     setSendAcc(null)
     toast.ok(card.flow === 'Payment' ? t('board.toasts.sentAccPaymentClosed') : t('board.toasts.sentAcc'))
+    await load()
+  }
+
+  // "Skip Completed" (Contract/DCC2 only): fast-forward past ACC/BOP to Completed.
+  // Errors propagate so the modal shows the 409 duplicate / fail alert (like doSendAcc).
+  async function doSkip(card: BoardCard, documentNo: string) {
+    await skipToCompleted(card.id, documentNo || undefined)
+    setSendAcc(null)
+    toast.ok(t('board.toasts.skippedCompleted'))
     await load()
   }
 
@@ -237,7 +247,7 @@ export function useBoardActions(load: () => Promise<void>) {
   return {
     handover, sendAcc, receiveAcc, ask, inFlight,
     setHandover, setSendAcc, setReceiveAcc, setAsk,
-    run: guardedRun, doSeize, doReceive, doMissing, doSendAcc, doReceiveAcc,
+    run: guardedRun, doSeize, doReceive, doMissing, doSendAcc, doSkip, doReceiveAcc,
     doBatch,
   }
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { Check, X } from 'lucide-react'
 import { ApiClientError } from '../../shared/api-client'
 import { ConfirmModal } from '../../shared/ConfirmModal'
 import { useFocusTrap } from '../../shared/useFocusTrap'
@@ -19,13 +19,20 @@ export interface SendAccountingModalProps {
   /** Both Contract No (DCC2) and Payment No (DCC3) are normalised to uppercase as you
    *  type, matching the server (MED-2) so the field shows exactly what is stored. */
   uppercase?: boolean
+  /** DCC2/Contract only: show the "Skip Completed" checkbox. When ticked the ticket
+   *  fast-forwards past ACC + BOP straight to Completed and Contract No is optional. */
+  allowSkip?: boolean
+  /** Called instead of onSubmit when "Skip Completed" is ticked (value may be ''). */
+  onSkip?: (documentNo: string) => Promise<void>
 }
 
 /**
  * DCC2/DCC3 entry of the contract/payment number before sending to Accounting
  * (FR-11) — the field label is flow-aware (see `docLabel`). Empty is blocked
  * client-side (aria-invalid + role=alert); the server's DB UNIQUE index is the
- * real guard — a 409 duplicate is surfaced in the same alert.
+ * real guard — a 409 duplicate is surfaced in the same alert. With `allowSkip`,
+ * a "Skip Completed" checkbox lets DCC2 fast-forward a Contract to Completed
+ * (ACC/BOP run server-side) behind an irreversible-action confirm.
  */
 export function SendAccountingModal({
   code,
@@ -33,6 +40,8 @@ export function SendAccountingModal({
   onClose,
   confirmClose = false,
   uppercase = false,
+  allowSkip = false,
+  onSkip,
   // Default keeps standalone usage sensible; StationBoard overrides it per flow.
   docLabel = t('board.modals.sendAccounting.docNoLabel'),
 }: SendAccountingModalProps) {
@@ -43,14 +52,27 @@ export function SendAccountingModal({
   // Payment closes the ticket for good at "Sent to Accounting" (confirmClose) — gate
   // it behind an explicit danger confirm instead of a passive warning line (H5).
   const [confirming, setConfirming] = useState(false)
+  // "Skip Completed" — bypasses ACC/BOP straight to Completed; makes Contract No
+  // optional and routes submit through its own irreversible-action confirm.
+  const [skip, setSkip] = useState(false)
+  const [skipConfirming, setSkipConfirming] = useState(false)
   // A drag-select ending on the overlay must not throw away the typed value.
   const backdrop = useBackdropClose(() => {
     if (!busy) onClose()
   })
 
+  const skipping = allowSkip && skip
+
   function submit() {
     if (busy) return
     const value = documentNo.trim()
+    // Skip path: Contract No is optional (blank → server stores N/A), so no empty
+    // guard — just confirm the irreversible fast-forward.
+    if (skipping) {
+      setError(null)
+      setSkipConfirming(true)
+      return
+    }
     if (value === '') {
       setError(t('board.modals.sendAccounting.emptyError', { field: docLabel }))
       return
@@ -64,12 +86,13 @@ export function SendAccountingModal({
     void doSubmit(value)
   }
 
-  async function doSubmit(value: string) {
+  async function run(value: string, action: (v: string) => Promise<void>) {
     setConfirming(false)
+    setSkipConfirming(false)
     setBusy(true)
     setError(null)
     try {
-      await onSubmit(value)
+      await action(value)
     } catch (e) {
       setError(
         e instanceof ApiClientError && e.code === 'DocumentNoDuplicate'
@@ -79,6 +102,8 @@ export function SendAccountingModal({
       setBusy(false)
     }
   }
+
+  const doSubmit = (value: string) => run(value, onSubmit)
 
   const invalid = error !== null
   return (
@@ -102,7 +127,7 @@ export function SendAccountingModal({
         <div className="mb">
           <div className="field">
             <label htmlFor="send-acc-docno">
-              {docLabel} <span className="req">*</span>
+              {docLabel} {!skipping && <span className="req">*</span>}
             </label>
             <input
               id="send-acc-docno"
@@ -111,12 +136,28 @@ export function SendAccountingModal({
                 setDocumentNo(uppercase ? e.target.value.toUpperCase() : e.target.value)
                 if (error) setError(null)
               }}
-              aria-required="true"
+              aria-required={!skipping}
               aria-invalid={invalid}
               aria-describedby={invalid ? 'send-acc-error' : undefined}
               className="mono"
             />
           </div>
+          {allowSkip && (
+            <label className={`skipbox${skip ? ' on' : ''}`}>
+              <input
+                type="checkbox"
+                checked={skip}
+                onChange={(e) => {
+                  setSkip(e.target.checked)
+                  if (error) setError(null)
+                }}
+              />
+              <span className="skipbox-box" aria-hidden>
+                <Check size={13} strokeWidth={3} />
+              </span>
+              <span className="skipbox-ttl">{t('board.modals.sendAccounting.skipLabel')}</span>
+            </label>
+          )}
           {invalid && (
             <p id="send-acc-error" role="alert" className="err">
               {error}
@@ -128,8 +169,15 @@ export function SendAccountingModal({
             {t('board.modals.cancel')}
           </button>
           <span className="sp" />
-          <button type="button" className="btn primary" disabled={busy} onClick={submit}>
-            {t('board.modals.sendAccounting.submit')}
+          <button
+            type="button"
+            className={`btn ${skipping ? 'warnfill' : 'primary'}`}
+            disabled={busy}
+            onClick={submit}
+          >
+            {skipping
+              ? t('board.modals.sendAccounting.skipSubmit')
+              : t('board.modals.sendAccounting.submit')}
           </button>
         </div>
       </div>
@@ -142,6 +190,17 @@ export function SendAccountingModal({
           confirmLabel={t('board.modals.sendAccounting.confirmSubmit')}
           onConfirm={() => doSubmit(documentNo.trim())}
           onCancel={() => setConfirming(false)}
+        />
+      )}
+      {skipConfirming && (
+        <ConfirmModal
+          title={t('board.modals.sendAccounting.skipConfirmTitle')}
+          message={t('board.modals.sendAccounting.skipConfirmMessage')}
+          code={code}
+          danger
+          confirmLabel={t('board.modals.sendAccounting.skipConfirmSubmit')}
+          onConfirm={() => onSkip && run(documentNo.trim(), onSkip)}
+          onCancel={() => setSkipConfirming(false)}
         />
       )}
     </div>

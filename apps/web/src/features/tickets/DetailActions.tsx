@@ -22,7 +22,7 @@ export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Pr
   const {
     handover, sendAcc, receiveAcc, ask, inFlight,
     setHandover, setSendAcc, setReceiveAcc, setAsk,
-    run, doReceive, doMissing, doSendAcc, doReceiveAcc,
+    run, doReceive, doMissing, doSendAcc, doSkip, doReceiveAcc,
   } = useBoardActions(onDone)
 
   // Reopen is closed-lookup-only: it runs its own /reopen endpoint (reopen → sendBack,
@@ -118,6 +118,7 @@ export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Pr
         doReceive={doReceive}
         doMissing={doMissing}
         doSendAcc={doSendAcc}
+        doSkip={doSkip}
         doReceiveAcc={doReceiveAcc}
         onReload={onDone}
       />

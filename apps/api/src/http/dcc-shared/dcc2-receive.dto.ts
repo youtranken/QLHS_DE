@@ -21,3 +21,12 @@ export class SendAccountingDto {
 /** DCC2 complete: confirming closes the Contract + emails the Applicant. No file
  *  and no scan path — DCC2 scans on their own; the app only records completion. */
 export class CompleteContractDto {}
+
+/** DCC2 "Skip Completed": fast-forward straight to Completed. Contract No is
+ *  OPTIONAL — omitted/blank stores 'N/A' — so the field may be empty here. */
+export class SkipToCompletedDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(DOCUMENT_NO_MAX)
+  documentNo?: string
+}
