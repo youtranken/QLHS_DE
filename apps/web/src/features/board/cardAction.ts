@@ -8,6 +8,7 @@ import {
   resendDcc3,
   resumeSla,
   returnPushback,
+  sendAccounting,
   type BoardCard,
   type LegalAction,
 } from './api'
@@ -61,8 +62,16 @@ export function makeCardAction({
         setHandover(card) // open the 2-phase modal instead of a blind transition
         return
       } else if (action.event === 'sendToAccounting') {
-        setSendAcc(card) // open the Document No entry form
-        return
+        // Loại luồng Contract KHÔNG cần số & KHÔNG cho skip (VD: VO, Annex) → gửi
+        // thẳng, không popup (server lưu contract_no = 'N/A'). Các trường hợp còn lại
+        // (cần số / cho skip / Payment) mở popup để nhập số hoặc tick Skip.
+        if (card.flow !== 'Payment' && !card.requiresContractNo && !card.allowSkip) {
+          await sendAccounting(card.id, '')
+          toast.ok(t('board.toasts.sentAcc'))
+        } else {
+          setSendAcc(card)
+          return
+        }
       } else if (action.event === 'receiveFromAcc') {
         setReceiveAcc(card) // open the dated receipt modal
         return

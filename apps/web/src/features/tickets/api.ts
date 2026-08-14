@@ -83,6 +83,10 @@ export interface TicketDetail {
   amount: string | null
   currency: string | null
   roundNo: number
+  /** Ga Received by DCC2 (chỉ loại luồng Contract) — quyết định popup Gửi Accounting:
+   *  requiresContractNo → ô Contract No bắt buộc; allowSkip → checkbox Skip. */
+  requiresContractNo: boolean
+  allowSkip: boolean
   overdueDays: number
   dwellDays: number
   isClosed: boolean

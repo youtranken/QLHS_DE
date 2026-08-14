@@ -1,10 +1,19 @@
 import { describe, it, expect, vi } from 'vitest'
 import { SkipToCompletedUseCase } from './skip-to-completed.usecase'
 
-function make() {
+function make(caps: { allowSkip: boolean } = { allowSkip: true }) {
   const skip = vi.fn().mockResolvedValue({ status: 'Completed' })
   const clock = { now: () => new Date('2026-08-13T00:00:00.000Z') }
-  const uc = new SkipToCompletedUseCase({ skip } as never, clock as never)
+  const tickets = { findById: vi.fn().mockResolvedValue({ id: 't1', documentType: 'Budget' }) }
+  const options = {
+    docTypeCapabilities: vi.fn().mockResolvedValue({ requiresContractNo: false, allowSkip: caps.allowSkip }),
+  }
+  const uc = new SkipToCompletedUseCase(
+    { skip } as never,
+    tickets as never,
+    options as never,
+    clock as never,
+  )
   return { uc, skip }
 }
 
@@ -32,5 +41,11 @@ describe('SkipToCompletedUseCase', () => {
     await expect(uc.execute({ ticketId: 't1', actorSub: 'u1' })).resolves.toEqual({
       status: 'Completed',
     })
+  })
+
+  it('loại KHÔNG bật allowSkip → chặn (không gọi repo)', async () => {
+    const { uc, skip } = make({ allowSkip: false })
+    await expect(uc.execute({ ticketId: 't1', actorSub: 'u1' })).rejects.toThrow()
+    expect(skip).not.toHaveBeenCalled()
   })
 })

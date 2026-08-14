@@ -104,7 +104,11 @@
 }
 .field.bad input,
 .field.bad input:focus,
-.field.bad .fsel-trigger {
+.field.bad .fsel-trigger,
+/* Popup động (vd Gửi Accounting) đánh dấu lỗi qua aria-invalid, không bọc .field.bad
+   — viền + quầng đỏ để "chưa nhập" nhận biết ngay. */
+.field input[aria-invalid='true'],
+.field input[aria-invalid='true']:focus {
   border-color: var(--sla);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--sla) 20%, transparent);
 }
@@ -210,6 +214,13 @@
   color: var(--urgent);
   background: var(--urgent-soft);
 }
+/* Nhắc cho loại chỉ-Skip (không có ô Contract No): giải thích không tick vẫn gửi. */
+.skiphint {
+  margin: 0 0 4px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-3);
+}
 /* "Skip Completed" toggle — a custom-drawn checkbox row (the native box is hidden).
    Whole row is the label so the entire chip is clickable. */
 .skipbox {
@@ -278,8 +289,11 @@
 .modal .mf .sp {
   margin-left: auto;
 }
-.modal .err {
+/* `.modal .mb .err` (0,3,0) chứ không phải `.modal .err` — để THẮNG rule
+   `.modal .mb > p` (var(--ink-2)) vốn tô xám chữ lỗi <p> trong thân modal. */
+.modal .mb .err {
   color: var(--sla);
   font-size: 11.5px;
+  font-weight: 600;
   margin: 8px 0 0;
 }

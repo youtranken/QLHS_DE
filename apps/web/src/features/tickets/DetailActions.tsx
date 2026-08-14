@@ -41,6 +41,8 @@ export function DetailActions({ d, onDone }: { d: TicketDetail; onDone: () => Pr
     flow: d.flow,
     status: d.status,
     roundNo: d.roundNo,
+    requiresContractNo: d.requiresContractNo,
+    allowSkip: d.allowSkip,
     overdueDays: d.overdueDays,
     lockedByMe: false,
     lockedBy: null,

@@ -182,6 +182,7 @@ export const board = {
       confirmSubmit: 'Send to Accounting & close ticket',
       confirmMessage: 'Sending to Accounting closes the Payment ticket at "Sent to Accounting".',
       skipLabel: 'Skip to Completed',
+      skipOnlyHint: 'This document type needs no Contract No. Tick Skip to complete; leave it unticked to send to Accounting as usual.',
       skipSubmit: 'Complete',
       skipConfirmTitle: 'Complete this ticket now?',
       skipConfirmMessage:

@@ -6,6 +6,7 @@ import {
 import { TicketQueryRepo } from '../../infra/prisma/ticket/ticket-query.repo'
 import { SlaRepo } from '../../infra/prisma/sla/sla.repo'
 import { LockRepo } from '../../infra/prisma/ticket/lock.repo'
+import { OptionRepo, type DocTypeCapabilities } from '../../infra/prisma/admin/option.repo'
 import { SystemClock } from '../../infra/clock/system-clock'
 import { roleFlows } from '../../domain/dispatch/role-flows'
 import { stationsForRole } from '../../domain/dispatch/station-columns'
@@ -29,6 +30,11 @@ export interface BoardCard {
    *  "Skip to Completed" is offered only on round 0 (a re-entered Contract already
    *  carries a real Contract No a blank skip would clobber). */
   roundNo: number
+  /** Cờ ga Received by DCC2 (chỉ loại luồng Contract) — web quyết định popup ở đây:
+   *  requiresContractNo → ô Contract No bắt buộc; allowSkip → checkbox Skip. Cả hai
+   *  tắt → gửi thẳng, không popup. */
+  requiresContractNo: boolean
+  allowSkip: boolean
   overdueDays: number
   lockedByMe: boolean
   lockedBy: string | null
@@ -103,7 +109,10 @@ export class StationBoardUseCase {
     private readonly clock: SystemClock,
     private readonly dupes: ScanDuplicatesUseCase,
     private readonly slaClock: SlaClock,
+    private readonly options: OptionRepo,
   ) {}
+
+  private static readonly NO_CAPS: DocTypeCapabilities = { requiresContractNo: false, allowSkip: false }
 
   async execute(role: Role | null, viewerSub: string): Promise<BoardColumn[]> {
     const flows = roleFlows(role)
@@ -116,6 +125,11 @@ export class StationBoardUseCase {
     const clock = await this.slaClock.forRows(all, now)
     // One threshold snapshot for the whole board instead of a findUnique per card.
     const thresholdOf = makeThresholdOf(await this.sla.list())
+    // One capability snapshot (Contract doc types) instead of a lookup per card —
+    // skip the query entirely for a board whose role never sees Contract (e.g. DCC3).
+    const capsMap = flows.includes(FLOW.Contract)
+      ? await this.options.contractCapabilityMap()
+      : new Map<string, DocTypeCapabilities>()
     // A reconcile-flagged ticket (missing paper OR pushed back for Return) has
     // bounced off DCC2's board into DCC1's reconcile lane below — drop it here.
     const inLane = (r: (typeof all)[number], status: TicketStatus) =>
@@ -128,7 +142,7 @@ export class StationBoardUseCase {
         )
         const cards = await Promise.all(
           at.map((r) =>
-            this.toCard(r, status, viewerSub, now, clock, thresholdOf, () =>
+            this.toCard(r, status, viewerSub, now, clock, thresholdOf, capsMap, () =>
               actionsFor(status, role, r.flow as Flow),
             ),
           ),
@@ -138,7 +152,7 @@ export class StationBoardUseCase {
     )
 
     await this.attachDupHints(columnsOut, all)
-    const reconcile = await this.reconcileLane(role, all, viewerSub, now, clock, thresholdOf)
+    const reconcile = await this.reconcileLane(role, all, viewerSub, now, clock, thresholdOf, capsMap)
     return reconcile ? [...columnsOut, reconcile] : columnsOut
   }
 
@@ -163,6 +177,7 @@ export class StationBoardUseCase {
     now: Date,
     clock: Map<string, ClockState>,
     thresholdOf: (status: string, flow: string) => number | null,
+    capsMap: Map<string, DocTypeCapabilities>,
   ): Promise<BoardColumn | null> {
     if (role !== ROLE.Dcc1 && role !== ROLE.Admin) return null
     const flagged = sortPool(
@@ -173,7 +188,7 @@ export class StationBoardUseCase {
     const cards = await Promise.all(
       flagged.map(async (r) => {
         const actions = reconcileActions(r.flow as Flow)
-        const card = await this.toCard(r, r.status as TicketStatus, viewerSub, now, clock, thresholdOf, () => actions)
+        const card = await this.toCard(r, r.status as TicketStatus, viewerSub, now, clock, thresholdOf, capsMap, () => actions)
         return { ...card, reconcileComment: comments.get(r.id) ?? null }
       }),
     )
@@ -193,12 +208,14 @@ export class StationBoardUseCase {
     now: Date,
     clock: Map<string, ClockState>,
     thresholdOf: (status: string, flow: string) => number | null,
+    capsMap: Map<string, DocTypeCapabilities>,
     actionsOf: (lockedByMe: boolean) => LegalAction[],
   ): Promise<BoardCard> {
     const threshold = thresholdOf(status, r.flow)
     const lk = await this.lock.get(r.id)
     const live = lk !== null && lk.expiresAt.getTime() > now.getTime()
     const lockedByMe = live && lk?.holderSub === viewerSub
+    const caps = (r.documentType && capsMap.get(r.documentType)) || StationBoardUseCase.NO_CAPS
     return {
       id: r.id,
       code: r.code,
@@ -208,6 +225,8 @@ export class StationBoardUseCase {
       flow: r.flow,
       status,
       roundNo: r.roundNo,
+      requiresContractNo: caps.requiresContractNo,
+      allowSkip: caps.allowSkip,
       overdueDays: overdueDays(startOf(clock, r), threshold, now),
       paused: clock.get(r.id)?.paused ?? false,
       mine: r.currentHolderSub === viewerSub,

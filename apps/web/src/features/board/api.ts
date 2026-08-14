@@ -31,6 +31,11 @@ export interface BoardCard {
    *  Optional on the client: the board always sends it; a synthesized card (detail)
    *  may omit it, in which case skip stays hidden (safe default). */
   roundNo?: number
+  /** Ga Received by DCC2 (chỉ loại luồng Contract): requiresContractNo → popup ô
+   *  Contract No bắt buộc; allowSkip → checkbox Skip. Cả hai tắt → gửi thẳng, không
+   *  popup. Optional trên client (mặc định false → như luồng cũ, an toàn). */
+  requiresContractNo?: boolean
+  allowSkip?: boolean
   overdueDays: number
   lockedByMe: boolean
   lockedBy: string | null

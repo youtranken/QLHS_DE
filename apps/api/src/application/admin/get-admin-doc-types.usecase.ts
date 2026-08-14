@@ -11,6 +11,9 @@ export interface AdminDocType {
   active: boolean
   /** Số hồ sơ đang tham chiếu loại này — 0 mới cho xoá hẳn, >0 thì chỉ ẩn được. */
   usedBy: number
+  /** Hai cờ ga Received by DCC2 — chỉ có nghĩa với luồng Contract (bảng ma trận). */
+  requiresContractNo: boolean
+  allowSkip: boolean
 }
 export interface AdminDocTypeGroup {
   flow: string
@@ -29,7 +32,14 @@ export class GetAdminDocTypesUseCase {
       flow,
       types: rows
         .filter((r) => r.flow === flow)
-        .map((r) => ({ id: r.id, value: r.value, active: r.active, usedBy: usage[r.value] ?? 0 })),
+        .map((r) => ({
+          id: r.id,
+          value: r.value,
+          active: r.active,
+          usedBy: usage[r.value] ?? 0,
+          requiresContractNo: r.requiresContractNo,
+          allowSkip: r.allowSkip,
+        })),
     })).filter((g) => g.types.length > 0)
   }
 }

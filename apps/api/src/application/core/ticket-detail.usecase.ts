@@ -11,6 +11,7 @@ import {
 } from '@qlhs/contracts'
 import { TicketQueryRepo } from '../../infra/prisma/ticket/ticket-query.repo'
 import { SlaRepo } from '../../infra/prisma/sla/sla.repo'
+import { OptionRepo } from '../../infra/prisma/admin/option.repo'
 import { TicketViewRepo } from '../../infra/prisma/ticket/ticket-view.repo'
 import { UserDirectoryRepo } from '../../infra/prisma/users/user-directory.repo'
 import { SystemClock } from '../../infra/clock/system-clock'
@@ -73,6 +74,11 @@ export interface TicketDetail {
   currency: string | null
   currentHolderSub: string | null
   roundNo: number
+  /** Cờ ga Received by DCC2 (chỉ loại luồng Contract) — web quyết định popup Gửi
+   *  Accounting: requiresContractNo → ô Contract No bắt buộc; allowSkip → checkbox
+   *  Skip. Cả hai tắt → gửi thẳng, không popup. */
+  requiresContractNo: boolean
+  allowSkip: boolean
   statusEnteredAt: string
   overdueDays: number
   dwellDays: number
@@ -122,6 +128,7 @@ export class TicketDetailUseCase {
     private readonly clock: SystemClock,
     private readonly slaClock: SlaClock,
     private readonly pauses: SlaPauseRepo,
+    private readonly options: OptionRepo,
   ) {}
 
   async execute(
@@ -153,6 +160,12 @@ export class TicketDetailUseCase {
       })
     }
     const threshold = await this.sla.threshold(t.status, t.flow)
+    // Two DCC2-station flags — only meaningful on Contract flow, so non-Contract
+    // details skip the option_item lookup (it would always resolve to false/false).
+    const caps =
+      t.flow === FLOW.Contract && t.documentType
+        ? await this.options.docTypeCapabilities(t.documentType)
+        : { requiresContractNo: false, allowSkip: false }
     const clock = await this.slaClock.forOne(t, now)
     const events = await this.tickets.timeline(t.id)
     const pauseRows = await this.pauses.listForTicket(t.id)
@@ -195,6 +208,8 @@ export class TicketDetailUseCase {
       currency: t.currency,
       currentHolderSub: t.currentHolderSub,
       roundNo: t.roundNo,
+      requiresContractNo: caps.requiresContractNo,
+      allowSkip: caps.allowSkip,
       statusEnteredAt: t.statusEnteredAt.toISOString(),
       overdueDays: overdueDays(clock.enteredAt, threshold, now),
       dwellDays: dwellDays(clock.enteredAt, now),

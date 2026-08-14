@@ -183,6 +183,7 @@ export const board = {
       confirmSubmit: 'Gửi Accounting & đóng hồ sơ',
       confirmMessage: 'Gửi Accounting sẽ đóng hồ sơ Payment ở "Sent to Accounting".',
       skipLabel: 'Skip to Completed',
+      skipOnlyHint: 'Loại hồ sơ này không cần Contract No. Tick Skip để hoàn tất; không tick vẫn gửi Accounting bình thường.',
       skipSubmit: 'Hoàn tất',
       skipConfirmTitle: 'Hoàn tất hồ sơ?',
       skipConfirmMessage:

@@ -16,9 +16,9 @@ function groups(): AdminDocTypeGroup[] {
     {
       flow: 'Payment',
       types: [
-        { id: 'p1', value: 'Payment', active: true, usedBy: 3 },
-        { id: 'p2', value: 'Payment request', active: true, usedBy: 0 },
-        { id: 'p3', value: 'Advance request', active: false, usedBy: 0 },
+        { id: 'p1', value: 'Payment', active: true, usedBy: 3, requiresContractNo: false, allowSkip: false },
+        { id: 'p2', value: 'Payment request', active: true, usedBy: 0, requiresContractNo: false, allowSkip: false },
+        { id: 'p3', value: 'Advance request', active: false, usedBy: 0, requiresContractNo: false, allowSkip: false },
       ],
     },
   ]

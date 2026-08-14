@@ -36,6 +36,7 @@ import { GetDocumentTypesUseCase } from '../../application/admin/get-document-ty
 import { AddDocumentTypeUseCase } from '../../application/admin/add-document-type.usecase'
 import { GetAdminDocTypesUseCase } from '../../application/admin/get-admin-doc-types.usecase'
 import { SetDocTypeActiveUseCase } from '../../application/admin/set-doc-type-active.usecase'
+import { SetDocTypeCapabilitiesUseCase } from '../../application/admin/set-doc-type-capabilities.usecase'
 import { DeleteDocTypeUseCase } from '../../application/admin/delete-doc-type.usecase'
 import { SearchDirectoryUseCase } from '../../application/admin/search-directory.usecase'
 import { ListSlaPausesUseCase } from '../../application/sla/list-sla-pauses.usecase'
@@ -88,6 +89,7 @@ import { ProcessedWebhookEventRepo } from '../../infra/prisma/webhook/processed-
     AddDocumentTypeUseCase,
     GetAdminDocTypesUseCase,
     SetDocTypeActiveUseCase,
+    SetDocTypeCapabilitiesUseCase,
     DeleteDocTypeUseCase,
     UpdateOptionUseCase,
     SearchDirectoryUseCase,

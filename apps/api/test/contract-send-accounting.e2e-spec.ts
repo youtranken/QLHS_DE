@@ -36,7 +36,30 @@ describe('Contract Document No + send to Accounting (e2e)', () => {
     await admin.ticketLock.deleteMany({})
     await admin.ticketEvent.deleteMany({})
     await admin.ticket.deleteMany({})
+    // Self-provision the catalog rows this suite reads (admin-doc-types.e2e wipes
+    // option_item wholesale): Contract requires a Document No, VO does not.
+    await seedDocType('Contract', { requiresContractNo: true })
+    await seedDocType('VO', {})
+    await seedDocType('Budget', { allowSkip: true })
   })
+
+  async function seedDocType(
+    value: string,
+    caps: { requiresContractNo?: boolean; allowSkip?: boolean },
+  ): Promise<void> {
+    const data = {
+      kind: 'documentType',
+      value,
+      flow: 'Contract',
+      requiresContractNo: caps.requiresContractNo ?? false,
+      allowSkip: caps.allowSkip ?? false,
+    }
+    await admin.optionItem.upsert({
+      where: { kind_value: { kind: 'documentType', value } },
+      create: data,
+      update: { flow: data.flow, requiresContractNo: data.requiresContractNo, allowSkip: data.allowSkip },
+    })
+  }
 
   async function login(sub: string, roles: string[]): Promise<Agent> {
     const agent = request.agent(app.getHttpServer())
@@ -44,12 +67,15 @@ describe('Contract Document No + send to Accounting (e2e)', () => {
     return agent
   }
 
-  /** A Contract ticket already at `Received by DCC2`. */
-  async function receivedByDcc2(code: string): Promise<string> {
+  /** A Contract ticket already at `Received by DCC2`. Defaults to documentType
+   *  'Contract' (seeded requires_contract_no=true) so the Document No is mandatory;
+   *  pass another type (e.g. 'VO') to exercise the no-number path. */
+  async function receivedByDcc2(code: string, documentType = 'Contract'): Promise<string> {
     const t = await admin.ticket.create({
       data: {
         status: 'Received by DCC2',
         flow: 'Contract',
+        documentType,
         applicantSub: 'app-e2e',
         currentHolderSub: 'dcc2-e2e',
         priority: 'normal',
@@ -96,6 +122,35 @@ describe('Contract Document No + send to Accounting (e2e)', () => {
     expect(res.status).toBe(400)
     const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
     expect(row.status).toBe('Received by DCC2') // unchanged
+  })
+
+  it('loại KHÔNG yêu cầu số (VO) + để trống → gửi thẳng, contract_no = N/A (201)', async () => {
+    const dcc2 = await login('dcc2-e2e', ['DCC2'])
+    const id = await receivedByDcc2('CT-2026-0009', 'VO')
+    const res = await dcc2.post(`/dcc2/tickets/${id}/send-accounting`).send({ documentNo: '' })
+    expect(res.status).toBe(201)
+    expect(res.body.status).toBe('Submitted to Accounting')
+    const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
+    expect(row.contractNo).toBe('N/A')
+  })
+
+  it('Skip to Completed: loại bật allowSkip (Budget) → chạy thẳng tới Completed', async () => {
+    const dcc2 = await login('dcc2-e2e', ['DCC2'])
+    const id = await receivedByDcc2('CT-2026-0010', 'Budget')
+    const res = await dcc2.post(`/dcc2/tickets/${id}/skip-to-completed`).send({})
+    expect(res.status).toBe(201)
+    expect(res.body.status).toBe('Completed')
+    const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
+    expect(row.status).toBe('Completed')
+  })
+
+  it('Skip to Completed: loại KHÔNG bật allowSkip (Contract) → chặn (400, không đổi trạng thái)', async () => {
+    const dcc2 = await login('dcc2-e2e', ['DCC2'])
+    const id = await receivedByDcc2('CT-2026-0011', 'Contract')
+    const res = await dcc2.post(`/dcc2/tickets/${id}/skip-to-completed`).send({})
+    expect(res.status).toBe(400)
+    const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
+    expect(row.status).toBe('Received by DCC2')
   })
 
   it('duplicate Document No across two tickets → exactly one 409 (DB UNIQUE)', async () => {

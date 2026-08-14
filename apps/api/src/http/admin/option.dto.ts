@@ -36,3 +36,15 @@ export class SetDocTypeActiveDto {
   @IsBoolean()
   active!: boolean
 }
+
+/** Bật/tắt hai cờ khả năng của loại luồng Contract (bảng ma trận). Cả hai optional
+ *  — client gửi cờ nào thì đổi cờ đó (checkbox độc lập). */
+export class SetDocTypeCapabilitiesDto {
+  @IsOptional()
+  @IsBoolean()
+  requiresContractNo?: boolean
+
+  @IsOptional()
+  @IsBoolean()
+  allowSkip?: boolean
+}

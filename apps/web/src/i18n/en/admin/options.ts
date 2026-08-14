@@ -49,7 +49,7 @@ export const adminOptions = {
   confirmOffLabel: 'Disable value',
   docTypes: {
     title: 'Document Type',
-    hint: 'Add a new type with its processing flow (A/B/C). Hide it to drop it from the create form (existing tickets keep it); hard-delete only when no ticket uses it.',
+    hint: 'Add a new type with its processing flow (A/B/C). Hide it to drop it from the create form (existing tickets keep it); hard-delete only when no ticket uses it. The Contract flow is a table: tick “Contract No” to require a number when sending to Accounting; tick “Skip” to allow a quick complete (no Accounting).',
     namePlaceholder: 'New type name (e.g. Annex 2)',
     flowLabel: 'Flow',
     addBtn: 'Add type',
@@ -72,5 +72,14 @@ export const adminOptions = {
     confirmDeleteTitle: 'Delete document type',
     confirmDeleteMessage: 'Permanently remove this type from the catalog. Allowed because no ticket uses it. Continue?',
     confirmDeleteLabel: 'Delete',
+    matrix: {
+      type: 'Type',
+      contractNo: 'Contract No',
+      skip: 'Skip',
+      used: 'Used',
+      actions: 'Actions',
+      contractNoAria: 'Require Contract No for {value}',
+      skipAria: 'Allow Skip to Completed for {value}',
+    },
   },
 } as const

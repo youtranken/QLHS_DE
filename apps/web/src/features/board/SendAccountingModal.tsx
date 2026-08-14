@@ -19,6 +19,10 @@ export interface SendAccountingModalProps {
   /** Both Contract No (DCC2) and Payment No (DCC3) are normalised to uppercase as you
    *  type, matching the server (MED-2) so the field shows exactly what is stored. */
   uppercase?: boolean
+  /** Loại luồng Contract có bật `requiresContractNo` (hoặc Payment) → hiện ô nhập số
+   *  và bắt buộc. Loại chỉ-Skip (không yêu cầu số) → ẩn ô, chỉ còn checkbox Skip;
+   *  không tick vẫn "Gửi Accounting" bình thường (server lưu 'N/A'). */
+  requireDocNo?: boolean
   /** DCC2/Contract only: show the "Skip Completed" checkbox. When ticked the ticket
    *  fast-forwards past ACC + BOP straight to Completed and Contract No is optional. */
   allowSkip?: boolean
@@ -40,6 +44,7 @@ export function SendAccountingModal({
   onClose,
   confirmClose = false,
   uppercase = false,
+  requireDocNo = true,
   allowSkip = false,
   onSkip,
   // Default keeps standalone usage sensible; StationBoard overrides it per flow.
@@ -75,7 +80,7 @@ export function SendAccountingModal({
       setSkipConfirming(true)
       return
     }
-    if (value === '') {
+    if (requireDocNo && value === '') {
       setError(t('board.modals.sendAccounting.emptyError', { field: docLabel }))
       return
     }
@@ -127,23 +132,29 @@ export function SendAccountingModal({
           </button>
         </div>
         <div className="mb">
-          <div className="field">
-            <label htmlFor="send-acc-docno">
-              {docLabel} {!skipping && <span className="req">*</span>}
-            </label>
-            <input
-              id="send-acc-docno"
-              value={documentNo}
-              onChange={(e) => {
-                setDocumentNo(uppercase ? e.target.value.toUpperCase() : e.target.value)
-                if (error) setError(null)
-              }}
-              aria-required={!skipping}
-              aria-invalid={invalid}
-              aria-describedby={invalid ? 'send-acc-error' : undefined}
-              className="mono"
-            />
-          </div>
+          {requireDocNo && (
+            <div className="field">
+              <label htmlFor="send-acc-docno">
+                {docLabel} {!skipping && <span className="req">*</span>}
+              </label>
+              <input
+                id="send-acc-docno"
+                value={documentNo}
+                onChange={(e) => {
+                  setDocumentNo(uppercase ? e.target.value.toUpperCase() : e.target.value)
+                  if (error) setError(null)
+                }}
+                aria-required={!skipping}
+                aria-invalid={invalid}
+                aria-describedby={invalid ? 'send-acc-error' : undefined}
+                className="mono"
+              />
+            </div>
+          )}
+          {/* Loại chỉ-Skip không có ô số → nhắc rõ hành vi: không tick vẫn gửi Accounting. */}
+          {!requireDocNo && (
+            <p className="skiphint">{t('board.modals.sendAccounting.skipOnlyHint')}</p>
+          )}
           {allowSkip && onSkip && (
             <label className={`skipbox${skip ? ' on' : ''}`}>
               <input

@@ -153,6 +153,9 @@ export interface AdminDocType {
   active: boolean
   /** Số hồ sơ đang dùng — 0 mới xoá hẳn được, >0 chỉ ẩn được. */
   usedBy: number
+  /** Hai cờ ga Received by DCC2 — chỉ có nghĩa với loại luồng Contract (bảng ma trận). */
+  requiresContractNo: boolean
+  allowSkip: boolean
 }
 export interface AdminDocTypeGroup {
   flow: string
@@ -165,6 +168,11 @@ export const setDocTypeActive = (id: string, active: boolean) =>
   apiPatch<{ id: string }>(`/admin/document-types/${id}`, { active })
 /** Xoá hẳn — chỉ khi chưa hồ sơ nào dùng (BE chặn usedBy>0). */
 export const deleteDocType = (id: string) => apiDelete<{ ok: true }>(`/admin/document-types/${id}`)
+/** Bật/tắt hai cờ khả năng (Contract No · Skip) — chỉ loại luồng Contract (bảng ma trận). */
+export const setDocTypeCapabilities = (
+  id: string,
+  patch: { requiresContractNo?: boolean; allowSkip?: boolean },
+) => apiPatch<{ id: string }>(`/admin/document-types/${id}/capabilities`, patch)
 export const updateOption = (id: string, patch: { value?: string; active?: boolean }) =>
   apiPatch<{ id: string }>(`/admin/options/${id}`, patch)
 

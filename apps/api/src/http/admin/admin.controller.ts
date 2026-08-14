@@ -33,13 +33,20 @@ import {
   type AdminDocTypeGroup,
 } from '../../application/admin/get-admin-doc-types.usecase'
 import { SetDocTypeActiveUseCase } from '../../application/admin/set-doc-type-active.usecase'
+import { SetDocTypeCapabilitiesUseCase } from '../../application/admin/set-doc-type-capabilities.usecase'
 import { DeleteDocTypeUseCase } from '../../application/admin/delete-doc-type.usecase'
 import { SearchDirectoryUseCase, type DirectoryMatch } from '../../application/admin/search-directory.usecase'
 import { ListSlaPausesUseCase, type SlaPauseReport } from '../../application/sla/list-sla-pauses.usecase'
 import { GetAnalyticsUseCase, type AnalyticsData } from '../../application/admin/get-analytics.usecase'
 import { ExportAnalyticsUseCase } from '../../application/admin/export-analytics.usecase'
 import { isOptionKind, type OptionRow } from '../../infra/prisma/admin/option.repo'
-import { AddDocumentTypeDto, CreateOptionDto, SetDocTypeActiveDto, UpdateOptionDto } from './option.dto'
+import {
+  AddDocumentTypeDto,
+  CreateOptionDto,
+  SetDocTypeActiveDto,
+  SetDocTypeCapabilitiesDto,
+  UpdateOptionDto,
+} from './option.dto'
 import { AnalyticsQueryDto, AnalyticsExportDto } from './analytics-query.dto'
 import { GetCurrentUser, type CurrentUser } from '../auth/current-user'
 import { SetRolesDto } from './set-roles.dto'
@@ -66,6 +73,7 @@ export class AdminController {
     private readonly addDocType: AddDocumentTypeUseCase,
     private readonly getAdminDocTypes: GetAdminDocTypesUseCase,
     private readonly setDocTypeActive: SetDocTypeActiveUseCase,
+    private readonly setDocTypeCapabilities: SetDocTypeCapabilitiesUseCase,
     private readonly deleteDocType: DeleteDocTypeUseCase,
     private readonly searchDirectory: SearchDirectoryUseCase,
     private readonly listPauses: ListSlaPausesUseCase,
@@ -109,6 +117,18 @@ export class AdminController {
     @Body() dto: SetDocTypeActiveDto,
   ): Promise<OptionRow> {
     return this.setDocTypeActive.execute(id, dto.active)
+  }
+
+  /** Bật/tắt hai cờ khả năng (Contract No · Skip) — chỉ loại luồng Contract (bảng ma trận). */
+  @Patch('document-types/:id/capabilities')
+  setDocTypeCapabilitiesEndpoint(
+    @Param('id') id: string,
+    @Body() dto: SetDocTypeCapabilitiesDto,
+  ): Promise<OptionRow> {
+    return this.setDocTypeCapabilities.execute(id, {
+      requiresContractNo: dto.requiresContractNo,
+      allowSkip: dto.allowSkip,
+    })
   }
 
   /** Xoá HẲN một document type — chỉ khi chưa hồ sơ nào dùng (use-case chặn usedBy>0). */

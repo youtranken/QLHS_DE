@@ -29,6 +29,8 @@ function detailAt(status: string): TicketDetail {
     amount: '1000',
     currency: 'VND',
     roundNo: 0,
+    requiresContractNo: false,
+    allowSkip: false,
     overdueDays: 0,
     dwellDays: 1,
     isClosed: false,

@@ -1,20 +1,24 @@
 import { useCallback, useEffect, useState } from 'react'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { Eye, EyeOff, MoreHorizontal, Plus, Trash2 } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { FLOW } from '@qlhs/contracts'
 import {
   addDocumentType,
   deleteDocType,
   getAdminDocTypes,
   setDocTypeActive,
+  setDocTypeCapabilities,
   type AdminDocType,
   type AdminDocTypeGroup,
 } from './api'
+import { ContractMatrix } from './ContractMatrix'
+import { DocTypeRowMenu } from './DocTypeRowMenu'
 import { ConfirmModal } from '../../shared/ConfirmModal'
 import { StateNotice } from '../../shared/StateNotice'
 import { Select } from '../../shared/Select'
 import { toast } from '../../shared/toast'
 import { t } from '../../i18n'
+
+type CapKey = 'requiresContractNo' | 'allowSkip'
 
 const FLOWS: readonly string[] = Object.values(FLOW)
 
@@ -71,6 +75,17 @@ export function AdminDocTypes() {
     }
   }
 
+  async function toggleCap(d: AdminDocType, key: CapKey, next: boolean) {
+    try {
+      await setDocTypeCapabilities(d.id, { [key]: next })
+      await load()
+    } catch {
+      toast.err(t('adminOptions.docTypes.actionErr'))
+      // Reload to snap the checkbox back to the server truth after a failed toggle.
+      await load()
+    }
+  }
+
   async function doDelete(d: AdminDocType) {
     try {
       await deleteDocType(d.id)
@@ -111,6 +126,19 @@ export function AdminDocTypes() {
       {groups?.map((g) => {
         const visible = g.types.filter((d) => showHidden || d.active)
         if (visible.length === 0) return null
+        // Luồng Contract → bảng ma trận (2 cột cờ) để quản lý gọn khi danh mục phình
+        // to; General/Payment giữ dạng chip (không có 2 cờ này).
+        if (g.flow === FLOW.Contract) {
+          return (
+            <ContractMatrix
+              key={g.flow}
+              types={visible}
+              onToggleCap={toggleCap}
+              onToggleActive={toggleActive}
+              onRequestDelete={setConfirmDelete}
+            />
+          )
+        }
         return (
           <div key={g.flow} className="dt-group">
             <span className="dt-flow" lang="en">
@@ -130,42 +158,7 @@ export function AdminDocTypes() {
                     ·{d.usedBy}
                   </span>
                   {!d.active && <span className="dt-off-pill">{t('adminOptions.docTypes.hiddenChip')}</span>}
-                  <DropdownMenu.Root>
-                    <DropdownMenu.Trigger asChild>
-                      <button
-                        type="button"
-                        className="dt-menu-btn"
-                        aria-label={t('adminOptions.docTypes.menuAria', { value: d.value })}
-                      >
-                        <MoreHorizontal size={14} aria-hidden />
-                      </button>
-                    </DropdownMenu.Trigger>
-                    <DropdownMenu.Portal>
-                      {/* Keep focus on the modal that opens from a menu item — let Confirm-
-                          Modal's own autofocus win instead of Radix returning it to the ⋯. */}
-                      <DropdownMenu.Content
-                        className="dt-menu"
-                        align="end"
-                        sideOffset={4}
-                        onCloseAutoFocus={(e) => e.preventDefault()}
-                      >
-                        <DropdownMenu.Item className="dt-mi" onSelect={() => void toggleActive(d)}>
-                          {d.active ? <EyeOff size={14} aria-hidden /> : <Eye size={14} aria-hidden />}
-                          {t(d.active ? 'adminOptions.docTypes.hide' : 'adminOptions.docTypes.unhide')}
-                        </DropdownMenu.Item>
-                        {d.usedBy === 0 ? (
-                          <DropdownMenu.Item className="dt-mi danger" onSelect={() => setConfirmDelete(d)}>
-                            <Trash2 size={14} aria-hidden />
-                            {t('adminOptions.docTypes.delete')}
-                          </DropdownMenu.Item>
-                        ) : (
-                          <DropdownMenu.Label className="dt-mi-note">
-                            {t('adminOptions.docTypes.deleteBlocked', { n: d.usedBy })}
-                          </DropdownMenu.Label>
-                        )}
-                      </DropdownMenu.Content>
-                    </DropdownMenu.Portal>
-                  </DropdownMenu.Root>
+                  <DocTypeRowMenu d={d} onToggleActive={toggleActive} onRequestDelete={setConfirmDelete} />
                 </span>
               ))}
             </span>

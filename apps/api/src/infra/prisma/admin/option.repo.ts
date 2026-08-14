@@ -13,8 +13,16 @@ export interface OptionRow {
   kind: string
   value: string
   flow: string | null
+  requiresContractNo: boolean
+  allowSkip: boolean
   sortOrder: number
   active: boolean
+}
+
+/** Hai cờ khả năng ở ga Received by DCC2, chỉ áp cho documentType luồng Contract. */
+export interface DocTypeCapabilities {
+  requiresContractNo: boolean
+  allowSkip: boolean
 }
 
 /** Document Type sống trong cùng bảng option_item nhưng mang thêm `flow` (luồng
@@ -118,6 +126,40 @@ export class OptionRepo {
       where: { kind_value: { kind: DOC_TYPE_KIND, value } },
     })
     return row && row.active ? row.flow : null
+  }
+
+  /** Hai cờ khả năng của một document type — chỉ có nghĩa với luồng Contract; loại
+   *  khác (hoặc không tìm thấy) trả false/false. Dùng cho board-card + ticket-detail
+   *  để web biết ga Received by DCC2 hiện popup/checkbox nào. */
+  async docTypeCapabilities(value: string): Promise<DocTypeCapabilities> {
+    const row = await this.prisma.optionItem.findUnique({
+      where: { kind_value: { kind: DOC_TYPE_KIND, value } },
+    })
+    if (!row || row.flow !== 'Contract') return { requiresContractNo: false, allowSkip: false }
+    return { requiresContractNo: row.requiresContractNo, allowSkip: row.allowSkip }
+  }
+
+  /** Map value→capabilities cho MỌI loại luồng Contract — board dựng MỘT lần thay
+   *  vì findUnique mỗi card. Loại vắng mặt = không phải Contract → mặc định false. */
+  async contractCapabilityMap(): Promise<Map<string, DocTypeCapabilities>> {
+    const rows = await this.prisma.optionItem.findMany({
+      where: { kind: DOC_TYPE_KIND, flow: 'Contract' },
+      select: { value: true, requiresContractNo: true, allowSkip: true },
+    })
+    return new Map(
+      rows.map((r) => [r.value, { requiresContractNo: r.requiresContractNo, allowSkip: r.allowSkip }]),
+    )
+  }
+
+  /** Bật/tắt cờ khả năng cho một document type luồng Contract (admin, bảng ma trận).
+   *  Trả null nếu id không phải documentType luồng Contract → controller báo 400. */
+  async setDocTypeCapabilities(
+    id: string,
+    patch: Partial<DocTypeCapabilities>,
+  ): Promise<OptionRow | null> {
+    const row = await this.prisma.optionItem.findUnique({ where: { id } })
+    if (!row || row.kind !== DOC_TYPE_KIND || row.flow !== 'Contract') return null
+    return this.prisma.optionItem.update({ where: { id }, data: patch })
   }
 
   /** Loại ĐÃ BỊ ẨN (row tồn tại nhưng active=false) — để FlowResolver phân biệt với

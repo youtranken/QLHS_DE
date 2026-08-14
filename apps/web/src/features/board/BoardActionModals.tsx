@@ -55,7 +55,13 @@ export function BoardActionModals({
           }
           confirmClose={sendAcc.flow === 'Payment'}
           uppercase
-          allowSkip={sendAcc.flow !== 'Payment' && sendAcc.roundNo === 0}
+          requireDocNo={sendAcc.flow === 'Payment' || !!sendAcc.requiresContractNo}
+          // Skip là tuỳ chọn của loại luồng Contract có cờ allowSkip. Với loại chỉ-Skip
+          // (không yêu cầu số) skip an toàn ở mọi vòng; loại cả-hai-cờ vẫn giới hạn
+          // round 0 vì skip có ghi số thật mà hồ sơ quay lại đã mang số.
+          allowSkip={
+            !!sendAcc.allowSkip && (!sendAcc.requiresContractNo || sendAcc.roundNo === 0)
+          }
           onSubmit={(docNo) => doSendAcc(sendAcc, docNo)}
           onSkip={(docNo) => doSkip(sendAcc, docNo)}
           onClose={() => setSendAcc(null)}

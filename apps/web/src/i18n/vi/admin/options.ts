@@ -49,7 +49,7 @@ export const adminOptions = {
   confirmOffLabel: 'Tắt giá trị',
   docTypes: {
     title: 'Document Type',
-    hint: 'Thêm loại mới kèm luồng xử lý (A/B/C). Ẩn để gỡ khỏi form tạo hồ sơ (hồ sơ cũ vẫn giữ); xoá hẳn chỉ được khi chưa hồ sơ nào dùng.',
+    hint: 'Thêm loại mới kèm luồng xử lý (A/B/C). Ẩn để gỡ khỏi form tạo hồ sơ (hồ sơ cũ vẫn giữ); xoá hẳn chỉ được khi chưa hồ sơ nào dùng. Luồng Contract ở dạng bảng: tick “Contract No” = bắt buộc nhập số khi gửi Accounting; tick “Skip” = cho phép hoàn tất nhanh (không trình Accounting).',
     namePlaceholder: 'Tên loại mới (vd: Phụ lục 2)',
     flowLabel: 'Luồng',
     addBtn: 'Thêm loại',
@@ -72,5 +72,14 @@ export const adminOptions = {
     confirmDeleteTitle: 'Xoá loại hồ sơ',
     confirmDeleteMessage: 'Xoá hẳn loại này khỏi danh mục. Chỉ làm được vì chưa hồ sơ nào dùng. Tiếp tục?',
     confirmDeleteLabel: 'Xoá',
+    matrix: {
+      type: 'Loại',
+      contractNo: 'Contract No',
+      skip: 'Skip',
+      used: 'Dùng',
+      actions: 'Thao tác',
+      contractNoAria: 'Yêu cầu Contract No cho {value}',
+      skipAria: 'Cho phép Skip to Completed cho {value}',
+    },
   },
 } as const

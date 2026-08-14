@@ -57,6 +57,10 @@ export class SkipToCompletedRepo {
     now: Date,
   ): Promise<{ status: string }> {
     const storedNumber = documentNo.toUpperCase()
+    // Loại chỉ-Skip (allowSkip, không yêu cầu Contract No) đóng với sentinel 'N/A':
+    // KHÔNG ghi đè contract_no và BỎ ràng buộc round-0 — ràng buộc đó chỉ để bảo vệ
+    // số thật khi hồ sơ quay lại; loại này chưa từng có số nên vô hại ở mọi vòng.
+    const numberless = storedNumber === 'N/A'
     try {
       return await this.prisma.$transaction(async (tx) => {
         const rows = await tx.$queryRaw<TicketRow[]>`
@@ -75,9 +79,11 @@ export class SkipToCompletedRepo {
         if (row.status !== TICKET_STATUS.ReceivedByDcc2) {
           throw new IllegalTransitionError('Skip chỉ dùng ở bước "Received by DCC2"')
         }
-        // Round-0 only: a re-entered ticket (heavy return) already carries a real
-        // Contract No from a prior round — a blank skip would overwrite it with N/A.
-        if (row.round_no !== 0) {
+        // Round-0 only WHEN a real number is written: a re-entered ticket (heavy
+        // return) already carries a real Contract No from a prior round that a blank
+        // skip would clobber. Numberless skip (loại chỉ-Skip) carries no number, so
+        // it's safe at any round.
+        if (!numberless && row.round_no !== 0) {
           throw new IllegalTransitionError('Skip chỉ dùng cho hồ sơ vòng đầu (hồ sơ đã quay lại đã có số)')
         }
 
@@ -134,7 +140,9 @@ export class SkipToCompletedRepo {
         await tx.ticket.update({
           where: { id: ticketId },
           data: {
-            contractNo: storedNumber,
+            // Numberless skip preserves whatever contract_no already holds ('N/A' for
+            // these types) — writing it would clobber a real number on a re-entry.
+            ...(numberless ? {} : { contractNo: storedNumber }),
             status: state.status,
             currentHolderSub: state.currentHolderSub,
             roundNo: state.roundNo,

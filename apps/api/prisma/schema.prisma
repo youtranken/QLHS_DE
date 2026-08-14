@@ -262,6 +262,13 @@ model OptionItem {
   /// Chỉ dùng cho kind='documentType': luồng xử lý của loại này (General/Contract/
   /// Payment) — thay mapFlow hardcode. Null với các danh mục khác.
   flow      String?
+  /// Chỉ có nghĩa với documentType luồng Contract — hai khả năng độc lập ở ga
+  /// "Received by DCC2" (admin bật/tắt trong bảng ma trận): requiresContractNo =
+  /// popup bắt buộc nhập Contract No; allowSkip = hiện checkbox "Skip to Completed"
+  /// (không tick vẫn đi Accounting bình thường). Loại không bật cờ nào → gửi thẳng,
+  /// contract_no giữ 'N/A'. Các danh mục/luồng khác luôn false.
+  requiresContractNo Boolean @default(false) @map("requires_contract_no")
+  allowSkip          Boolean @default(false) @map("allow_skip")
   sortOrder Int      @default(0) @map("sort_order")
   active    Boolean  @default(true)
   createdAt DateTime @default(now()) @map("created_at")

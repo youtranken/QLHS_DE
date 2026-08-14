@@ -202,7 +202,14 @@ export function StationBoard({
           const shown = col.cards.filter(match)
           // Received-by-DCC2/DCC3 columns: each card needs its own Contract No /
           // Payment No, so offer a batch-entry sheet instead of a one-action bulk.
-          const batchCards = shown.filter((c) => c.actions.some((a) => a.event === 'sendToAccounting'))
+          // Only types that REQUIRE a number belong here (Payment always does; Contract
+          // only when requiresContractNo). No-number / Skip Contract types have no number
+          // to type in bulk — they use the per-card action (gửi thẳng / checkbox Skip).
+          const batchCards = shown.filter(
+            (c) =>
+              c.actions.some((a) => a.event === 'sendToAccounting') &&
+              (c.flow === 'Payment' || c.requiresContractNo),
+          )
           // Cards in this column the DCC1 can bulk-select; drives the "select all" chip.
           const selectableCards = canBulk && !col.reconcile ? shown.filter((c) => c.actions.some(isBulkable)) : []
           // One "select all" per bulk family — the Andy column splits General vs
