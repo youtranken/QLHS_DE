@@ -67,7 +67,9 @@ export function Select({
   )
   const firstSelectable = (list: SelectOption[]) => list.findIndex((o) => !o.header)
 
-  const { refs, floatingStyles } = useAnchoredMenu(open, { matchWidth: true, maxHeight: 300 })
+  // Cap thấp (≈6 dòng + ô lọc) để dropdown danh mục dài (Project/Team) vừa trong
+  // popup, không tràn xuống dưới modal — dài thì lọc/cuộn trong hộp.
+  const { refs, floatingStyles } = useAnchoredMenu(open, { matchWidth: true, maxHeight: 248 })
 
   // Open → focus the filter (if any) and point `active` at the current value.
   useEffect(() => {
