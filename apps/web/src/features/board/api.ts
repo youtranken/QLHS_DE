@@ -23,6 +23,10 @@ export interface BoardCard {
   id: string
   code: string | null
   contractor: string | null
+  /** Loại hồ sơ — batch DCC3 hiện cột "Loại"; optional (card tổng hợp có thể thiếu). */
+  documentType?: string | null
+  /** Contract No applicant nhập lúc tạo (tham chiếu, luồng Payment) — batch DCC3 hiện kèm. */
+  contractNo?: string | null
   amount: string | null
   priority: string
   flow: string

@@ -41,6 +41,8 @@ describe('Contract Document No + send to Accounting (e2e)', () => {
     await seedDocType('Contract', { requiresContractNo: true })
     await seedDocType('VO', {})
     await seedDocType('Budget', { allowSkip: true })
+    // Service Contract dùng CẢ hai cờ: bắt buộc số + cho Skip → Completed kèm số thật.
+    await seedDocType('Service Contract', { requiresContractNo: true, allowSkip: true })
   })
 
   async function seedDocType(
@@ -151,6 +153,26 @@ describe('Contract Document No + send to Accounting (e2e)', () => {
     expect(res.status).toBe(400)
     const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
     expect(row.status).toBe('Received by DCC2')
+  })
+
+  it('Service Contract (cả 2 cờ): Skip mà bỏ trống số → chặn (400, chưa đổi trạng thái)', async () => {
+    const dcc2 = await login('dcc2-e2e', ['DCC2'])
+    const id = await receivedByDcc2('CT-2026-0012', 'Service Contract')
+    const res = await dcc2.post(`/dcc2/tickets/${id}/skip-to-completed`).send({})
+    expect(res.status).toBe(400)
+    const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
+    expect(row.status).toBe('Received by DCC2')
+  })
+
+  it('Service Contract (cả 2 cờ): Skip kèm số → Completed và giữ đúng số', async () => {
+    const dcc2 = await login('dcc2-e2e', ['DCC2'])
+    const id = await receivedByDcc2('CT-2026-0013', 'Service Contract')
+    const res = await dcc2.post(`/dcc2/tickets/${id}/skip-to-completed`).send({ documentNo: 'SC-2026-1' })
+    expect(res.status).toBe(201)
+    expect(res.body.status).toBe('Completed')
+    const row = await admin.ticket.findUniqueOrThrow({ where: { id } })
+    expect(row.status).toBe('Completed')
+    expect(row.contractNo).toBe('SC-2026-1')
   })
 
   it('duplicate Document No across two tickets → exactly one 409 (DB UNIQUE)', async () => {

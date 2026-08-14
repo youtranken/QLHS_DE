@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { DOCUMENT_TYPE_GROUPS } from '@qlhs/contracts'
-import { groupAmount } from '../../shared/format'
+import { groupAmountComma } from '../../shared/format'
 import { getDocumentTypes, getOptions, type CreateTicketBody, type DocTypeGroup } from './api'
 import { Select, type SelectOption } from '../../shared/Select'
 import { toast } from '../../shared/toast'
@@ -195,13 +195,13 @@ export function TicketFieldsFieldset({
           Amount (100,000) $ (If not-Pls, write 0) <span className="req">*</span>
         </label>
         <div className="amtrow">
-          {/* Group by the chosen currency so the typed value matches the list/detail. */}
+          {/* Always comma-grouped (matches the "100,000" label), độc lập với currency. */}
           <input
             id={id('amount')}
             className="mono"
             required
             inputMode="numeric"
-            value={groupAmount(form.amount, form.currency)}
+            value={groupAmountComma(form.amount)}
             onChange={(e) => set('amount', e.target.value.replace(/\D/g, ''))}
           />
         </div>

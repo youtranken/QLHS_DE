@@ -37,19 +37,20 @@ describe('SendAccountingModal (FR-11 — Document No)', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('đã tồn tại'))
   })
 
-  it('allowSkip: ticking "Skip Completed" gates onSkip behind a danger confirm; empty is allowed', async () => {
+  it('loại chỉ-Skip (requireDocNo=false): tick Skip gates onSkip qua confirm; số để trống được (N/A)', async () => {
     const onSkip = vi.fn().mockResolvedValue(undefined)
     const onSubmit = vi.fn().mockResolvedValue(undefined)
     render(
       <SendAccountingModal
         code="CT-2026-0003"
+        requireDocNo={false}
         allowSkip
         onSkip={onSkip}
         onSubmit={onSubmit}
         onClose={vi.fn()}
       />,
     )
-    // Tick the checkbox — Contract No left blank (optional on the skip path).
+    // Skip-only type has no number field — ticking Skip closes with a blank (→ N/A).
     fireEvent.click(screen.getByRole('checkbox'))
     fireEvent.click(screen.getByRole('button', { name: 'Hoàn tất' }))
     // First click only opens the confirm — nothing posted yet.
@@ -57,6 +58,32 @@ describe('SendAccountingModal (FR-11 — Document No)', () => {
     expect(onSubmit).not.toHaveBeenCalled()
     fireEvent.click(await screen.findByRole('button', { name: 'Xác nhận hoàn tất' }))
     await waitFor(() => expect(onSkip).toHaveBeenCalledWith(''))
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('loại CẢ hai cờ (requireDocNo + allowSkip): Skip mà bỏ trống số → chặn, có số → onSkip(số)', async () => {
+    const onSkip = vi.fn().mockResolvedValue(undefined)
+    const onSubmit = vi.fn().mockResolvedValue(undefined)
+    render(
+      <SendAccountingModal
+        code="CT-2026-0004"
+        requireDocNo
+        allowSkip
+        onSkip={onSkip}
+        onSubmit={onSubmit}
+        onClose={vi.fn()}
+      />,
+    )
+    // Tick Skip but leave the number blank → blocked (number mandatory for this type).
+    fireEvent.click(screen.getByRole('checkbox'))
+    fireEvent.click(screen.getByRole('button', { name: 'Hoàn tất' }))
+    expect(screen.getByRole('alert')).toBeInTheDocument()
+    expect(onSkip).not.toHaveBeenCalled()
+    // Enter a number → Skip proceeds through the confirm with that number.
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'SC-77' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Hoàn tất' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Xác nhận hoàn tất' }))
+    await waitFor(() => expect(onSkip).toHaveBeenCalledWith('SC-77'))
     expect(onSubmit).not.toHaveBeenCalled()
   })
 

@@ -9,6 +9,15 @@ export function groupAmount(amount: string | null | undefined, currency = 'VND')
   return amount.replace(/\B(?=(\d{3})+(?!\d))/g, sep)
 }
 
+/** Applicant amount INPUT (create/edit form) groups with commas regardless of
+ *  currency — matches the field label's "100,000" convention. Distinct from
+ *  groupAmount's per-currency display used on boards/detail/lists. */
+export function groupAmountComma(amount: string | null | undefined): string {
+  if (!amount) return ''
+  if (!/^\d+$/.test(amount)) return amount
+  return amount.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
 /** Never surface a raw PMH sub: prefer the directory name, else the email
  *  local-part, else a short id (AD-12 display-only resolution). Input is a sub. */
 export function displaySub(sub: string, directory: Record<string, string> = {}): string {

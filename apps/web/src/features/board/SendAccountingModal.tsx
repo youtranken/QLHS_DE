@@ -73,15 +73,16 @@ export function SendAccountingModal({
   function submit() {
     if (busy) return
     const value = documentNo.trim()
-    // Skip path: Contract No is optional (blank → server stores N/A), so no empty
-    // guard — just confirm the irreversible fast-forward.
+    // Số bắt buộc khi loại yêu cầu (requiresContractNo/Payment) — áp cho CẢ đường Skip:
+    // loại cả-hai-cờ (Service Contract) phải nhập số rồi mới Skip → Completed. Loại
+    // chỉ-Skip (requireDocNo=false) không có ô số nên bỏ qua, skip trống → N/A.
+    if (requireDocNo && value === '') {
+      setError(t('board.modals.sendAccounting.emptyError', { field: docLabel }))
+      return
+    }
     if (skipping) {
       setError(null)
       setSkipConfirming(true)
-      return
-    }
-    if (requireDocNo && value === '') {
-      setError(t('board.modals.sendAccounting.emptyError', { field: docLabel }))
       return
     }
     // Irreversible branch (Payment) → confirm closing the ticket before posting.
@@ -135,7 +136,7 @@ export function SendAccountingModal({
           {requireDocNo && (
             <div className="field">
               <label htmlFor="send-acc-docno">
-                {docLabel} {!skipping && <span className="req">*</span>}
+                {docLabel} <span className="req">*</span>
               </label>
               <input
                 id="send-acc-docno"
@@ -144,7 +145,7 @@ export function SendAccountingModal({
                   setDocumentNo(uppercase ? e.target.value.toUpperCase() : e.target.value)
                   if (error) setError(null)
                 }}
-                aria-required={!skipping}
+                aria-required={true}
                 aria-invalid={invalid}
                 aria-describedby={invalid ? 'send-acc-error' : undefined}
                 className="mono"

@@ -195,6 +195,22 @@ export function MyTickets({ reloadKey, action }: { reloadKey: number; action?: R
         </div>
         <span className="cnt">{t('tickets.myList.visibleCount', { n: total })}</span>
         <button type="button" className="btn ghost sm" onClick={openSearch}>
+          {/* Same archive-box glyph as the DCC board "Tìm hồ sơ" button, for parity. */}
+          <svg
+            width={14}
+            height={14}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.9}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="2.5" y="4" width="19" height="4.5" rx="1" />
+            <path d="M4.5 8.5V19a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V8.5" />
+            <path d="M10 12.5h4" />
+          </svg>
           {t('tickets.myList.searchBtn')}
         </button>
         <span className="fb-action">{action}</span>

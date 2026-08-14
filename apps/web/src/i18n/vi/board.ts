@@ -169,6 +169,7 @@ export const board = {
       dupBlocked: 'Có số bị trùng — sửa lại rồi mới gửi (chưa gửi hồ sơ nào).',
       colCode: 'Code',
       colContractor: 'Contractor',
+      colContractNo: 'Contract No',
       colAmount: 'Amount',
     },
     sendAccounting: {

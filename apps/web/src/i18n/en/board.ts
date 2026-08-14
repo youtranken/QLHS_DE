@@ -168,6 +168,7 @@ export const board = {
       dupBlocked: 'Some numbers are duplicates — fix them before sending (nothing sent yet).',
       colCode: 'Code',
       colContractor: 'Contractor',
+      colContractNo: 'Contract No',
       colAmount: 'Amount',
     },
     sendAccounting: {

@@ -142,17 +142,25 @@ export function BatchSendAccountingModal({ cards, onClose, onDone }: BatchSendAc
         </div>
         <div className="mb">
           <p>{t('board.modals.batchAcc.hint', { field: docLabel })}</p>
-          <div className="batchtbl">
-            <div className="batchrow batchhead" aria-hidden>
+          <div className={`batchtbl${isPayment ? ' pay' : ''}`}>
+            <div className={`batchrow batchhead${isPayment ? ' pay' : ''}`} aria-hidden>
               <span>{t('board.modals.batchAcc.colCode')}</span>
               <span>{t('board.modals.batchAcc.colContractor')}</span>
+              {isPayment && <span>{t('board.modals.batchAcc.colContractNo')}</span>}
               <span className="ba">{t('board.modals.batchAcc.colAmount')}</span>
               <span>{docLabel}</span>
             </div>
             {rows.map((c) => (
-              <div className={`batchrow${rowErr(c.id) ? ' bad' : ''}`} key={c.id}>
-                <span className="bc mono">{c.code ?? c.id.slice(0, 8)}</span>
+              <div className={`batchrow${isPayment ? ' pay' : ''}${rowErr(c.id) ? ' bad' : ''}`} key={c.id}>
+                {/* Loại đi kèm Code như một dòng phụ (khỏi tốn thêm cột) — luồng Payment. */}
+                <span className="bc mono">
+                  {c.code ?? c.id.slice(0, 8)}
+                  {isPayment && c.documentType && <span className="bdt">{c.documentType}</span>}
+                </span>
                 <span className="bw" title={c.contractor ?? undefined}>{c.contractor ?? '—'}</span>
+                {isPayment && (
+                  <span className="bw mono" title={c.contractNo ?? undefined}>{c.contractNo ?? '—'}</span>
+                )}
                 <span className="ba mono">{c.amount ? groupAmount(c.amount) : ''}</span>
                 <input
                   className="mono"

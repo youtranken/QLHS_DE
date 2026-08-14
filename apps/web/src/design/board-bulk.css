@@ -213,6 +213,26 @@
   align-items: center;
   gap: 10px;
 }
+/* Payment batch (DCC3) adds one read-only column — the applicant's Contract No
+   reference — before Amount and the Payment No input. Document type rides under the
+   Code as a sub-label (.bdt) so the table stays 5 columns and never crowds. */
+.batchrow.pay {
+  grid-template-columns:
+    128px minmax(90px, 1fr) minmax(96px, 150px) 96px minmax(120px, 180px);
+}
+.batchtbl.pay {
+  overflow-x: auto;
+}
+/* Loại (document type) dưới mã hồ sơ — dòng phụ mảnh, không phải cột riêng. */
+.batchrow .bc .bdt {
+  display: block;
+  margin-top: 1px;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 10.5px;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
 .batchrow .bc {
   font-size: 12px;
   font-weight: 600;

@@ -24,6 +24,7 @@ import {
   SKIP_COMPLETED_REASON,
   SKIP_TO_COMPLETED_STEPS,
 } from '../../../domain/ticket/skip-to-completed'
+import { DOCUMENT_NO_NA } from '../../../domain/ticket/document-no'
 import { writeEmailIntent } from '../notify/outbox.writer'
 
 interface TicketRow {
@@ -60,7 +61,7 @@ export class SkipToCompletedRepo {
     // Loại chỉ-Skip (allowSkip, không yêu cầu Contract No) đóng với sentinel 'N/A':
     // KHÔNG ghi đè contract_no và BỎ ràng buộc round-0 — ràng buộc đó chỉ để bảo vệ
     // số thật khi hồ sơ quay lại; loại này chưa từng có số nên vô hại ở mọi vòng.
-    const numberless = storedNumber === 'N/A'
+    const numberless = storedNumber === DOCUMENT_NO_NA
     try {
       return await this.prisma.$transaction(async (tx) => {
         const rows = await tx.$queryRaw<TicketRow[]>`

@@ -7,29 +7,26 @@ function make() {
   return { uc, setDocTypeCapabilities }
 }
 
-describe('SetDocTypeCapabilitiesUseCase — hai cờ loại trừ nhau', () => {
-  it('bật requiresContractNo → tự tắt allowSkip', async () => {
+describe('SetDocTypeCapabilitiesUseCase — hai cờ độc lập (không loại trừ)', () => {
+  it('bật requiresContractNo → KHÔNG đụng allowSkip', async () => {
     const { uc, setDocTypeCapabilities } = make()
     await uc.execute('d1', { requiresContractNo: true })
-    expect(setDocTypeCapabilities).toHaveBeenCalledWith('d1', {
-      requiresContractNo: true,
-      allowSkip: false,
-    })
+    expect(setDocTypeCapabilities).toHaveBeenCalledWith('d1', { requiresContractNo: true })
   })
 
-  it('bật allowSkip → tự tắt requiresContractNo', async () => {
+  it('bật allowSkip → KHÔNG đụng requiresContractNo', async () => {
     const { uc, setDocTypeCapabilities } = make()
     await uc.execute('d1', { allowSkip: true })
-    expect(setDocTypeCapabilities).toHaveBeenCalledWith('d1', {
-      allowSkip: true,
-      requiresContractNo: false,
-    })
+    expect(setDocTypeCapabilities).toHaveBeenCalledWith('d1', { allowSkip: true })
   })
 
-  it('tắt một cờ → KHÔNG đụng cờ kia', async () => {
+  it('bật CẢ hai cờ (vd Service Contract) → truyền nguyên vẹn, không clear chéo', async () => {
     const { uc, setDocTypeCapabilities } = make()
-    await uc.execute('d1', { requiresContractNo: false })
-    expect(setDocTypeCapabilities).toHaveBeenCalledWith('d1', { requiresContractNo: false })
+    await uc.execute('d1', { requiresContractNo: true, allowSkip: true })
+    expect(setDocTypeCapabilities).toHaveBeenCalledWith('d1', {
+      requiresContractNo: true,
+      allowSkip: true,
+    })
   })
 
   it('id không phải loại Contract → 400', async () => {

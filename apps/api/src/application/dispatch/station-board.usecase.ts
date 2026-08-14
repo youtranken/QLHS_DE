@@ -22,6 +22,11 @@ export interface BoardCard {
   id: string
   code: string | null
   contractor: string | null
+  /** Loại hồ sơ (document type) — dùng cho batch DCC3 hiện cột "Loại" mỗi dòng. */
+  documentType: string | null
+  /** Contract No do applicant nhập lúc tạo (tham chiếu, luồng Payment) — batch DCC3
+   *  hiện kèm để đối chiếu; DCC3 nhập payment_no riêng. */
+  contractNo: string | null
   amount: string | null
   priority: string
   flow: string
@@ -220,6 +225,8 @@ export class StationBoardUseCase {
       id: r.id,
       code: r.code,
       contractor: r.contractor,
+      documentType: r.documentType,
+      contractNo: r.contractNo,
       amount: r.amount === null ? null : r.amount.toString(),
       priority: r.priority,
       flow: r.flow,
