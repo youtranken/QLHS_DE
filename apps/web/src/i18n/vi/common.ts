@@ -19,6 +19,9 @@ export const common = {
   },
   select: {
     noOptions: '— Không có lựa chọn —',
+    searchPlaceholder: 'Tìm kiếm…',
+    searchAria: 'Tìm kiếm lựa chọn',
+    noMatch: '— Không khớp —',
   },
   datePicker: {
     choose: 'Chọn ngày',

@@ -19,6 +19,9 @@ export const common = {
   },
   select: {
     noOptions: '— No options —',
+    searchPlaceholder: 'Search…',
+    searchAria: 'Search options',
+    noMatch: '— No match —',
   },
   datePicker: {
     choose: 'Pick a date',

@@ -212,7 +212,7 @@ export function CreateTicketForm({ onCreated }: { onCreated: () => void }) {
               )}
             </div>
             <div className="mf">
-              <button type="button" className="btn ghost" onClick={discard}>
+              <button type="button" className="btn ghost danger-hover" onClick={discard}>
                 {t('tickets.createForm.cancelBtn')}
               </button>
               <span className="sp" />

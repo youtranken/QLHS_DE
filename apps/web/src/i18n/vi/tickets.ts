@@ -3,7 +3,7 @@ export const tickets = {
   myList: {
     eyebrow: 'Hồ sơ của tôi',
     title: 'Theo dõi hồ sơ',
-    searchBtn: 'Tra cứu hồ sơ',
+    searchBtn: 'Tìm hồ sơ',
     searchTitle: 'Tra cứu hồ sơ của tôi',
     subCount: '{n} hồ sơ',
     subAwaitingFix: ' · {n} đang chờ bạn sửa',

@@ -194,11 +194,9 @@ export function MyTickets({ reloadKey, action }: { reloadKey: number; action?: R
           ))}
         </div>
         <span className="cnt">{t('tickets.myList.visibleCount', { n: total })}</span>
-        <button type="button" className="btn ghost sm" onClick={openSearch}>
-          {/* Same archive-box glyph as the DCC board "Tìm hồ sơ" button, for parity. */}
+        {/* Cùng style .newbtn + glyph hộp lưu trữ như nút "Tìm hồ sơ" của DCC (đồng bộ). */}
+        <button type="button" className="newbtn" onClick={openSearch}>
           <svg
-            width={14}
-            height={14}
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"

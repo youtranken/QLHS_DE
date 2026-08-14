@@ -15,6 +15,11 @@
 .filterbar .fb-action {
   margin-left: auto;
 }
+/* Dùng lại style .newbtn cho nút "Tìm hồ sơ" nhưng BỎ margin-left:auto của nó —
+   để nút bám ngay sau bộ đếm (trái), nhường .fb-action đẩy nút Tạo sang phải. */
+.filterbar .newbtn {
+  margin-left: 0;
+}
 .seg button.hotf {
   color: var(--sla);
 }

@@ -3,6 +3,7 @@ import { DOCUMENT_TYPE_GROUPS } from '@qlhs/contracts'
 import { groupAmountComma } from '../../shared/format'
 import { getDocumentTypes, getOptions, type CreateTicketBody, type DocTypeGroup } from './api'
 import { Select, type SelectOption } from '../../shared/Select'
+import { DocTypePicker } from './DocTypePicker'
 import { toast } from '../../shared/toast'
 import { t } from '../../i18n'
 
@@ -95,10 +96,6 @@ export function TicketFieldsFieldset({
   // this flow's own Document Types (#2). General has a single type → the dropdown
   // locks entirely; Contract/Payment still switch among their family (VO/Annex…).
   const optionSource = lock ? docSource.filter((g) => g.flow === lock.flow) : docSource
-  const docOptions: SelectOption[] = optionSource.flatMap((g) => [
-    { value: `__h-${g.flow}`, label: g.flow, header: true },
-    ...g.types.map((d) => ({ value: d, label: d, indent: true })),
-  ])
   const docTypeLocked = !!lock && optionSource.flatMap((g) => g.types).length <= 1
 
   // Contract flow: the real Contract No is assigned by DCC2 at send-to-Accounting,
@@ -135,10 +132,10 @@ export function TicketFieldsFieldset({
         <label lang="en">
           Document Type <span className="req">*</span>
         </label>
-        <Select
+        <DocTypePicker
           value={form.documentType}
           onChange={(v) => set('documentType', v)}
-          options={docOptions}
+          groups={optionSource}
           ariaLabel="Document Type"
           disabled={docTypeLocked}
         />
