@@ -273,7 +273,9 @@ export function AdminShell({
               <span className="av" aria-hidden>{initials(userName)}</span>
               <span className="who">
                 <span className="nm">{userName}</span>
-                {roleLabel(activeRole) && <span className="rl">{roleLabel(activeRole)}</span>}
+                {roles.length <= 1 && roleLabel(activeRole) && (
+                  <span className="rl">{roleLabel(activeRole)}</span>
+                )}
               </span>
             </button>
           </div>

@@ -87,12 +87,18 @@
 .topbar .me .nm {
   font-weight: 600;
   color: var(--ink);
+  max-width: 200px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .topbar .me .rl {
   font-size: 10.5px;
   color: var(--ink-3);
+  max-width: 200px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .topbar .av {
   display: grid;

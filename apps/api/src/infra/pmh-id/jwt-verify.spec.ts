@@ -78,4 +78,12 @@ describe('claimsToUser', () => {
   it('prefers `full_name` over `name`', () => {
     expect(claimsToUser({ sub: 'x', full_name: 'Full', name: 'Std' }).displayName).toBe('Full')
   })
+  it('falls back to `name` when `full_name` is empty/blank', () => {
+    expect(claimsToUser({ sub: 'x', full_name: '', name: 'Std' }).displayName).toBe('Std')
+    expect(claimsToUser({ sub: 'x', full_name: '   ', name: 'Std' }).displayName).toBe('Std')
+  })
+  it('leaves displayName undefined when no name claim is present', () => {
+    expect(claimsToUser({ sub: 'x' }).displayName).toBeUndefined()
+    expect(claimsToUser({ sub: 'x', full_name: '', name: '' }).displayName).toBeUndefined()
+  })
 })

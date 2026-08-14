@@ -158,10 +158,11 @@ export function App() {
           <LocaleToggle />
           <ThemeToggle />
           <div className="me">
-            {/* Tên + nhãn vai (Admin1/2/3 · Nhân viên · Quản trị viên) như QLTS. */}
+            {/* Tên + nhãn vai (Admin1/2/3 · Nhân viên · Quản trị viên) như QLTS.
+                Ẩn nhãn khi ≥2 vai — RoleSwitcher đã hiện vai, tránh lặp. */}
             <span className="who">
               <span className="nm">{name}</span>
-              {roleLabel(user.activeRole) && (
+              {user.roles.length <= 1 && roleLabel(user.activeRole) && (
                 <span className="rl">{roleLabel(user.activeRole)}</span>
               )}
             </span>

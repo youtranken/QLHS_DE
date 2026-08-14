@@ -83,8 +83,9 @@ export class PmhIdIdentity {
       user: {
         sub,
         groups: extractGroups(claims?.['groups']),
-        // PMH ID delivers the full name as `full_name`; `name` is a fallback.
-        displayName: asString(claims?.['full_name']) ?? asString(claims?.['name']),
+        // PMH ID delivers the full name as `full_name`; `name` is a fallback. Use
+        // `||` (not `??`) so an EMPTY `full_name` still falls back to `name`.
+        displayName: asString(claims?.['full_name']) || asString(claims?.['name']) || undefined,
         email: asString(claims?.['email']),
       },
       tokens: {
